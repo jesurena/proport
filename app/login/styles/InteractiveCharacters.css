@@ -1,0 +1,54 @@
+@keyframes character-extend-blue {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    50% { transform: scaleY(1.12) scaleX(0.97); }
+}
+
+@keyframes character-extend-black {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    50% { transform: scaleY(1.14) scaleX(0.96); }
+}
+
+@keyframes character-extend-orange {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    50% { transform: scaleY(1.10) scaleX(1.02); }
+}
+
+@keyframes character-extend-yellow {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    50% { transform: scaleY(1.13) scaleX(0.97); }
+}
+
+.react-blue { animation: character-extend-blue 0.8s ease-in-out infinite; }
+.react-black { animation: character-extend-black 0.8s ease-in-out infinite 0.1s; }
+.react-orange { animation: character-extend-orange 0.8s ease-in-out infinite 0.2s; }
+.react-yellow { animation: character-extend-yellow 0.8s ease-in-out infinite 0.3s; }
+
+@keyframes click-wobble {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(-8deg); }
+    40% { transform: rotate(6deg); }
+    60% { transform: rotate(-4deg); }
+    80% { transform: rotate(2deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes click-squish {
+    0% { transform: scaleY(1) scaleX(1); }
+    30% { transform: scaleY(0.7) scaleX(1.2); }
+    50% { transform: scaleY(1.15) scaleX(0.9); }
+    70% { transform: scaleY(0.95) scaleX(1.05); }
+    100% { transform: scaleY(1) scaleX(1); }
+}
+
+@keyframes click-jelly {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.15, 0.85); }
+    50% { transform: scale(0.9, 1.1); }
+    75% { transform: scale(1.05, 0.95); }
+    100% { transform: scale(1); }
+}
+
+.clicked-blue { animation: click-wobble 0.5s ease-in-out !important; cursor: pointer; }
+.clicked-black { animation: click-squish 0.5s ease-in-out !important; cursor: pointer; }
+.clicked-orange { animation: click-jelly 0.5s ease-in-out !important; cursor: pointer; }
+.clicked-yellow { animation: click-squish 0.5s ease-in-out !important; cursor: pointer; }

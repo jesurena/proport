@@ -1,0 +1,286 @@
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  AppLabel,
+  AppSidebar,
+  cn,
+} from '@integrated-computer-system/ui-kit';
+import {
+  LayoutDashboard,
+  PenSquare,
+  Ticket,
+  FileBarChart,
+  Inbox,
+  CircleDot,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  ArrowRightLeft,
+  Database,
+  Shield,
+  Mail,
+  Layers,
+  FileText,
+  ChevronDown,
+  Tag,
+} from 'lucide-react';
+import { SettingsModal } from '@/modules/settings';
+import SearchModal from '@/components/SearchModal';
+import { ComposeModal } from '@/modules/compose/components/ComposeModal';
+import { getTicketCountByStatus } from '@/lib/stats';
+import { StatusCount } from '@/lib/types';
+import SidebarAppDropdown from './SidebarAppDropdown';
+import UserProfile from './UserProfile';
+
+interface SidebarItem {
+  name: string;
+  icon: React.ComponentType<any>;
+  href?: string;
+  badge?: number;
+  subItems?: { name: string; href: string }[];
+}
+
+interface SidebarGroup {
+  title: string;
+  items: SidebarItem[];
+}
+
+export default function ProportSidebar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [statusCounts, setStatusCounts] = useState<StatusCount[]>([]);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>(['Focus']);
+
+  const toggleSubMenu = (name: string) => {
+    setExpandedMenus((prev) =>
+      prev.includes(name) ? prev.filter((m) => m !== name) : [...prev, name]
+    );
+  };
+
+  useEffect(() => {
+    setStatusCounts(getTicketCountByStatus());
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleToggle = () => setMobileOpen((prev) => !prev);
+    const handleCompose = () => setComposeOpen(true);
+    const handleSearch = () => setSearchOpen(true);
+    window.addEventListener('tcd-toggle-sidebar', handleToggle);
+    window.addEventListener('tcd-open-compose', handleCompose);
+    window.addEventListener('tcd-open-search', handleSearch);
+    return () => {
+      window.removeEventListener('tcd-toggle-sidebar', handleToggle);
+      window.removeEventListener('tcd-open-compose', handleCompose);
+      window.removeEventListener('tcd-open-search', handleSearch);
+    };
+  }, []);
+
+  const totalOpen = statusCounts
+    .filter((s) => s.status !== 'closed')
+    .reduce((sum, s) => sum + s.count, 0);
+
+  const menuGroups: SidebarGroup[] = [
+    {
+      title: 'Navigation',
+      items: [
+        { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+        { name: 'All Inquiries', href: '/tickets', icon: Ticket, badge: totalOpen },
+        { name: 'Reports', href: '/reports', icon: FileBarChart },
+      ],
+    },
+    {
+      title: 'Status Filtering',
+      items: [
+        {
+          name: 'Focus',
+          icon: Mail,
+          subItems: [
+            { name: 'Pending Request', href: '/tickets?status=pending' },
+            { name: 'Answered Request', href: '/tickets?status=answered' },
+            { name: 'Closed Request', href: '/tickets?status=closed' },
+            { name: 'Reassigned Request', href: '/tickets?status=reassigned' },
+          ],
+        },
+        {
+          name: 'Non Focus',
+          icon: Layers,
+          subItems: [
+            { name: 'BU Head Approval', href: '/tickets?status=bu-approval' },
+            { name: 'Declined by BU Head', href: '/tickets?status=bu-declined' },
+            { name: 'Final Approval', href: '/tickets?status=final-approval' },
+            { name: 'Declined by Adel', href: '/tickets?status=adel-declined' },
+            { name: 'Pending Request', href: '/tickets?status=pending' },
+            { name: 'Answered Request', href: '/tickets?status=answered' },
+            { name: 'Closed Request', href: '/tickets?status=closed' },
+            { name: 'Reassigned Request', href: '/tickets?status=reassigned' },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'System',
+      items: [
+        { name: 'Supplier Settings', href: '/maintenance/suppliers', icon: Database },
+        { name: 'Brand Settings', href: '/maintenance/brands', icon: Tag },
+        { name: 'User Logs', href: '/logs', icon: Shield },
+      ],
+    },
+  ];
+
+  const navigate = (href: string) => {
+    router.push(href);
+    setMobileOpen(false);
+  };
+
+  return (
+    <>
+      <AppSidebar
+        collapsed={collapsed}
+        onCollapsedChange={setCollapsed}
+        mobileOpen={mobileOpen}
+        onMobileOpenChange={setMobileOpen}
+      >
+        {/* Header */}
+        <AppSidebar.Header className={cn(collapsed ? "!px-2 !py-3" : "!px-3 !py-4")}>
+          {collapsed ? (
+            <div className="flex flex-col items-center gap-3 w-full">
+              <AppSidebar.Toggle />
+              <button
+                onClick={() => setComposeOpen(true)}
+                title="Compose Inquiry"
+                className="w-9 h-9 flex items-center justify-center rounded-lg border border-border text-text-info hover:text-text hover:bg-hover/60 transition-all cursor-pointer group"
+              >
+                <PenSquare size={15} className="group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex items-center justify-between w-full">
+                <SidebarAppDropdown />
+                <AppSidebar.Toggle className="h-8 w-8 shrink-0" />
+              </div>
+              <div className="px-1">
+                {/* Compose button */}
+                <button
+                  onClick={() => setComposeOpen(true)}
+                  className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg border border-border hover:text-text hover:bg-hover/60 transition-all text-sm font-medium text-left cursor-pointer group"
+                >
+                  <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
+                  <span>Compose</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </AppSidebar.Header>
+
+        {/* Content Navigation */}
+        <AppSidebar.Content>
+          {menuGroups.map((group) => (
+            <AppSidebar.Group key={group.title} title={collapsed ? '' : group.title}>
+              <div className="flex flex-col gap-1">
+                {group.items.map((item) => {
+                  const hasSubItems = item.subItems && item.subItems.length > 0;
+                  const isExpanded = expandedMenus.includes(item.name);
+                  const isSubActive = hasSubItems && item.subItems?.some(sub => pathname + (typeof window !== 'undefined' ? window.location.search : '') === sub.href);
+                  const isActiveLink = !hasSubItems && pathname + (typeof window !== 'undefined' ? window.location.search : '') === item.href;
+                  const isParentActive = isSubActive || isActiveLink;
+                  const Icon = item.icon;
+
+                  if (hasSubItems) {
+                    if (collapsed) {
+                      return (
+                        <AppSidebar.Item
+                          key={item.name}
+                          icon={<Icon size={20} />}
+                          active={isParentActive}
+                          onClick={() => setCollapsed(false)}
+                          className="self-center"
+                        >
+                          <span>{item.name}</span>
+                        </AppSidebar.Item>
+                      );
+                    }
+
+                    return (
+                      <div key={item.name} className="flex flex-col gap-1 w-full">
+                        <AppSidebar.Item
+                          icon={<Icon size={20} />}
+                          active={isSubActive}
+                          onClick={() => toggleSubMenu(item.name)}
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <span>{item.name}</span>
+                            <ChevronDown size={14} className={cn("transition-transform duration-200", isSubActive ? "text-white" : "text-text-info", isExpanded && "rotate-180")} />
+                          </div>
+                        </AppSidebar.Item>
+                        {isExpanded && (
+                          <div className="flex flex-col gap-1 ml-6 pl-4 border-l-2 border-border overflow-hidden animate-in slide-in-from-top-1 duration-200 my-1">
+                            {item.subItems?.map((sub) => {
+                              const isChildActive = pathname + (typeof window !== 'undefined' ? window.location.search : '') === sub.href;
+                              return (
+                                <button
+                                  key={sub.name + '-' + sub.href}
+                                  onClick={() => navigate(sub.href)}
+                                  className={cn(
+                                    "flex items-center px-3 py-1.5 rounded-lg text-[13px] transition-all text-left cursor-pointer",
+                                    isChildActive
+                                      ? "text-accent-1 bg-accent-1/10 font-bold"
+                                      : "text-text/75 hover:text-text hover:bg-hover/40 font-semibold"
+                                  )}
+                                >
+                                  <span className="truncate">{sub.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  const isActive = pathname + (typeof window !== 'undefined' ? window.location.search : '') === item.href;
+
+                  return (
+                    <AppSidebar.Item
+                      key={item.href}
+                      icon={<Icon size={20} />}
+                      active={isActive}
+                      onClick={() => navigate(item.href || '#')}
+                      className={cn(collapsed && "self-center")}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span>{item.name}</span>
+                        {item.badge !== undefined && item.badge > 0 && !collapsed && (
+                          <span className="text-[11px] font-semibold bg-accent-1/15 text-accent-1 px-2 py-0.5 rounded-full">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                    </AppSidebar.Item>
+                  );
+                })}
+              </div>
+            </AppSidebar.Group>
+          ))}
+        </AppSidebar.Content>
+
+        {/* Footer */}
+        <AppSidebar.Footer className="!p-3">
+          <UserProfile collapsed={collapsed} setSettingsOpen={setSettingsOpen} />
+        </AppSidebar.Footer>
+      </AppSidebar>
+
+      <SettingsModal visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <ComposeModal open={composeOpen} onClose={() => setComposeOpen(false)} />
+    </>
+  );
+}
