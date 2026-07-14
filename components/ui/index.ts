@@ -17,3 +17,4 @@ export * from './select';
 export * from './sidebar';
 export * from './tabs';
 export * from './toggle';
+export * from './table';

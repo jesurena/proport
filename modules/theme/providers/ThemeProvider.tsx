@@ -4,6 +4,20 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { getItem, setItem, STORAGE_KEYS } from '@/lib/storage';
 import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd';
 
+export let message: ReturnType<typeof AntdApp.useApp>['message'];
+export let notification: ReturnType<typeof AntdApp.useApp>['notification'];
+export let modal: ReturnType<typeof AntdApp.useApp>['modal'];
+
+function StaticApp() {
+  const { message: msg, notification: notify, modal: mdl } = AntdApp.useApp();
+  useEffect(() => {
+    message = msg;
+    notification = notify;
+    modal = mdl;
+  }, [msg, notify, mdl]);
+  return null;
+}
+
 export type Theme =
   | 'system'
   | 'light'
@@ -110,6 +124,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }}
       >
         <AntdApp>
+          <StaticApp />
           {children}
         </AntdApp>
       </ConfigProvider>

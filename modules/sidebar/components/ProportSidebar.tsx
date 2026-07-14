@@ -128,8 +128,7 @@ export default function ProportSidebar() {
     {
       title: 'System',
       items: [
-        { name: 'Supplier Settings', href: '/maintenance/suppliers', icon: Database },
-        { name: 'Brand Settings', href: '/maintenance/brands', icon: Tag },
+        { name: 'Brand Maintenance', href: '/maintenance/brands', icon: Tag },
         { name: 'User Logs', href: '/logs', icon: Shield },
       ],
     },

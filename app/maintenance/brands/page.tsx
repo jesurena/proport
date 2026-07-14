@@ -7,11 +7,14 @@ import {
   AppModal,
   AppSelect,
   AppLabel,
+  AppChip,
 } from '@integrated-computer-system/ui-kit';
-import { Plus, Search, Edit, Trash2, ArrowLeft, PlusCircle, MinusCircle } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, ArrowLeft, PlusCircle, MinusCircle, MoreVertical, Target, Circle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProportNavbar } from '@/modules/sidebar';
 import { getBrands, addBrand, updateBrand, deleteBrand, type Brand } from '@/lib/brands';
+import { AppDropdown, AppTable } from '@/components/ui';
+import { notification, modal, message } from '@/modules/theme';
 
 const TYPE_OPTIONS = [
   { value: 'Focus', label: 'Focus' },
@@ -22,13 +25,10 @@ export default function BrandsPage() {
   const router = useRouter();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Modals state
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // Form states
   const [newRows, setNewRows] = useState<{ id: string; name: string; type: 'Focus' | 'Non Focus'; checked: boolean }[]>([
@@ -37,6 +37,77 @@ export default function BrandsPage() {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [editName, setEditName] = useState('');
   const [editType, setEditType] = useState<'Focus' | 'Non Focus'>('Focus');
+
+  const columns = [
+    {
+      title: 'Brand Name',
+      dataIndex: 'name',
+      key: 'name',
+      align: 'center' as const,
+    },
+    {
+      title: 'Brand Type',
+      dataIndex: 'type',
+      key: 'type',
+      slotName: 'brandType',
+      align: 'center' as const,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      slotName: 'action',
+      align: 'center' as const,
+      width: 120,
+    },
+  ];
+
+  const slots = {
+    brandType: (type: string) => (
+      <AppChip
+        label={type}
+        color={type === 'Focus' ? '#7c3aed' : '#2563eb'}
+        icon={type === 'Focus' ? <Target /> : <Circle />}
+        size="sm"
+      />
+    ),
+    action: (_: any, record: Brand) => {
+      const dropdownItems = [
+        {
+          key: 'edit',
+          label: 'Edit',
+          icon: <Edit size={14} className="text-emerald-600" />,
+        },
+        {
+          key: 'delete',
+          label: 'Delete',
+          icon: <Trash2 size={14} className="text-rose-600" />,
+          danger: true,
+        },
+      ];
+
+      const handleMenuClick = (info: any) => {
+        if (info.key === 'edit') {
+          handleOpenEdit(record);
+        } else if (info.key === 'delete') {
+          handleOpenDelete(record);
+        }
+      };
+
+      return (
+        <div className="flex items-center justify-center">
+          <AppDropdown
+            items={dropdownItems}
+            onItemClick={handleMenuClick}
+            placement="bottomRight"
+          >
+            <button className="p-2 rounded-lg text-text-info transition-all cursor-pointer">
+              <MoreVertical size={16} />
+            </button>
+          </AppDropdown>
+        </div>
+      );
+    },
+  };
 
   // Load brands
   const loadBrands = () => {
@@ -57,14 +128,6 @@ export default function BrandsPage() {
         b.type.toLowerCase().includes(q)
     );
   }, [brands, searchQuery]);
-
-  // Paginated brands
-  const paginatedBrands = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredBrands.slice(start, start + pageSize);
-  }, [filteredBrands, currentPage, pageSize]);
-
-  const totalPages = Math.ceil(filteredBrands.length / pageSize) || 1;
 
   // Add Brand: add a row in modal
   const handleAddRow = () => {
@@ -92,7 +155,7 @@ export default function BrandsPage() {
   const handleSaveBrands = () => {
     const hasEmpty = newRows.some((r) => !r.name.trim());
     if (hasEmpty) {
-      alert('Please fill in all brand names!');
+      message.warning('Please fill in all brand names!');
       return;
     }
 
@@ -103,6 +166,12 @@ export default function BrandsPage() {
     setNewRows([{ id: '1', name: '', type: 'Focus', checked: false }]);
     setAddOpen(false);
     loadBrands();
+
+    notification.success({
+      message: 'Brands Added',
+      description: 'The brands have been successfully added to the catalog.',
+      placement: 'topRight',
+    });
   };
 
   // Edit Brand: open
@@ -116,47 +185,53 @@ export default function BrandsPage() {
   // Edit Brand: save
   const handleUpdateBrand = () => {
     if (!editName.trim()) {
-      alert('Brand name is required!');
+      message.warning('Brand name is required!');
       return;
     }
     if (selectedBrand) {
       updateBrand(selectedBrand.id, editName.trim(), editType);
       setEditOpen(false);
       loadBrands();
+
+      notification.success({
+        message: 'Brand Updated',
+        description: `"${editName.trim()}" has been successfully updated.`,
+        placement: 'topRight',
+      });
     }
   };
 
-  // Delete Brand: open
+  // Delete Brand: open using modal.confirm
   const handleOpenDelete = (brand: Brand) => {
-    setSelectedBrand(brand);
-    setDeleteOpen(true);
-  };
-
-  // Delete Brand: confirm
-  const handleDeleteBrand = () => {
-    if (selectedBrand) {
-      deleteBrand(selectedBrand.id);
-      setDeleteOpen(false);
-      loadBrands();
-    }
+    modal.confirm({
+      title: 'Confirm Brand Deletion',
+      content: `Are you sure you want to permanently delete the brand "${brand.name}"? This action cannot be undone and will update the global catalog configuration.`,
+      okText: 'Delete Brand',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      centered: true,
+      onOk: () => {
+        deleteBrand(brand.id);
+        loadBrands();
+        notification.success({
+          message: 'Brand Deleted',
+          description: `"${brand.name}" has been successfully deleted.`,
+          placement: 'topRight',
+        });
+      },
+    });
   };
 
   return (
     <>
-      <ProportNavbar title="Brand Settings" />
+      <ProportNavbar title="Brand Maintenance" />
 
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push('/')}
-              className="p-2 rounded-full border border-border/60 hover:bg-hover transition-colors cursor-pointer text-text-info hover:text-text"
-            >
-              <ArrowLeft size={16} />
-            </button>
             <div>
-              <AppLabel as="h2" variant="title" className="!text-lg !font-bold">Brand Configuration</AppLabel>
+              <AppLabel as="h2" variant="title" className="!text-lg !font-bold">Brand Maintenance</AppLabel>
               <AppLabel as="p" variant="description" className="text-sm">Manage global brand catalog and their focus classification status.</AppLabel>
             </div>
           </div>
@@ -173,121 +248,24 @@ export default function BrandsPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-card-bg border border-border/60 rounded-3xl p-5 shadow-sm space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs font-semibold text-text">
-              <span>Show</span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="bg-neutral border border-border/60 rounded-lg px-2 py-1 focus:outline-hidden cursor-pointer"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-              <span>entries</span>
-            </div>
-
-            <div className="w-full md:w-80">
-              <AppInput
-                preset="search"
-                placeholder="Search brands..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto border border-border/40 rounded-2xl">
-            <table className="w-full text-center border-collapse">
-              <thead>
-                <tr className="bg-neutral/40 border-b border-border/40 text-xs text-text font-bold uppercase tracking-wider">
-                  <th className="p-3.5">Brand Name</th>
-                  <th className="p-3.5">Brand Type</th>
-                  <th className="p-3.5">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20">
-                {paginatedBrands.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="p-8 text-sm text-text-info/60 font-medium">
-                      No brands found matching filters.
-                    </td>
-                  </tr>
-                ) : (
-                  paginatedBrands.map((b) => (
-                    <tr key={b.id} className="hover:bg-neutral/10 text-sm text-text font-semibold">
-                      <td className="p-4">{b.name}</td>
-                      <td className="p-4">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-md text-xs font-bold text-white shadow-xs ${
-                            b.type === 'Focus' ? 'bg-[#7c3aed]' : 'bg-[#2563eb]'
-                          }`}
-                        >
-                          {b.type}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleOpenEdit(b)}
-                            className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
-                            title="Edit Brand"
-                          >
-                            <Edit size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleOpenDelete(b)}
-                            className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center hover:bg-rose-700 transition-colors shadow-xs cursor-pointer"
-                            title="Delete Brand"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between border-t border-border/20 pt-4 text-xs font-medium text-text-info">
-            <div>
-              Showing {filteredBrands.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{' '}
-              {Math.min(currentPage * pageSize, filteredBrands.length)} of {filteredBrands.length} entries
-            </div>
-            <div className="flex items-center gap-1">
-              <AppButton
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </AppButton>
-              <div className="bg-neutral px-3 py-1 rounded-md text-text font-semibold">
-                {currentPage} of {totalPages}
-              </div>
-              <AppButton
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </AppButton>
-            </div>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <AppInput
+              preset="search"
+              placeholder="Search brands by name or type..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
+
+        {/* Table */}
+        <AppTable
+          columns={columns}
+          dataSource={filteredBrands}
+          slots={slots}
+          rowKey="id"
+        />
       </div>
 
       {/* Add Brand Modal */}
@@ -369,7 +347,7 @@ export default function BrandsPage() {
       <AppModal open={editOpen} onClose={() => setEditOpen(false)} width="420px" centered>
         <AppModal.Body className="p-6 space-y-4">
           <div className="flex justify-between items-center border-b border-border/40 pb-2">
-            <h3 className="text-base font-bold text-text">Edit Brand Settings</h3>
+            <h3 className="text-base font-bold text-text">Edit Brand Maintenance</h3>
           </div>
 
           <div className="space-y-4">
@@ -395,32 +373,6 @@ export default function BrandsPage() {
             <AppButton variant="neutral" onClick={() => setEditOpen(false)}>Cancel</AppButton>
             <AppButton variant="primary" onClick={handleUpdateBrand}>
               Save Changes
-            </AppButton>
-          </div>
-        </AppModal.Body>
-      </AppModal>
-
-      {/* Delete Confirmation Modal */}
-      <AppModal open={deleteOpen} onClose={() => setDeleteOpen(false)} width="400px" centered>
-        <AppModal.Body className="p-6 space-y-4">
-          <div className="flex justify-between items-center border-b border-border/40 pb-2">
-            <h3 className="text-base font-bold text-text animate-in">Confirm Brand Deletion</h3>
-          </div>
-
-          <div className="py-2">
-            <p className="text-sm text-text">
-              Are you sure you want to permanently delete the brand{' '}
-              <span className="font-bold text-accent-2">"{selectedBrand?.name}"</span>?
-            </p>
-            <p className="text-xs text-text-info mt-1.5">
-              This action cannot be undone and will update the global catalog configuration.
-            </p>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-3 border-t border-border/40">
-            <AppButton variant="neutral" onClick={() => setDeleteOpen(false)}>Cancel</AppButton>
-            <AppButton variant="danger" onClick={handleDeleteBrand}>
-              Delete Brand
             </AppButton>
           </div>
         </AppModal.Body>

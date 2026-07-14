@@ -12,6 +12,8 @@ import { Plus, Search, Edit, Trash2, ArrowLeft, PlusCircle, MinusCircle } from '
 import { useRouter } from 'next/navigation';
 import { ProportNavbar } from '@/modules/sidebar';
 import { getSuppliers, addSupplier, updateSupplier, deleteSupplier, type Supplier } from '@/lib/suppliers';
+import { AppTable } from '@/components/ui';
+import { notification, modal, message } from '@/modules/theme';
 
 const TYPE_OPTIONS = [
   { value: '1', label: 'Hardware/Systems' },
@@ -26,7 +28,6 @@ export default function SuppliersPage() {
   // Modals state
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // Form states
   const [newRows, setNewRows] = useState<{ id: string; name: string; typeId: number; checked: boolean }[]>([
@@ -67,12 +68,12 @@ export default function SuppliersPage() {
   // Add Supplier: remove checked rows
   const handleRemoveCheckedRows = () => {
     if (newRows.length <= 1) {
-      alert("You can't delete all rows!");
+      message.warning("You can't delete all rows!");
       return;
     }
     const unchecked = newRows.filter((r) => !r.checked);
     if (unchecked.length === 0) {
-      alert("You must keep at least one row!");
+      message.warning("You must keep at least one row!");
       return;
     }
     setNewRows(unchecked);
@@ -83,7 +84,7 @@ export default function SuppliersPage() {
     // Check if empty
     const hasEmpty = newRows.some((r) => !r.name.trim());
     if (hasEmpty) {
-      alert('Please fill in all supplier names!');
+      message.warning('Please fill in all supplier names!');
       return;
     }
 
@@ -94,6 +95,12 @@ export default function SuppliersPage() {
     setNewRows([{ id: '1', name: '', typeId: 1, checked: false }]);
     setAddOpen(false);
     loadSuppliers();
+
+    notification.success({
+      message: 'Suppliers Added',
+      description: 'The suppliers have been successfully added to the system.',
+      placement: 'topRight',
+    });
   };
 
   // Edit Supplier: open
@@ -107,29 +114,97 @@ export default function SuppliersPage() {
   // Edit Supplier: save
   const handleUpdateSupplier = () => {
     if (!editName.trim()) {
-      alert('Supplier name is required!');
+      message.warning('Supplier name is required!');
       return;
     }
     if (selectedSupplier) {
       updateSupplier(selectedSupplier.id, editName.trim(), editTypeId);
       setEditOpen(false);
       loadSuppliers();
+
+      notification.success({
+        message: 'Supplier Updated',
+        description: `"${editName.trim()}" has been successfully updated.`,
+        placement: 'topRight',
+      });
     }
   };
 
-  // Delete Supplier: open
+  // Delete Supplier: open using modal.confirm
   const handleOpenDelete = (supplier: Supplier) => {
-    setSelectedSupplier(supplier);
-    setDeleteOpen(true);
+    modal.confirm({
+      title: 'Confirm Supplier Deletion',
+      content: `Are you sure you want to permanently delete the supplier "${supplier.name}"? This action cannot be undone.`,
+      okText: 'Delete Supplier',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      centered: true,
+      onOk: () => {
+        deleteSupplier(supplier.id);
+        loadSuppliers();
+        notification.success({
+          message: 'Supplier Deleted',
+          description: `"${supplier.name}" has been successfully deleted.`,
+          placement: 'topRight',
+        });
+      },
+    });
   };
 
-  // Delete Supplier: confirm
-  const handleDeleteSupplier = () => {
-    if (selectedSupplier) {
-      deleteSupplier(selectedSupplier.id);
-      setDeleteOpen(false);
-      loadSuppliers();
-    }
+  const columns = [
+    {
+      title: 'Supplier Name',
+      dataIndex: 'name',
+      key: 'name',
+      align: 'left' as const,
+    },
+    {
+      title: 'Supplier Classification',
+      dataIndex: 'typeName',
+      key: 'typeName',
+      slotName: 'classification',
+      align: 'left' as const,
+      width: 250,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      slotName: 'action',
+      align: 'right' as const,
+      width: 120,
+    },
+  ];
+
+  const slots = {
+    classification: (_: any, record: Supplier) => (
+      <AppChip
+        label={record.typeName}
+        variant={record.typeId === 1 ? 'accent' : 'info'}
+        size="sm"
+      />
+    ),
+    action: (_: any, record: Supplier) => (
+      <div className="flex items-center justify-end gap-2">
+        <AppButton
+          variant="neutral"
+          size="icon"
+          onClick={() => handleOpenEdit(record)}
+          className="!w-8 !h-8 !p-0 !text-success hover:!bg-success/5 hover:!border-success/30"
+          title={`Edit ${record.name}`}
+        >
+          <Edit size={14} />
+        </AppButton>
+        <AppButton
+          variant="neutral"
+          size="icon"
+          onClick={() => handleOpenDelete(record)}
+          className="!w-8 !h-8 !p-0 !text-danger hover:!bg-danger/5 hover:!border-danger/30"
+          title={`Delete ${record.name}`}
+        >
+          <Trash2 size={14} />
+        </AppButton>
+      </div>
+    ),
   };
 
   return (
@@ -168,62 +243,13 @@ export default function SuppliersPage() {
           </div>
         </div>
 
-        {/* Suppliers Table Card */}
-        <div className="rounded-2xl bg-card-bg border border-border/60 overflow-hidden shadow-sm">
-          {/* Table Header */}
-          <div className="grid grid-cols-[1fr_200px_120px] gap-4 px-6 py-3.5 bg-neutral/30 border-b border-border/40 font-semibold text-[11px] text-text-info uppercase tracking-wider">
-            <span>Supplier Name</span>
-            <span>Supplier Classification</span>
-            <span className="text-right">Action</span>
-          </div>
-
-          {/* Rows */}
-          {filteredSuppliers.length === 0 ? (
-            <div className="text-center py-16 text-text-info">
-              <Search size={40} className="mx-auto mb-3 opacity-30" />
-              <p className="text-sm font-medium">No suppliers found</p>
-              <p className="text-xs mt-1">Try search queries or add a new supplier.</p>
-            </div>
-          ) : (
-            filteredSuppliers.map((supplier, i) => (
-              <div
-                key={supplier.id}
-                className={`grid grid-cols-[1fr_200px_120px] gap-4 px-6 py-4 items-center ${
-                  i !== filteredSuppliers.length - 1 ? 'border-b border-border/30' : ''
-                }`}
-              >
-                <span className="text-sm font-semibold text-text">{supplier.name}</span>
-                <div>
-                  <AppChip
-                    label={supplier.typeName}
-                    variant={supplier.typeId === 1 ? 'accent' : 'info'}
-                    size="sm"
-                  />
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  <AppButton
-                    variant="neutral"
-                    size="icon"
-                    onClick={() => handleOpenEdit(supplier)}
-                    className="!w-8 !h-8 !p-0 !text-success hover:!bg-success/5 hover:!border-success/30"
-                    title={`Edit ${supplier.name}`}
-                  >
-                    <Edit size={14} />
-                  </AppButton>
-                  <AppButton
-                    variant="neutral"
-                    size="icon"
-                    onClick={() => handleOpenDelete(supplier)}
-                    className="!w-8 !h-8 !p-0 !text-danger hover:!bg-danger/5 hover:!border-danger/30"
-                    title={`Delete ${supplier.name}`}
-                  >
-                    <Trash2 size={14} />
-                  </AppButton>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        {/* Table */}
+        <AppTable
+          columns={columns}
+          dataSource={filteredSuppliers}
+          slots={slots}
+          rowKey="id"
+        />
       </div>
 
       {/* ADD SUPPLIER MODAL */}
@@ -360,30 +386,6 @@ export default function SuppliersPage() {
             </AppButton>
             <AppButton variant="primary" onClick={handleUpdateSupplier}>
               Update Supplier
-            </AppButton>
-          </div>
-        </AppModal.Body>
-      </AppModal>
-
-      {/* DELETE CONFIRM MODAL */}
-      <AppModal open={deleteOpen} onClose={() => setDeleteOpen(false)} width="380px" centered>
-        <AppModal.Body className="p-6 space-y-4">
-          <div className="text-center space-y-2">
-            <Trash2 size={40} className="mx-auto text-danger animate-bounce" />
-            <h3 className="text-base font-bold text-text">Delete Supplier?</h3>
-            <p className="text-sm text-text-info">
-              Are you sure you want to delete supplier{' '}
-              <span className="font-bold text-text">{selectedSupplier?.name}</span>? This action cannot be
-              undone.
-            </p>
-          </div>
-
-          <div className="flex justify-center gap-2 pt-2">
-            <AppButton variant="neutral" onClick={() => setDeleteOpen(false)}>
-              Cancel
-            </AppButton>
-            <AppButton variant="danger" onClick={handleDeleteSupplier}>
-              Yes, Delete It
             </AppButton>
           </div>
         </AppModal.Body>

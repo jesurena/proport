@@ -134,15 +134,29 @@ export function ComposeModal({ open, onClose }: ComposeModalProps) {
 
   if (!open) return null;
 
+  const normalHeight = minimized ? '46px' : '82vh';
+  const modalStyle = expanded ? {
+    top: '0px',
+    left: '0px',
+    right: '0px',
+    bottom: '0px',
+    borderTopLeftRadius: '0px',
+    borderTopRightRadius: '0px',
+  } : {
+    top: `calc(100vh - ${normalHeight})`,
+    left: `max(12px, calc(100vw - 780px - 24px))`,
+    right: '24px',
+    bottom: '0px',
+    borderTopLeftRadius: '14px',
+    borderTopRightRadius: '14px',
+  };
+
   return (
     <>
       {/* Floating compose window — fixed bottom-right or fullscreen */}
       <div
-        className={expanded
-          ? "fixed inset-0 z-[1000] w-screen h-screen flex flex-col bg-background transition-all duration-200"
-          : `fixed bottom-0 right-6 z-[1000] w-[780px] flex flex-col rounded-t-2xl shadow-2xl border border-border overflow-hidden bg-background transition-all duration-200 ${minimized ? 'h-[46px]' : 'h-[82vh]'}`
-        }
-        style={expanded ? undefined : { maxWidth: 'calc(100vw - 24px)' }}
+        className="fixed z-[1000] flex flex-col bg-background border border-border shadow-2xl overflow-hidden transition-all duration-300 ease-in-out"
+        style={modalStyle}
       >
         {/* ── Title bar ── */}
         <div

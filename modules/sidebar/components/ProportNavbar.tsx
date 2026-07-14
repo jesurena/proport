@@ -185,14 +185,16 @@ export default function ProportNavbar({ title, children }: ProportNavbarProps) {
           >
             <Bell size={17} />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-card-bg" />
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-extrabold text-white ring-2 ring-card-bg leading-none">
+                {unreadCount}
+              </span>
             )}
           </button>
 
           {notifOpen && (
             <div className="absolute right-0 top-full mt-2 w-[340px] bg-card-bg border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-neutral/60 dark:bg-black/30">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-text">Notifications</span>
                   {unreadCount > 0 && (

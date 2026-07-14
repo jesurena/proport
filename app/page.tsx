@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Ticket, Clock, Users, ChevronRight, ChevronLeft, MoreHorizontal, Inbox, CircleDot, ArrowRight, Plus, CheckCircle2, XCircle, AlertTriangle, ArrowRightLeft } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
-import { AppToggle } from '@/components/ui';
+import { AppToggle, AppTable } from '@/components/ui';
 import { AppLabel } from '@integrated-computer-system/ui-kit';
 import StatCard from '@/components/dashboard/StatCard';
 import TicketStatusGrid from '@/components/dashboard/TicketStatusGrid';
@@ -41,6 +41,73 @@ export default function DashboardPage() {
   const [showAllCards, setShowAllCards] = useState(false);
   const [buyerPeriod, setBuyerPeriod] = useState<'today' | 'week'>('today');
   const [showAllBuyers, setShowAllBuyers] = useState(false);
+
+  const columns = [
+    {
+      title: 'Buyer',
+      dataIndex: 'assigneeName',
+      key: 'assigneeName',
+      slotName: 'buyer',
+      align: 'left' as const,
+      width: '30%',
+    },
+    {
+      title: 'Supplier',
+      dataIndex: 'supplierName',
+      key: 'supplierName',
+      slotName: 'supplier',
+      align: 'left' as const,
+      width: '20%',
+    },
+    {
+      title: 'Subject',
+      dataIndex: 'subject',
+      key: 'subject',
+      align: 'left' as const,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      slotName: 'action',
+      align: 'right' as const,
+      width: 80,
+    },
+  ];
+
+  const slots = {
+    buyer: (_: any, record: any) => (
+      <div className="flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-full bg-neutral flex items-center justify-center font-bold text-xs text-text-info shrink-0">
+          {record.assigneeName ? record.assigneeName.substring(0, 2).toUpperCase() : 'UN'}
+        </div>
+        <div>
+          <p className="text-xs font-bold text-text leading-none mb-0.5">{record.assigneeName || 'Unassigned'}</p>
+          <p className="text-[10px] text-text-info">
+            {new Date(record.createdAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}
+          </p>
+        </div>
+      </div>
+    ),
+    supplier: (supplierName: string) => {
+      let categoryBg = 'bg-neutral border border-border/40 text-text';
+      if (supplierName === 'Ingram Micro') categoryBg = 'bg-sky-500/10 text-sky-600';
+      else if (supplierName === 'Synnex') categoryBg = 'bg-cyan-500/10 text-cyan-600';
+      else if (supplierName === 'Tech Data') categoryBg = 'bg-indigo-500/10 text-indigo-600';
+
+      return (
+        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider w-fit block ${categoryBg}`}>
+          {supplierName || 'General'}
+        </span>
+      );
+    },
+    action: () => (
+      <div className="flex justify-end pr-1">
+        <button className="w-8 h-8 rounded-full border border-border/60 hover:bg-accent-1 hover:text-white flex items-center justify-center text-text-info transition-colors cursor-pointer shrink-0">
+          <ArrowRight size={13} />
+        </button>
+      </div>
+    ),
+  };
 
   useEffect(() => {
     setStatusCounts(getTicketCountByStatus());
@@ -194,7 +261,7 @@ export default function DashboardPage() {
                   onClick={() => setShowAllCards(!showAllCards)}
                   className="text-xs font-semibold text-accent-1 hover:underline cursor-pointer select-none"
                 >
-                  {showAllCards ? 'Show Less (Retract)' : 'View All'}
+                  {showAllCards ? 'Show Less' : 'View More'}
                 </button>
               </div>
 
@@ -326,58 +393,23 @@ export default function DashboardPage() {
 
             {/* Inquiries list */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+              <div className="flex items-center justify-between pb-1">
                 <h3 className="text-base font-bold text-text">Your Inquiries</h3>
                 <span onClick={() => router.push('/tickets')} className="text-xs font-semibold text-accent-1 hover:underline cursor-pointer">See all</span>
               </div>
 
-              {/* Table header */}
-              <div className="hidden sm:grid grid-cols-[2fr_1.2fr_3fr_40px] gap-4 px-4 text-[10px] uppercase font-semibold text-text-info tracking-wider">
-                <span>Buyer</span>
-                <span>Supplier</span>
-                <span>Subject</span>
-                <span>Action</span>
-              </div>
-
-              <div className="space-y-1.5">
-                {recentTickets.slice(0, 5).map((ticket) => {
-                  let categoryBg = 'bg-neutral border border-border/40 text-text';
-                  if (ticket.supplierName === 'Ingram Micro') categoryBg = 'bg-sky-500/10 text-sky-600';
-                  else if (ticket.supplierName === 'Synnex') categoryBg = 'bg-cyan-500/10 text-cyan-600';
-                  else if (ticket.supplierName === 'Tech Data') categoryBg = 'bg-indigo-500/10 text-indigo-600';
-
-                  return (
-                    <div
-                      key={ticket.id}
-                      onClick={() => router.push(`/tickets/${ticket.id}`)}
-                      className="grid grid-cols-1 sm:grid-cols-[2fr_1.2fr_3fr_40px] gap-4 items-center p-3 rounded-2xl border border-border/30 hover:border-border/60 bg-card-bg hover:bg-hover/20 transition-all cursor-pointer shadow-sm"
-                    >
-                      {/* Assignee / Buyer */}
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-full bg-neutral flex items-center justify-center font-bold text-xs text-text-info shrink-0">
-                          {ticket.assigneeName ? ticket.assigneeName.substring(0, 2).toUpperCase() : 'UN'}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-text leading-none mb-0.5">{ticket.assigneeName || 'Unassigned'}</p>
-                          <p className="text-[10px] text-text-info">
-                            {new Date(ticket.createdAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}
-                          </p>
-                        </div>
-                      </div>
-                      {/* Supplier */}
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider w-fit ${categoryBg}`}>
-                        {ticket.supplierName || 'General'}
-                      </span>
-                      {/* Subject */}
-                      <span className="text-xs font-medium text-text truncate">{ticket.subject}</span>
-                      {/* Action */}
-                      <button className="w-8 h-8 rounded-full border border-border/60 hover:bg-accent-1 hover:text-white flex items-center justify-center text-text-info transition-colors cursor-pointer shrink-0">
-                        <ArrowRight size={13} />
-                      </button>
-                    </div>
-                  );
+              {/* Table */}
+              <AppTable
+                columns={columns}
+                dataSource={recentTickets.slice(0, 5)}
+                slots={slots}
+                rowKey="id"
+                pagination={false}
+                onRow={(record) => ({
+                  onClick: () => router.push(`/tickets/${record.id}`),
+                  className: 'cursor-pointer',
                 })}
-              </div>
+              />
             </div>
 
 
