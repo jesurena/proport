@@ -20,7 +20,6 @@ import {
   AlertTriangle,
   ArrowRightLeft,
   Database,
-  Shield,
   Mail,
   Layers,
   FileText,
@@ -129,7 +128,6 @@ export default function ProportSidebar() {
       title: 'System',
       items: [
         { name: 'Brand Maintenance', href: '/maintenance/brands', icon: Tag },
-        { name: 'User Logs', href: '/logs', icon: Shield },
       ],
     },
   ];

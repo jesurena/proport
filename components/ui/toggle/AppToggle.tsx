@@ -13,6 +13,7 @@ interface AppToggleProps<T> {
   value: T;
   onChange: (val: T) => void;
   className?: string;
+  size?: 'small' | 'middle' | 'large';
 }
 
 export function AppToggle<T extends string>({
@@ -20,15 +21,16 @@ export function AppToggle<T extends string>({
   value,
   onChange,
   className,
+  size,
 }: AppToggleProps<T>) {
   return (
     <Segmented
+      size={size}
       value={value}
       onChange={(val) => onChange(val as T)}
       options={options.map((o) => ({ label: o.label, value: o.value }))}
       className={className}
       style={{}}
-      // Override Ant Design's default styling via CSS classes applied to root
       rootClassName="app-toggle"
     />
   );

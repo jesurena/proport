@@ -232,7 +232,7 @@ body {
 .app-toggle.ant-segmented {
   background-color: var(--primary) !important;
   border-radius: 10px !important;
-  padding: 3px !important;
+  padding: 1px !important;
   border: none !important;
 }
 
@@ -306,7 +306,7 @@ body {
   background: transparent !important;
 }
 
-.app-table-wrapper .ant-table-thead > tr > th {
+.app-table-wrapper .ant-table-thead>tr>th {
   font-size: 11px !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
@@ -316,7 +316,7 @@ body {
   color: var(--text-info) !important;
 }
 
-.app-table-wrapper .ant-table-tbody > tr > td {
+.app-table-wrapper .ant-table-tbody>tr>td {
   padding: 10px 24px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
@@ -324,19 +324,19 @@ body {
   border-bottom: 1px solid rgba(217, 218, 219, 0.3) !important;
 }
 
-.dark .app-table-wrapper .ant-table-tbody > tr > td {
+.dark .app-table-wrapper .ant-table-tbody>tr>td {
   border-bottom: 1px solid rgba(39, 39, 42, 0.3) !important;
 }
 
-.app-table-wrapper .ant-table-tbody > tr:last-child > td {
+.app-table-wrapper .ant-table-tbody>tr:last-child>td {
   border-bottom: none !important;
 }
 
-.app-table-wrapper .ant-table-tbody > tr {
+.app-table-wrapper .ant-table-tbody>tr {
   transition: all 0.2s ease !important;
 }
 
-.app-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td {
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td {
   background-color: var(--hover-bg) !important;
 }
 
