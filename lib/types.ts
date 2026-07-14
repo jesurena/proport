@@ -48,6 +48,9 @@ export interface Ticket {
   requesterName: string;
   assigneeId?: string;
   assigneeName?: string;
+  assigneeAvatar?: string;
+  brandType?: string;
+  requestType?: string;
   businessUnitId: string;
   businessUnitName: string;
   createdAt: string;   // ISO string

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { AppTable } from '@/components/ui';
+import { AppTable, AppAvatar, AppChip } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardTableProps {
@@ -16,17 +16,40 @@ export default function DashboardTable({ recentTickets }: DashboardTableProps) {
       title: 'Buyer',
       dataIndex: 'assigneeName',
       key: 'assigneeName',
-      slotName: 'buyer',
       align: 'left' as const,
       width: '30%',
+      render: (_: any, record: any) => (
+        <div className="flex items-center gap-2.5">
+          <AppAvatar
+            src={record.assigneeName}
+            name={record.assigneeName ?? 'Unassigned'}
+          />
+          <div>
+            <p className="text-xs font-bold text-text leading-none mb-0.5">
+              {record.assigneeName || 'Unassigned'}
+            </p>
+            <p className="text-[10px] text-text-info">
+              {new Date(record.createdAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}
+            </p>
+          </div>
+        </div>
+      ),
     },
     {
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'supplierName',
-      slotName: 'supplier',
       align: 'left' as const,
       width: '20%',
+      render: (supplierName: string) => {
+        const variantMap: Record<string, string> = {
+          'Ingram Micro': 'info',
+          Synnex: 'success',
+          'Tech Data': 'warning',
+        };
+        const variant = variantMap[supplierName] ?? 'default';
+        return <AppChip label={supplierName || 'General'} />;
+      },
     },
     {
       title: 'Subject',
@@ -37,9 +60,15 @@ export default function DashboardTable({ recentTickets }: DashboardTableProps) {
     {
       title: 'Action',
       key: 'action',
-      slotName: 'action',
       align: 'right' as const,
       width: 80,
+      render: () => (
+        <div className="flex justify-end pr-1">
+          <button className="w-8 h-8 rounded-full border border-border/60 hover:bg-accent-1 hover:text-white flex items-center justify-center text-text-info transition-colors cursor-pointer shrink-0">
+            <ArrowRight size={13} />
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -88,7 +117,6 @@ export default function DashboardTable({ recentTickets }: DashboardTableProps) {
       <AppTable
         columns={columns}
         dataSource={recentTickets.slice(0, 5)}
-        slots={slots}
         rowKey="id"
         pagination={false}
         onRow={(record) => ({

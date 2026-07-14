@@ -8,23 +8,8 @@ import {
   cn,
 } from '@integrated-computer-system/ui-kit';
 import {
-  LayoutDashboard,
   PenSquare,
-  Ticket,
-  FileBarChart,
-  Inbox,
-  CircleDot,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  ArrowRightLeft,
-  Database,
-  Mail,
-  Layers,
-  FileText,
   ChevronDown,
-  Tag,
 } from 'lucide-react';
 import { SettingsModal } from '@/modules/settings';
 import SearchModal from '@/components/SearchModal';
@@ -33,19 +18,7 @@ import { getTicketCountByStatus } from '@/lib/stats';
 import { StatusCount } from '@/lib/types';
 import SidebarAppDropdown from './SidebarAppDropdown';
 import UserProfile from './UserProfile';
-
-interface SidebarItem {
-  name: string;
-  icon: React.ComponentType<any>;
-  href?: string;
-  badge?: number;
-  subItems?: { name: string; href: string }[];
-}
-
-interface SidebarGroup {
-  title: string;
-  items: SidebarItem[];
-}
+import { getSidebarGroups, type SidebarGroup, type SidebarItem } from './SidebarGroups';
 
 export default function ProportSidebar() {
   const pathname = usePathname();
@@ -57,6 +30,7 @@ export default function ProportSidebar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['Focus']);
+  const [role, setRole] = useState<string>('admin');
 
   const toggleSubMenu = (name: string) => {
     setExpandedMenus((prev) =>
@@ -66,6 +40,10 @@ export default function ProportSidebar() {
 
   useEffect(() => {
     setStatusCounts(getTicketCountByStatus());
+    const stored = localStorage.getItem('proport_my_role');
+    if (stored) {
+      setRole(stored);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -86,51 +64,7 @@ export default function ProportSidebar() {
     .filter((s) => s.status !== 'closed')
     .reduce((sum, s) => sum + s.count, 0);
 
-  const menuGroups: SidebarGroup[] = [
-    {
-      title: 'Navigation',
-      items: [
-        { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-        { name: 'All Inquiries', href: '/tickets', icon: Ticket, badge: totalOpen },
-        { name: 'Reports', href: '/reports', icon: FileBarChart },
-      ],
-    },
-    {
-      title: 'Status Filtering',
-      items: [
-        {
-          name: 'Focus',
-          icon: Mail,
-          subItems: [
-            { name: 'Pending Request', href: '/tickets?status=pending' },
-            { name: 'Answered Request', href: '/tickets?status=answered' },
-            { name: 'Closed Request', href: '/tickets?status=closed' },
-            { name: 'Reassigned Request', href: '/tickets?status=reassigned' },
-          ],
-        },
-        {
-          name: 'Non Focus',
-          icon: Layers,
-          subItems: [
-            { name: 'BU Head Approval', href: '/tickets?status=bu-approval' },
-            { name: 'Declined by BU Head', href: '/tickets?status=bu-declined' },
-            { name: 'Final Approval', href: '/tickets?status=final-approval' },
-            { name: 'Declined by Adel', href: '/tickets?status=adel-declined' },
-            { name: 'Pending Request', href: '/tickets?status=pending' },
-            { name: 'Answered Request', href: '/tickets?status=answered' },
-            { name: 'Closed Request', href: '/tickets?status=closed' },
-            { name: 'Reassigned Request', href: '/tickets?status=reassigned' },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'System',
-      items: [
-        { name: 'Brand Maintenance', href: '/maintenance/brands', icon: Tag },
-      ],
-    },
-  ];
+  const menuGroups = getSidebarGroups(role, totalOpen);
 
   const navigate = (href: string) => {
     router.push(href);
@@ -152,8 +86,13 @@ export default function ProportSidebar() {
               <AppSidebar.Toggle />
               <button
                 onClick={() => setComposeOpen(true)}
-                title="Compose Inquiry"
-                className="w-9 h-9 flex items-center justify-center rounded-lg border border-border text-text-info hover:text-text hover:bg-hover/60 transition-all cursor-pointer group"
+                title={role === 'sales' ? 'Compose Request' : 'Compose Inquiry'}
+                className={cn(
+                  "w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer group",
+                  role === 'sales'
+                    ? "bg-[#d946ef] text-white hover:bg-[#c084fc] border-none"
+                    : "border border-border text-text-info hover:text-text hover:bg-hover/60"
+                )}
               >
                 <PenSquare size={15} className="group-hover:scale-110 transition-transform" />
               </button>
@@ -168,10 +107,15 @@ export default function ProportSidebar() {
                 {/* Compose button */}
                 <button
                   onClick={() => setComposeOpen(true)}
-                  className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg border border-border hover:text-text hover:bg-hover/60 transition-all text-sm font-medium text-left cursor-pointer group"
+                  className={cn(
+                    "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group",
+                    role === 'sales'
+                      ? "bg-[#d946ef] text-white hover:bg-[#c084fc] font-semibold border-none"
+                      : "border border-border hover:text-text hover:bg-hover/60 font-medium"
+                  )}
                 >
                   <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
-                  <span>Compose</span>
+                  <span>{role === 'sales' ? 'Compose Request' : 'Compose'}</span>
                 </button>
               </div>
             </div>
