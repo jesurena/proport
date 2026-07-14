@@ -27,12 +27,12 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 14px;
-  --radius-2xl: 16px;
-  --radius-3xl: 20px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-3xl: 18px;
   --font-scale: 0px;
 }
 
@@ -226,4 +226,77 @@ body {
 /* ─── Antd Overrides ─────────────────────────────────────────────────────── */
 .ant-modal-mask {
   backdrop-filter: blur(4px) !important;
+}
+
+/* ─── AppToggle (Ant Design Segmented) ───────────────────────────────────── */
+.app-toggle.ant-segmented {
+  background-color: var(--primary) !important;
+  border-radius: 10px !important;
+  padding: 3px !important;
+  border: none !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-item {
+  border-radius: 7px !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s ease !important;
+  padding: 3px 10px !important;
+  line-height: 1.5 !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-item:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-item-selected {
+  background-color: #ffffff !important;
+  color: var(--primary) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .app-toggle.ant-segmented .ant-segmented-item-selected {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-thumb {
+  background-color: #ffffff !important;
+  border-radius: 7px !important;
+}
+
+.dark .app-toggle.ant-segmented .ant-segmented-thumb {
+  background-color: #1e293b !important;
+}
+
+/* ─── Borderless AppSelect (Ant Design Select) ──────────────────────────── */
+.ant-select-borderless,
+.ant-select-borderless .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  outline: none !important;
+  padding-left: 0 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+.ant-select-borderless .ant-select-selector:hover,
+.ant-select-borderless .ant-select-selector:focus,
+.ant-select-borderless .ant-select-selector:active,
+.ant-select-borderless.ant-select-focused .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.ant-select-borderless .ant-select-selection-item,
+.ant-select-borderless .ant-select-selection-placeholder {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  padding: 0 !important;
 }

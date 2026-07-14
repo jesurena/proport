@@ -29,6 +29,7 @@ export interface AppSelectProps {
     notFoundImageSrc?: string;
     notFoundTitle?: string;
     notFoundDescription?: string;
+    variant?: 'default' | 'borderless';
 }
 
 export const AppSelect = ({
@@ -47,7 +48,8 @@ export const AppSelect = ({
     required = false,
     notFoundImageSrc,
     notFoundTitle,
-    notFoundDescription
+    notFoundDescription,
+    variant = 'default'
 }: AppSelectProps) => {
     const extractText = (node: React.ReactNode): string => {
         if (typeof node === 'string' || typeof node === 'number') {
@@ -80,6 +82,7 @@ export const AppSelect = ({
 
     const defaultPlaceholder = typeof label === 'string' ? `Select ${label.toLowerCase()}...` : 'Select option...';
     const resolvedPlaceholder = placeholder || defaultPlaceholder;
+    const isBorderless = variant === 'borderless';
 
     return (
         <AppField
@@ -99,6 +102,7 @@ export const AppSelect = ({
                 onSearch={onSearch}
                 disabled={disabled}
                 filterOption={onSearch ? false : filterOption}
+                variant={isBorderless ? 'borderless' : undefined}
                 notFoundContent={
                     <AppEmptyState
                         title={notFoundTitle || "No options found"}
@@ -110,18 +114,33 @@ export const AppSelect = ({
                 }
                 suffixIcon={
                     <ChevronDown
-                        size={16}
+                        size={14}
                         className="text-foreground/40 shrink-0"
                     />
                 }
+                style={isBorderless ? {
+                    border: 'none',
+                    boxShadow: 'none',
+                    background: 'transparent',
+                    padding: 0,
+                    height: 'auto',
+                    minHeight: 0,
+                    fontSize: '14px',
+                    fontWeight: 400,
+                } : undefined}
                 className={cn(
-                    "w-full h-11 transition-all rounded-xl",
-                    "[&_.ant-select-selector]:!bg-neutral/50 [&_.ant-select-selector]:!border-border [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!h-11 [&_.ant-select-selector]:!px-3.5",
-                    "hover:[&_.ant-select-selector]:!bg-neutral/80",
-                    "focus-within:[&_.ant-select-selector]:!border-accent-1 focus-within:[&_.ant-select-selector]:!ring-2 focus-within:[&_.ant-select-selector]:!ring-accent-1/40",
-                    "[&_.ant-select-selection-item]:!text-foreground [&_.ant-select-selection-item]:!leading-[42px] [&_.ant-select-selection-item]:!text-sm",
-                    "[&_.ant-select-selection-placeholder]:!text-foreground/30 [&_.ant-select-selection-placeholder]:!leading-[42px] [&_.ant-select-selection-placeholder]:!text-sm",
-                    "[&_.ant-select-selection-search-input]:!h-11 [&_.ant-select-selection-search]:!px-1.5",
+                    "w-full transition-all",
+                    isBorderless
+                        ? "!border-none !shadow-none !bg-transparent !h-auto !p-0 !text-sm !font-normal"
+                        : cn(
+                            "h-11 rounded-xl",
+                            "[&_.ant-select-selector]:!bg-neutral/50 [&_.ant-select-selector]:!border-border [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!h-11 [&_.ant-select-selector]:!px-3.5",
+                            "hover:[&_.ant-select-selector]:!bg-neutral/80",
+                            "focus-within:[&_.ant-select-selector]:!border-accent-1 focus-within:[&_.ant-select-selector]:!ring-2 focus-within:[&_.ant-select-selector]:!ring-accent-1/40",
+                            "[&_.ant-select-selection-item]:!text-foreground [&_.ant-select-selection-item]:!leading-[42px] [&_.ant-select-selection-item]:!text-sm",
+                            "[&_.ant-select-selection-placeholder]:!text-foreground/30 [&_.ant-select-selection-placeholder]:!leading-[42px] [&_.ant-select-selection-placeholder]:!text-sm",
+                            "[&_.ant-select-selection-search-input]:!h-11 [&_.ant-select-selection-search]:!px-1.5"
+                        ),
                     disabled && "opacity-40 pointer-events-none"
                 )}
                 classNames={{

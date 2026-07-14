@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppButton } from '@integrated-computer-system/ui-kit';
+import { AppSelect } from '@/components/ui';
 import {
   Send, Paperclip, X, Bold, Italic, Underline,
   Link2, List, Minus, Maximize2, ChevronDown, ChevronUp, Trash2, Check,
@@ -133,20 +134,23 @@ export function ComposeModal({ open, onClose }: ComposeModalProps) {
 
   if (!open) return null;
 
-  const width = expanded ? 'w-[780px]' : 'w-[560px]';
-  const height = expanded ? 'h-[82vh]' : 'h-[580px]';
-
   return (
     <>
-      {/* Floating compose window — fixed bottom-right */}
+      {/* Floating compose window — fixed bottom-right or fullscreen */}
       <div
-        className={`fixed bottom-0 right-6 z-[1000] ${width} flex flex-col rounded-t-2xl shadow-2xl border border-border overflow-hidden bg-background transition-all duration-200 ${minimized ? 'h-[46px]' : height}`}
-        style={{ maxWidth: 'calc(100vw - 24px)' }}
+        className={expanded
+          ? "fixed inset-0 z-[1000] w-screen h-screen flex flex-col bg-background transition-all duration-200"
+          : `fixed bottom-0 right-6 z-[1000] w-[780px] flex flex-col rounded-t-2xl shadow-2xl border border-border overflow-hidden bg-background transition-all duration-200 ${minimized ? 'h-[46px]' : 'h-[82vh]'}`
+        }
+        style={expanded ? undefined : { maxWidth: 'calc(100vw - 24px)' }}
       >
         {/* ── Title bar ── */}
         <div
           className="flex items-center justify-between px-4 py-3 bg-[#404040] dark:bg-[#202020] select-none cursor-pointer shrink-0"
-          onClick={() => setMinimized((m) => !m)}
+          onClick={() => {
+            setMinimized((m) => !m);
+            if (expanded) setExpanded(false);
+          }}
         >
           <span className="text-white text-sm font-semibold truncate">
             {subject || 'Compose New Price Inquiry'}
@@ -154,14 +158,20 @@ export function ComposeModal({ open, onClose }: ComposeModalProps) {
           <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
             <button
               title={minimized ? 'Restore' : 'Minimize'}
-              onClick={() => setMinimized((m) => !m)}
+              onClick={() => {
+                setMinimized((m) => !m);
+                if (expanded) setExpanded(false);
+              }}
               className="w-6 h-6 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             >
               {minimized ? <ChevronUp size={13} /> : <Minus size={13} />}
             </button>
             <button
               title={expanded ? 'Restore size' : 'Full size'}
-              onClick={() => setExpanded((e) => !e)}
+              onClick={() => {
+                setExpanded((e) => !e);
+                if (minimized) setMinimized(false);
+              }}
               className="w-6 h-6 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             >
               <Maximize2 size={13} />
@@ -186,7 +196,7 @@ export function ComposeModal({ open, onClose }: ComposeModalProps) {
               <GmailRow label="AO">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="w-40 text-sm">
-                    <ComposeSelect options={aoOptions} value={ao} onChange={setAo} placeholder="Choose AO..." />
+                    <AppSelect options={aoOptions} value={ao} onChange={setAo} placeholder="Choose AO..." variant="borderless" />
                   </div>
                   <span className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5 font-semibold whitespace-nowrap hidden sm:block">
                     BU HEAD auto-copied
@@ -266,43 +276,43 @@ export function ComposeModal({ open, onClose }: ComposeModalProps) {
               </button>
 
               {showDetails && (
-                <div className="px-4 py-3 grid grid-cols-2 gap-2.5 bg-neutral/10 text-sm">
-                  <div>
-                    <p className="text-xs text-text-info uppercase font-semibold mb-1 tracking-wide">Inquiry Type</p>
-                    <ComposeSelect options={REQUEST_TYPES} value={requestType} onChange={setRequestType} placeholder="Choose inquiry type" />
+                <div className="px-4 py-3 grid grid-cols-2 gap-x-6 gap-y-3 bg-neutral/20 border-t border-border/30 text-sm">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-text-info font-semibold">Inquiry Type</p>
+                    <AppSelect options={REQUEST_TYPES} value={requestType} onChange={setRequestType} placeholder="Choose inquiry type" variant="borderless" />
                   </div>
-                  <div>
-                    <p className="text-xs text-text-info uppercase font-semibold mb-1 tracking-wide">Supplier</p>
-                    <ComposeSelect options={supplierOptions} value={supplier} onChange={setSupplier} placeholder="Choose supplier" />
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-text-info font-semibold">Supplier</p>
+                    <AppSelect options={supplierOptions} value={supplier} onChange={setSupplier} placeholder="Choose supplier" variant="borderless" />
                   </div>
-                  <div>
-                    <p className="text-xs text-text-info uppercase font-semibold mb-1 tracking-wide">Target Price (USD)</p>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-text-info font-semibold">Target Price (USD)</p>
                     <input
                       type="number"
                       step="0.01"
                       value={targetPrice}
                       onChange={(e) => setTargetPrice(e.target.value)}
                       placeholder="e.g. 250.00 (optional)"
-                      className="w-full border-b border-border/40 bg-transparent px-0 py-1 text-sm text-text focus:outline-none focus:border-text-info/50"
+                      className="w-full bg-transparent py-1 text-sm text-text font-normal placeholder:text-text-info/40 focus:outline-none"
                     />
                   </div>
-                  <div>
-                    <p className="text-xs text-text-info uppercase font-semibold mb-1 tracking-wide">Est. Quantity</p>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-text-info font-semibold">Est. Quantity</p>
                     <input
                       type="number"
                       value={estimatedQuantity}
                       onChange={(e) => setEstimatedQuantity(e.target.value)}
                       placeholder="e.g. 50 (optional)"
-                      className="w-full border-b border-border/40 bg-transparent px-0 py-1 text-sm text-text focus:outline-none focus:border-text-info/50"
+                      className="w-full bg-transparent py-1 text-sm text-text font-normal placeholder:text-text-info/40 focus:outline-none"
                     />
                   </div>
-                  <div>
-                    <p className="text-xs text-text-info uppercase font-semibold mb-1 tracking-wide">Assign To (Buyer)</p>
-                    <ComposeSelect options={buyerOptions} value={assignTo} onChange={setAssignTo} placeholder="Unassigned" />
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-text-info font-semibold">Assign To (Buyer)</p>
+                    <AppSelect options={buyerOptions} value={assignTo} onChange={setAssignTo} placeholder="Unassigned" variant="borderless" />
                   </div>
-                  <div>
-                    <p className="text-xs text-text-info uppercase font-semibold mb-1 tracking-wide">Priority</p>
-                    <ComposeSelect options={PRIORITY_OPTIONS} value={priority} onChange={setPriority} placeholder="Choose priority" />
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs text-text-info font-semibold">Priority</p>
+                    <AppSelect options={PRIORITY_OPTIONS} value={priority} onChange={setPriority} placeholder="Choose priority" variant="borderless" />
                   </div>
                 </div>
               )}
@@ -397,68 +407,4 @@ function ToolbarBtn({ title, onClick, children }: { title: string; onClick: () =
   );
 }
 
-function ComposeSelect({
-  options,
-  value,
-  onChange,
-  placeholder,
-}: {
-  options: SelectOption[];
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const selected = options.find((option) => option.value === value);
 
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
-
-  return (
-    <div ref={rootRef} className="relative w-full">
-      <button
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-        className="flex w-full items-center justify-between gap-2 border-b border-border/70 bg-transparent px-0 py-1.5 text-left text-sm text-text transition-colors hover:border-text-info/50"
-      >
-        <span className={selected ? 'text-text' : 'text-text-info/70'}>
-          {selected?.label || placeholder}
-        </span>
-        <ChevronDown size={14} className={`shrink-0 text-text-info transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-card-bg shadow-lg">
-          <div className="py-1">
-            {options.map((option) => {
-              const active = option.value === value;
-              return (
-                <button
-                  key={option.value || option.label}
-                  type="button"
-                  onClick={() => {
-                    onChange(option.value);
-                    setOpen(false);
-                  }}
-                  className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-sm transition-colors hover:bg-hover ${active ? 'text-text bg-hover' : 'text-text-info hover:text-text'}`}
-                >
-                  <span className="truncate">{option.label}</span>
-                  {active && <Check size={14} className="shrink-0 text-text-info" />}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}

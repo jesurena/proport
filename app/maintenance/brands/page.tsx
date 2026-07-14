@@ -291,136 +291,139 @@ export default function BrandsPage() {
       </div>
 
       {/* Add Brand Modal */}
-      <AppModal
-        open={addOpen}
-        onOpenChange={setAddOpen}
-        title="Add New Brands"
-        footer={
-          <div className="flex justify-end gap-2 w-full mt-4">
-            <AppButton onClick={() => setAddOpen(false)}>Cancel</AppButton>
+      <AppModal open={addOpen} onClose={() => setAddOpen(false)} width="520px" centered>
+        <AppModal.Body className="p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-border/40 pb-2">
+            <h3 className="text-base font-bold text-text">Add New Brands</h3>
+          </div>
+
+          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1 py-1">
+            <div className="flex justify-between items-center pb-2 border-b border-border/20">
+              <span className="text-xs text-text-info font-bold">Manage rows:</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleAddRow}
+                  className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700"
+                >
+                  <PlusCircle size={14} /> Add Row
+                </button>
+                <button
+                  onClick={handleRemoveCheckedRows}
+                  className="flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-700"
+                >
+                  <MinusCircle size={14} /> Delete Checked
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {newRows.map((row, index) => (
+                <div key={row.id} className="flex items-center gap-3 bg-neutral/20 p-3 rounded-xl border border-border/20">
+                  <input
+                    type="checkbox"
+                    checked={row.checked}
+                    onChange={(e) => {
+                      const next = [...newRows];
+                      next[index].checked = e.target.checked;
+                      setNewRows(next);
+                    }}
+                    className="rounded border-border text-primary cursor-pointer w-4 h-4"
+                  />
+                  <div className="flex-1">
+                    <AppInput
+                      placeholder="Brand Name (e.g. ASUS)"
+                      value={row.name}
+                      onChange={(e) => {
+                        const next = [...newRows];
+                        next[index].name = e.target.value;
+                        setNewRows(next);
+                      }}
+                    />
+                  </div>
+                  <div className="w-40">
+                    <AppSelect
+                      options={TYPE_OPTIONS}
+                      value={row.type}
+                      onChange={(val) => {
+                        const next = [...newRows];
+                        next[index].type = val as 'Focus' | 'Non Focus';
+                        setNewRows(next);
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-border/40">
+            <AppButton variant="neutral" onClick={() => setAddOpen(false)}>Cancel</AppButton>
             <AppButton variant="primary" onClick={handleSaveBrands}>
               Save
             </AppButton>
           </div>
-        }
-      >
-        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1 py-1">
-          <div className="flex justify-between items-center pb-2 border-b border-border/20">
-            <span className="text-xs text-text-info font-bold">Manage rows:</span>
-            <div className="flex gap-2">
-              <button
-                onClick={handleAddRow}
-                className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700"
-              >
-                <PlusCircle size={14} /> Add Row
-              </button>
-              <button
-                onClick={handleRemoveCheckedRows}
-                className="flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-700"
-              >
-                <MinusCircle size={14} /> Delete Checked
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {newRows.map((row, index) => (
-              <div key={row.id} className="flex items-center gap-3 bg-neutral/20 p-3 rounded-xl border border-border/20">
-                <input
-                  type="checkbox"
-                  checked={row.checked}
-                  onChange={(e) => {
-                    const next = [...newRows];
-                    next[index].checked = e.target.checked;
-                    setNewRows(next);
-                  }}
-                  className="rounded border-border text-primary cursor-pointer w-4 h-4"
-                />
-                <div className="flex-1">
-                  <AppInput
-                    placeholder="Brand Name (e.g. ASUS)"
-                    value={row.name}
-                    onChange={(e) => {
-                      const next = [...newRows];
-                      next[index].name = e.target.value;
-                      setNewRows(next);
-                    }}
-                  />
-                </div>
-                <div className="w-40">
-                  <AppSelect
-                    options={TYPE_OPTIONS}
-                    value={row.type}
-                    onChange={(val) => {
-                      const next = [...newRows];
-                      next[index].type = val as 'Focus' | 'Non Focus';
-                      setNewRows(next);
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        </AppModal.Body>
       </AppModal>
 
       {/* Edit Brand Modal */}
-      <AppModal
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        title="Edit Brand Settings"
-        footer={
-          <div className="flex justify-end gap-2 w-full mt-4">
-            <AppButton onClick={() => setEditOpen(false)}>Cancel</AppButton>
+      <AppModal open={editOpen} onClose={() => setEditOpen(false)} width="420px" centered>
+        <AppModal.Body className="p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-border/40 pb-2">
+            <h3 className="text-base font-bold text-text">Edit Brand Settings</h3>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <AppLabel className="font-semibold text-xs text-text-info">Brand Name</AppLabel>
+              <AppInput
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="ASUS"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <AppLabel className="font-semibold text-xs text-text-info">Brand Type</AppLabel>
+              <AppSelect
+                options={TYPE_OPTIONS}
+                value={editType}
+                onChange={(val) => setEditType(val as 'Focus' | 'Non Focus')}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-border/40">
+            <AppButton variant="neutral" onClick={() => setEditOpen(false)}>Cancel</AppButton>
             <AppButton variant="primary" onClick={handleUpdateBrand}>
               Save Changes
             </AppButton>
           </div>
-        }
-      >
-        <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <AppLabel className="font-semibold text-xs text-text-info">Brand Name</AppLabel>
-            <AppInput
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              placeholder="ASUS"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <AppLabel className="font-semibold text-xs text-text-info">Brand Type</AppLabel>
-            <AppSelect
-              options={TYPE_OPTIONS}
-              value={editType}
-              onChange={(val) => setEditType(val as 'Focus' | 'Non Focus')}
-            />
-          </div>
-        </div>
+        </AppModal.Body>
       </AppModal>
 
       {/* Delete Confirmation Modal */}
-      <AppModal
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        title="Confirm Brand Deletion"
-        footer={
-          <div className="flex justify-end gap-2 w-full mt-4">
-            <AppButton onClick={() => setDeleteOpen(false)}>Cancel</AppButton>
+      <AppModal open={deleteOpen} onClose={() => setDeleteOpen(false)} width="400px" centered>
+        <AppModal.Body className="p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-border/40 pb-2">
+            <h3 className="text-base font-bold text-text animate-in">Confirm Brand Deletion</h3>
+          </div>
+
+          <div className="py-2">
+            <p className="text-sm text-text">
+              Are you sure you want to permanently delete the brand{' '}
+              <span className="font-bold text-accent-2">"{selectedBrand?.name}"</span>?
+            </p>
+            <p className="text-xs text-text-info mt-1.5">
+              This action cannot be undone and will update the global catalog configuration.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-border/40">
+            <AppButton variant="neutral" onClick={() => setDeleteOpen(false)}>Cancel</AppButton>
             <AppButton variant="danger" onClick={handleDeleteBrand}>
               Delete Brand
             </AppButton>
           </div>
-        }
-      >
-        <div className="py-2">
-          <p className="text-sm text-text">
-            Are you sure you want to permanently delete the brand{' '}
-            <span className="font-bold text-accent-2">"{selectedBrand?.name}"</span>?
-          </p>
-          <p className="text-xs text-text-info mt-1.5">
-            This action cannot be undone and will update the global catalog configuration.
-          </p>
-        </div>
+        </AppModal.Body>
       </AppModal>
     </>
   );
