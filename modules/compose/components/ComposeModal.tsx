@@ -13,6 +13,7 @@ import { AppUserSelect } from './AppUserSelect';
 import { AppUserSelectModal } from './AppUserSelectModal';
 import { AppCustomerSelectModal } from './AppCustomerSelectModal';
 import { AppSummernoteEditor } from './AppSummernoteEditor';
+import { useComposeStore } from '../stores';
 import { getBrands, type Brand } from '@/lib/brands';
 import { createTicket, getBusinessUnits, getUsers } from '@/lib/tickets';
 import { getSuppliers } from '@/lib/suppliers';
@@ -26,8 +27,8 @@ const REQUEST_TYPES = [
 ];
 
 const BRAND_TYPE_OPTIONS = [
-  { value: 'Focus', label: '⭐ Focus Brand' },
-  { value: 'Non Focus', label: '📦 Non-Focus Brand' },
+  { value: 'Focus', label: 'Focus Brand' },
+  { value: 'Non Focus', label: 'Non-Focus Brand' },
 ];
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -55,7 +56,7 @@ interface SelectOption {
   label: string;
 }
 
-export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalProps) {
+export function ComposeModal() {
   const router = useRouter();
   const businessUnits = getBusinessUnits();
   const allUsers = getUsers();
@@ -64,8 +65,15 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
   const buyers = allUsers.filter((u) => u.role === 'buyer' || u.role === 'admin');
   const salesReps = allUsers.filter((u) => u.role === 'sales');
 
-  const [minimized, setMinimized] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const {
+    isOpen,
+    isMinimized,
+    isExpanded,
+    defaultBrandType,
+    closeCompose,
+    setMinimized,
+    setExpanded,
+  } = useComposeStore();
   const [showDetails, setShowDetails] = useState(false);
 
   const [ao, setAo] = useState('user-1');
@@ -99,20 +107,24 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
 
   const brandsList = useMemo(() => {
     const allBrands = getBrands();
-    if (defaultBrandType) {
-      return allBrands.filter((b: Brand) => b.type === defaultBrandType);
+    if (brandType) {
+      return allBrands.filter((b: Brand) => b.type === brandType);
     }
     return allBrands;
-  }, [defaultBrandType]);
+  }, [brandType]);
 
   const brandOptions = useMemo(() => {
     return brandsList.map((b) => ({ value: b.name, label: b.name }));
   }, [brandsList]);
 
+  const handleCategoryChange = (val: string) => {
+    setBrandType(val);
+    setBrand('');
+  };
+
   // Reset when opened
   useEffect(() => {
-    if (open) {
-      setMinimized(false);
+    if (isOpen) {
       setAo('user-1'); setSelectedCcUsers([]);
       setRequestType(''); setSupplier(''); setTargetPrice(''); setEstimatedQuantity('');
       setAssignTo(''); setSubject(''); setPriority('medium');
@@ -122,7 +134,7 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
       setAttachments([]); setShowDetails(false);
       setDescription('');
     }
-  }, [open, defaultBrandType]);
+  }, [isOpen, defaultBrandType]);
 
   // Dynamic subject auto-builder
   useEffect(() => {
@@ -173,14 +185,14 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
       projectName: projectName.trim() || undefined,
     });
     setSubmitting(false);
-    onClose();
+    closeCompose();
     router.push(`/tickets/${ticket.id}`);
   };
 
-  if (!open) return null;
+  if (!isOpen) return null;
 
-  const normalHeight = minimized ? '46px' : '82vh';
-  const modalStyle = expanded ? {
+  const normalHeight = isMinimized ? '46px' : '82vh';
+  const modalStyle = isExpanded ? {
     top: '0px',
     left: '0px',
     right: '0px',
@@ -207,8 +219,8 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
         <div
           className="flex items-center justify-between px-4 py-3 bg-[#404040] dark:bg-[#202020] select-none cursor-pointer shrink-0"
           onClick={() => {
-            setMinimized((m) => !m);
-            if (expanded) setExpanded(false);
+            setMinimized(!isMinimized);
+            if (isExpanded) setExpanded(false);
           }}
         >
           <span className="text-white text-sm font-semibold truncate">
@@ -216,20 +228,20 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
           </span>
           <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
             <button
-              title={minimized ? 'Restore' : 'Minimize'}
+              title={isMinimized ? 'Restore' : 'Minimize'}
               onClick={() => {
-                setMinimized((m) => !m);
-                if (expanded) setExpanded(false);
+                setMinimized(!isMinimized);
+                if (isExpanded) setExpanded(false);
               }}
               className="w-6 h-6 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             >
-              {minimized ? <ChevronUp size={13} /> : <Minus size={13} />}
+              {isMinimized ? <ChevronUp size={13} /> : <Minus size={13} />}
             </button>
             <button
-              title={expanded ? 'Restore size' : 'Full size'}
+              title={isExpanded ? 'Restore size' : 'Full size'}
               onClick={() => {
-                setExpanded((e) => !e);
-                if (minimized) setMinimized(false);
+                setExpanded(!isExpanded);
+                if (isMinimized) setMinimized(false);
               }}
               className="w-6 h-6 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             >
@@ -237,7 +249,7 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
             </button>
             <button
               title="Discard draft"
-              onClick={onClose}
+              onClick={closeCompose}
               className="w-6 h-6 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             >
               <X size={14} />
@@ -246,19 +258,44 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
         </div>
 
         {/* Body — hidden when minimized */}
-        {!minimized && (
+        {!isMinimized && (
           <div className="flex flex-col flex-1 min-h-0">
             {/* ── Fields ── */}
             <div className="divide-y divide-border shrink-0 border-b border-border">
 
-              {/* AO */}
-              <GmailRow label="Ao" labelWidthClass="w-28">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <div className="w-72 text-sm">
+              {/* Ao & Category split row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 divide-border">
+                {/* AO */}
+                <div className="flex items-center gap-0 px-4 py-1.5 min-h-[38px] transition-all">
+                  <span className="text-sm text-text-info w-28 shrink-0 font-medium mr-2">
+                    Ao
+                  </span>
+                  <div className="flex-1 text-sm">
                     <AppUserSelect users={allUsers} value={ao} onChange={setAo} placeholder="Choose AO..." variant="borderless" />
                   </div>
                 </div>
-              </GmailRow>
+
+                {/* Category */}
+                <div className="flex items-center gap-0 px-4 py-1.5 min-h-[38px] transition-all md:pl-2">
+                  <span
+                    className={cn(
+                      "text-sm text-text-info shrink-0 font-medium transition-all duration-200 overflow-hidden",
+                      brandType ? "w-28 opacity-100 mr-2" : "w-0 opacity-0 mr-0"
+                    )}
+                  >
+                    Category
+                  </span>
+                  <div className="flex-1 text-sm">
+                    <AppSelect
+                      options={BRAND_TYPE_OPTIONS}
+                      value={brandType}
+                      onChange={handleCategoryChange}
+                      placeholder={brandType ? "Choose brand category" : "Category"}
+                      variant="borderless"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Cc */}
               <GmailRow
@@ -479,7 +516,7 @@ export function ComposeModal({ open, onClose, defaultBrandType }: ComposeModalPr
               </button>
 
               <div className="flex-1" />
-              <button title="Discard" onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-text-info hover:bg-hover hover:text-text transition-colors cursor-pointer shrink-0">
+              <button title="Discard" onClick={closeCompose} className="w-7 h-7 flex items-center justify-center rounded-lg text-text-info hover:bg-hover hover:text-text transition-colors cursor-pointer shrink-0">
                 <Trash2 size={13} />
               </button>
             </div>

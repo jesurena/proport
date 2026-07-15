@@ -6,7 +6,11 @@ export type TicketStatus =
   | 'answered'
   | 'closed'
   | 'escalated'
-  | 'reassigned';
+  | 'reassigned'
+  | 'bu-approval'
+  | 'bu-declined'
+  | 'final-approval'
+  | 'adel-declined';
 
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 
@@ -99,6 +103,10 @@ export const STATUS_META: Record<TicketStatus, { label: string; color: string; c
   closed:     { label: 'Closed',     color: '#6b7280', chipVariant: 'default' },
   escalated:  { label: 'Escalated',  color: '#ef4444', chipVariant: 'danger' },
   reassigned: { label: 'Reassigned', color: '#8b5cf6', chipVariant: 'accent' },
+  'bu-approval': { label: 'BU Approval', color: '#ec4899', chipVariant: 'assigned' },
+  'bu-declined': { label: 'BU Declined', color: '#ef4444', chipVariant: 'danger' },
+  'final-approval': { label: 'Final Approval', color: '#10b981', chipVariant: 'success' },
+  'adel-declined': { label: 'Adel Declined', color: '#ef4444', chipVariant: 'danger' },
 };
 
 export const PRIORITY_META: Record<TicketPriority, { label: string; color: string }> = {

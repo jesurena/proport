@@ -21,6 +21,10 @@ const STATUS_ICONS: Record<TicketStatus, React.ReactNode> = {
   closed: <XCircle size={18} />,
   escalated: <AlertTriangle size={18} />,
   reassigned: <ArrowRightLeft size={18} />,
+  'bu-approval': <CircleDot size={18} />,
+  'bu-declined': <XCircle size={18} />,
+  'final-approval': <CheckCircle2 size={18} />,
+  'adel-declined': <XCircle size={18} />,
 };
 
 interface TicketStatusGridProps {

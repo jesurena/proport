@@ -5,17 +5,18 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Input, Dropdown, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import {
-  AppTabs,
   AppChip,
   AppButton,
   AppAvatar,
   AppInput,
 } from '@integrated-computer-system/ui-kit';
+import { AppTabs } from '@/components/ui';
 import { Search, Plus, Eye, MoreHorizontal, Filter, SlidersHorizontal, CalendarDays, MapPin, MessageSquareText, Building2, UserRound, Clock3, Tag, DollarSign, Layers } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
 import { getTickets } from '@/lib/tickets';
 import { STATUS_META } from '@/lib/types';
 import type { Ticket, TicketStatus } from '@/lib/types';
+import { AppEmptyState } from '@/components/ui';
 
 function timeAgo(dateStr: string): string {
   const now = new Date().getTime();
@@ -37,13 +38,10 @@ function timeAgo(dateStr: string): string {
 
 const STATUS_TABS = [
   { id: 'all', label: 'All' },
-  { id: 'unassigned', label: 'Unassigned' },
-  { id: 'assigned', label: 'Assigned' },
-  { id: 'pending', label: 'Pending' },
-  { id: 'answered', label: 'Answered' },
-  { id: 'closed', label: 'Closed' },
-  { id: 'escalated', label: 'Escalated' },
-  { id: 'reassigned', label: 'Reassigned' },
+  { id: 'focus', label: 'Focus' },
+  { id: 'non-focus', label: 'Non Focus' },
+  { id: 'bu-approval', label: 'BU Head Approval' },
+  { id: 'bu-declined', label: 'BU Head Declined' },
 ];
 
 function formatCardDate(dateStr: string): string {
@@ -63,9 +61,18 @@ function formatOrderNumber(ticketNumber: number): string {
 export default function TicketsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const statusParam = searchParams.get('status') || 'all';
+  const statusParam = searchParams.get('status');
+  const tabParam = searchParams.get('tab');
 
-  const [activeTab, setActiveTab] = useState(statusParam);
+  const getTabFromParams = () => {
+    if (tabParam) return tabParam;
+    if (statusParam === 'bu-approval' || statusParam === 'bu-declined') {
+      return statusParam;
+    }
+    return 'all';
+  };
+
+  const [activeTab, setActiveTab] = useState(getTabFromParams());
   const [searchQuery, setSearchQuery] = useState('');
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
@@ -74,23 +81,37 @@ export default function TicketsPage() {
   }, []);
 
   useEffect(() => {
-    setActiveTab(statusParam);
-  }, [statusParam]);
+    setActiveTab(getTabFromParams());
+  }, [tabParam, statusParam]);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     if (tabId === 'all') {
       router.push('/tickets');
     } else {
-      router.push(`/tickets?status=${tabId}`);
+      router.push(`/tickets?tab=${tabId}`);
     }
   };
 
   const filteredTickets = useMemo(() => {
     let result = tickets;
-    if (activeTab !== 'all') {
-      result = result.filter((t) => t.status === activeTab);
+    
+    // 1. Tab filtering
+    if (activeTab === 'focus') {
+      result = result.filter((t) => t.brandType === 'Focus');
+    } else if (activeTab === 'non-focus') {
+      result = result.filter((t) => t.brandType !== 'Focus');
+    } else if (activeTab === 'bu-approval') {
+      result = result.filter((t) => t.brandType !== 'Focus' && t.status === 'bu-approval');
+    } else if (activeTab === 'bu-declined') {
+      result = result.filter((t) => t.brandType !== 'Focus' && t.status === 'bu-declined');
     }
+
+    // 2. Optional status parameter filtering
+    if (statusParam && activeTab !== 'bu-approval' && activeTab !== 'bu-declined') {
+      result = result.filter((t) => t.status === statusParam);
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
@@ -104,13 +125,51 @@ export default function TicketsPage() {
       );
     }
     return result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  }, [tickets, activeTab, searchQuery]);
+  }, [tickets, activeTab, statusParam, searchQuery]);
+
+  const emptyState = useMemo(() => {
+    if (searchQuery.trim()) {
+      return {
+        imageSrc: '/aria-mascott-search.svg',
+        title: 'No inquiries found',
+        description: `Try searching for a different keyword instead of "${searchQuery}".`,
+      };
+    }
+    if (activeTab === 'all') {
+      return {
+        imageSrc: '/aria-mascott-sad.svg',
+        title: 'No inquiries submitted',
+        description: 'Create a new price inquiry to get started.',
+      };
+    }
+    if (activeTab === 'bu-approval') {
+      return {
+        imageSrc: '/aria-mascott-idle.svg',
+        title: 'No pending BU approvals',
+        description: 'Tickets waiting for BU head signature will appear here.',
+      };
+    }
+    if (activeTab === 'bu-declined') {
+      return {
+        imageSrc: '/aria-mascott-sad.svg',
+        title: 'No declined tickets',
+        description: 'Tickets declined by BU heads will appear here.',
+      };
+    }
+    const tabLabel = activeTab === 'focus' ? 'Focus' : 'Non Focus';
+    const statusLabel = statusParam ? `${statusParam} ` : '';
+    return {
+      imageSrc: '/aria-mascott-happy.svg',
+      title: 'Inbox cleared!',
+      description: `You have no ${statusLabel}${tabLabel} inquiries remaining in this view.`,
+    };
+  }, [activeTab, statusParam, searchQuery]);
 
   return (
     <>
       <ProportNavbar title="Inquiries" />
 
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="p-6 max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-text">Price Inquiries</h1>
@@ -132,7 +191,6 @@ export default function TicketsPage() {
           activeTab={activeTab}
           onChange={handleTabChange}
           variant="underlined"
-          fullWidth
           className="bg-transparent"
         />
 
@@ -173,9 +231,13 @@ export default function TicketsPage() {
 
           <div className="divide-y divide-border/60">
             {filteredTickets.length === 0 ? (
-              <div className="p-10 text-center">
-                <p className="text-sm text-text-info">No inquiries found for the current filters.</p>
-              </div>
+              <AppEmptyState
+                title={emptyState.title}
+                description={emptyState.description}
+                imageSrc={emptyState.imageSrc}
+                imageSize={110}
+                className="py-12"
+              />
             ) : (
               filteredTickets.map((ticket) => {
                 const statusMeta = STATUS_META[ticket.status];

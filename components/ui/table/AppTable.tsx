@@ -4,6 +4,7 @@ import React from 'react';
 import { Table, ConfigProvider } from 'antd';
 import type { TableProps } from 'antd';
 import { cn } from '../../utils/cn';
+import AppEmptyState from '../empty-state/AppEmptyState';
 
 export interface AppTableColumnType<RecordType> {
   title: React.ReactNode;
@@ -66,6 +67,17 @@ export function AppTable<RecordType extends object>({
           columns={resolvedColumns as any}
           pagination={resolvedPagination as any}
           className="app-table"
+          locale={{
+            emptyText: (
+              <AppEmptyState
+                title="No items found"
+                description="There is no data to display in this table."
+                imageSrc="/aria-mascott-idle.svg"
+                imageSize={70}
+                className="py-6 border-none bg-transparent"
+              />
+            ),
+          }}
           {...props}
         />
       </div>

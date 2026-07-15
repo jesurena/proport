@@ -1,14 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProportNavbar } from '@/modules/sidebar';
 import {
-  DashboardWelcomeBanner,
-  DashboardMetricCard,
-  DashboardSupplierInquiries,
-  DashboardTable,
-  DashboardFocusBreakdown,
-  DashboardTicketPerBuyer,
+  SalesDashboard,
+  BuyerDashboard,
   useDashboard
 } from '@/modules/dashboard';
 
@@ -20,29 +16,37 @@ export default function DashboardPage() {
     getCount
   } = useDashboard();
 
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem('proport_my_role');
+    setRole(storedRole || 'super_user');
+  }, []);
+
   return (
     <>
       <ProportNavbar title="Dashboard" />
 
       <div className="p-6 max-w-[1400px] mx-auto">
-        {/* Two-column layout */}
-        <div className="flex flex-col xl:flex-row gap-6">
-
-          {/* ── LEFT COLUMN ── */}
-          <div className="flex-1 min-w-0 space-y-6">
-            <DashboardWelcomeBanner />
-            <DashboardMetricCard totalCount={totalCount} getCount={getCount} />
-            <DashboardSupplierInquiries recentTickets={recentTickets} />
-            <DashboardTable recentTickets={recentTickets} />
+        {role === null ? (
+          <div className="p-12 text-center text-text-info text-sm">
+            Loading dashboard...
           </div>
-
-          {/* ── RIGHT COLUMN ── */}
-          <div className="xl:w-[300px] shrink-0 space-y-4">
-            <DashboardFocusBreakdown allTickets={allTickets} />
-            <DashboardTicketPerBuyer allTickets={allTickets} />
-          </div>
-
-        </div>
+        ) : role === 'sales' ? (
+          <SalesDashboard
+            totalCount={totalCount}
+            recentTickets={recentTickets}
+            allTickets={allTickets}
+            getCount={getCount}
+          />
+        ) : (
+          <BuyerDashboard
+            totalCount={totalCount}
+            recentTickets={recentTickets}
+            allTickets={allTickets}
+            getCount={getCount}
+          />
+        )}
       </div>
     </>
   );

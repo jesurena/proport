@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, CheckCircle2, AlertTriangle, XCircle, Info, Clock, Archive } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, XCircle, Info, Clock, Archive, CircleDot, Inbox } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 export type AppChipVariant =
@@ -13,7 +13,9 @@ export type AppChipVariant =
     | 'accent'
     | 'muted'
     | 'soon'
-    | 'archive';
+    | 'archive'
+    | 'assigned'
+    | 'unassigned';
 
 export interface AppChipProps {
     label: string;
@@ -38,6 +40,8 @@ const VARIANT_CLASSES: Record<AppChipVariant, string> = {
     muted:    'bg-foreground/10 text-foreground/60',
     soon:     'bg-foreground/10 text-foreground/40',
     archive:  'bg-gray-100 text-gray-500 border border-gray-200 dark:bg-neutral/40 dark:text-foreground/60 dark:border-border/40',
+    assigned: 'bg-pink-500 text-white',
+    unassigned: 'bg-purple-600 text-white',
 };
 
 const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>> = {
@@ -47,6 +51,8 @@ const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>>
     info:    <Info />,
     soon:    <Clock />,
     archive: <Archive />,
+    assigned: <CircleDot />,
+    unassigned: <Inbox />,
 };
 
 export const AppChip: React.FC<AppChipProps> = ({

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, Inbox, CircleDot, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Inbox, CircleDot, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { AppLabel, AppButton, AppCard } from '@/components/ui';
 
 interface DashboardMetricCardProps {
   totalCount: number;
@@ -28,35 +29,47 @@ export default function DashboardMetricCard({ totalCount, getCount }: DashboardM
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-text-info uppercase tracking-wider">Status Overview</span>
-        <button
+        <AppLabel as="h3" variant="subtitle">          Status Overview</AppLabel>
+        <AppButton
+          variant="link"
+          size="sm"
           onClick={() => setShowAllCards(!showAllCards)}
-          className="text-xs font-semibold text-accent-1 hover:underline cursor-pointer select-none"
+          className="!text-xs select-none"
         >
           {showAllCards ? 'Show Less' : 'View More'}
-        </button>
+        </AppButton>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 transition-all duration-300">
         {cardsToRender.map(({ label, status, icon, iconBg, iconColor }) => (
-          <div
+          <AppCard
             key={status}
+            variant="default"
+            padding="none"
             onClick={() => router.push(`/tickets?status=${status}`)}
-            className="bg-card-bg border border-border/60 rounded-2xl p-4 flex items-center justify-between shadow-sm cursor-pointer hover:bg-hover/20 transition-all"
+            className="p-4 flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-3">
               <div className={`w-11 h-11 rounded-full ${iconBg} flex items-center justify-center ${iconColor} shrink-0`}>
                 {icon}
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-text-info uppercase tracking-wider leading-none mb-1">
+                <AppLabel as="p" variant="info" className="text-[11px] font-semibold uppercase tracking-wider leading-none mb-1">
                   {getCount(status)}/{totalCount} inquiries
-                </p>
-                <p className="text-sm font-bold text-text">{label}</p>
+                </AppLabel>
+                <AppLabel as="p" variant="subtitle" className="font-bold text-sm">
+                  {label}
+                </AppLabel>
               </div>
             </div>
-            <MoreHorizontal className="text-text-info cursor-pointer shrink-0" size={16} />
-          </div>
+            <AppButton
+              variant="neutral"
+              size="icon"
+              className="!w-8 !h-8 rounded-full"
+            >
+              <ArrowRight size={13} />
+            </AppButton>
+          </AppCard>
         ))}
       </div>
     </div>

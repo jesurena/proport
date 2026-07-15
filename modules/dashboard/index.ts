@@ -1,7 +1,12 @@
 export { default as DashboardWelcomeBanner } from './components/DashboardWelcomeBanner';
 export { default as DashboardMetricCard } from './components/DashboardMetricCard';
-export { default as DashboardSupplierInquiries } from './components/DashboardSupplierInquiries';
+export { default as DashboardRecentTickets } from './components/DashboardRecentTickets';
 export { default as DashboardTable } from './components/DashboardTable';
 export { default as DashboardFocusBreakdown } from './components/DashboardFocusBreakdown';
 export { default as DashboardTicketPerBuyer } from './components/DashboardTicketPerBuyer';
+export { default as SalesDashboard } from './components/SalesDashboard';
+export { default as BuyerDashboard } from './components/BuyerDashboard';
+export { default as DashboardTicketCountAo } from './components/DashboardTicketCountAo';
+export { default as DashboardPinnedTickets } from './components/DashboardPinnedTickets';
+export { default as SalesDashboardMetricCard } from './components/SalesDashboardMetricCard';
 export { useDashboard } from './hooks/useDashboard';

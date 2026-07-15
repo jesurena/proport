@@ -41,7 +41,7 @@ export const AppButton = React.forwardRef<HTMLButtonElement, AppButtonProps>(
             secondary: 'bg-accent-2 text-white border border-transparent hover:bg-accent-2/80 hover:shadow-md focus-visible:ring-accent-2/50 shadow-sm',
             danger: 'bg-red-600 text-white border border-transparent hover:bg-red-600/80 dark:bg-red-700 dark:hover:bg-red-700/80 hover:shadow-md focus-visible:ring-red-500/50 shadow-sm',
             link: 'text-accent-1 hover:underline underline-offset-4 bg-transparent p-0 h-auto w-auto focus-visible:ring-0 focus-visible:ring-offset-0 disabled:text-muted-foreground hover:bg-transparent active:scale-100 cursor-pointer',
-            neutral: 'border border-border bg-neutral/40 hover:bg-neutral/80 dark:hover:bg-white/10 text-foreground hover:shadow-sm focus-visible:ring-border/50',
+            neutral: 'border border-border bg-neutral/40 hover:bg-accent-1 hover:text-white hover:border-accent-1 text-foreground hover:shadow-sm focus-visible:ring-border/50',
             ghost: 'border border-transparent bg-transparent hover:bg-neutral dark:hover:bg-white/8 text-foreground hover:shadow-none focus-visible:ring-border/50'
         };
 

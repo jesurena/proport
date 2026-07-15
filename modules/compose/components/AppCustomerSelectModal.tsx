@@ -132,118 +132,120 @@ export function AppCustomerSelectModal({
   ];
 
   return (
-    <AppModal open={open} onClose={onClose} width={740} padding="none">
-      {/* Header */}
-      <div className="px-5 pt-4 pb-3">
-        <AppModal.Title className="text-lg font-bold">Search Customer</AppModal.Title>
-        <AppModal.Description className="text-xs text-text-info mt-1">
-          Find and select a customer from the database. Type at least 2 characters to search.
-        </AppModal.Description>
-      </div>
-
-      {/* Search Input and Filters */}
-      <div className="px-5 py-2.5 flex items-center gap-3">
-        <div className="flex-1">
-          <AppInput
-            preset="search"
-            autoFocus
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Type customer name or ID..."
-            className="w-full"
-          />
+    <AppModal open={open} onClose={onClose} width={700} centered>
+      <AppModal.Body className="space-y-4">
+        {/* Header */}
+        <div>
+          <AppModal.Title>Search Customer</AppModal.Title>
+          <AppModal.Description>
+            Find and select a customer from the database. Type at least 2 characters to search.
+          </AppModal.Description>
         </div>
 
-        {/* Filter Popover Component */}
-        <AppFilterPopover
-          open={filterPopoverOpen}
-          onOpenChange={setFilterPopoverOpen}
-          title="Filters"
-          onResetAll={() => {
-            setSalesAreaFilter('All');
-            setTempSalesAreaFilter('All');
-            setFilterPopoverOpen(false);
-          }}
-          onApply={() => {
-            setSalesAreaFilter(tempSalesAreaFilter);
-            setFilterPopoverOpen(false);
-          }}
-          onClose={() => setFilterPopoverOpen(false)}
-          trigger={
-            <button
-              type="button"
-              className="h-11 px-4 flex items-center gap-2 rounded-xl border border-border bg-neutral/50 hover:bg-neutral/80 text-sm font-semibold text-text-info hover:text-text hover:border-accent-1/60 transition-all cursor-pointer shrink-0"
-            >
-              <Filter size={15} />
-              {salesAreaFilter !== 'All' && (
-                <span className="flex items-center justify-center bg-accent-1 text-white text-[9px] font-bold h-4 w-4 rounded-full -mr-1">
-                  1
-                </span>
-              )}
-            </button>
-          }
-        >
-          <AppFilterPopover.Group
-            title="Sales Area"
-            showReset={tempSalesAreaFilter !== 'All'}
-            onReset={() => setTempSalesAreaFilter('All')}
-          >
-            <AppSelect
-              options={salesAreas.map((s) => ({ value: s, label: s }))}
-              value={tempSalesAreaFilter}
-              onChange={(val) => setTempSalesAreaFilter(val)}
-              placeholder="Select sales area"
-              variant="borderless"
+        {/* Search Input and Filters */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <AppInput
+              preset="search"
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Type customer name or ID..."
+              className="w-full"
             />
-          </AppFilterPopover.Group>
-        </AppFilterPopover>
-      </div>
-
-      {/* Customers Table or Search Help State */}
-      <div className="px-5 py-2 max-h-[40vh] overflow-y-auto">
-        {!hasSearched ? (
-          <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
-            <Search size={32} className="opacity-30 mb-2.5" />
-            <p className="text-sm font-semibold">Enter a customer name or ID to start searching</p>
-            <p className="text-xs mt-1">Type at least 2 characters to fetch matching database entries.</p>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
-            <Building2 size={32} className="opacity-30 mb-2.5" />
-            <p className="text-sm font-semibold">No customers found</p>
-            <p className="text-xs mt-1">Try typing a different name or checking your Sales Area filter.</p>
-          </div>
-        ) : (
-          <AppTable<Customer>
-            columns={columns}
-            dataSource={filtered}
-            rowKey="id"
-            pagination={false}
-            size="small"
-            onRow={(record) => ({
-              onClick: (event) => {
-                // Prevent action click double trigger
-                const target = event.target as HTMLElement;
-                if (target.closest('button')) return;
-                handleSelect(record.name.split('\n')[0]);
-              },
-            })}
-            className="cursor-pointer"
-          />
-        )}
-      </div>
 
-      {/* Footer */}
-      <div className="px-5 py-3.5 flex items-center justify-between bg-neutral/10">
-        <p className="text-xs text-text-info">
-          Found: <span className="font-bold text-text">{hasSearched ? filtered.length : 0}</span> matching customers
-        </p>
-        <div className="flex items-center gap-2">
-          <AppButton variant="neutral" size="md" onClick={onClose}>
-            Cancel
-          </AppButton>
+          {/* Filter Popover Component */}
+          <AppFilterPopover
+            open={filterPopoverOpen}
+            onOpenChange={setFilterPopoverOpen}
+            title="Filters"
+            onResetAll={() => {
+              setSalesAreaFilter('All');
+              setTempSalesAreaFilter('All');
+              setFilterPopoverOpen(false);
+            }}
+            onApply={() => {
+              setSalesAreaFilter(tempSalesAreaFilter);
+              setFilterPopoverOpen(false);
+            }}
+            onClose={() => setFilterPopoverOpen(false)}
+            trigger={
+              <AppButton
+                variant="neutral"
+                leftIcon={<Filter size={15} />}
+                className="shrink-0"
+              >
+                <span>Filter</span>
+                {salesAreaFilter !== 'All' && (
+                  <span className="flex items-center justify-center bg-accent-1 text-white text-[9px] font-bold h-4 w-4 rounded-full ml-1.5">
+                    1
+                  </span>
+                )}
+              </AppButton>
+            }
+          >
+            <AppFilterPopover.Group
+              title="Sales Area"
+              showReset={tempSalesAreaFilter !== 'All'}
+              onReset={() => setTempSalesAreaFilter('All')}
+            >
+              <AppSelect
+                options={salesAreas.map((s) => ({ value: s, label: s }))}
+                value={tempSalesAreaFilter}
+                onChange={(val) => setTempSalesAreaFilter(val)}
+                placeholder="Select sales area"
+                variant="borderless"
+              />
+            </AppFilterPopover.Group>
+          </AppFilterPopover>
         </div>
-      </div>
+
+        {/* Customers Table or Search Help State */}
+        <div className="max-h-[45vh] overflow-y-auto">
+          {!hasSearched ? (
+            <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
+              <Search size={32} className="opacity-30 mb-2.5" />
+              <p className="text-sm font-semibold">Enter a customer name or ID to start searching</p>
+              <p className="text-xs mt-1">Type at least 2 characters to fetch matching database entries.</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
+              <Building2 size={32} className="opacity-30 mb-2.5" />
+              <p className="text-sm font-semibold">No customers found</p>
+              <p className="text-xs mt-1">Try typing a different name or checking your Sales Area filter.</p>
+            </div>
+          ) : (
+            <AppTable<Customer>
+              columns={columns}
+              dataSource={filtered}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              onRow={(record) => ({
+                onClick: (event) => {
+                  const target = event.target as HTMLElement;
+                  if (target.closest('button')) return;
+                  handleSelect(record.name.split('\n')[0]);
+                },
+              })}
+              className="cursor-pointer"
+            />
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-border/40">
+          <p className="text-xs text-text-info">
+            Found: <span className="font-bold text-text">{hasSearched ? filtered.length : 0}</span> matching customers
+          </p>
+          <div className="flex items-center gap-2">
+            <AppButton variant="neutral" onClick={onClose}>
+              Cancel
+            </AppButton>
+          </div>
+        </div>
+      </AppModal.Body>
     </AppModal>
   );
 }

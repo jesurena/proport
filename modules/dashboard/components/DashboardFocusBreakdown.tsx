@@ -1,6 +1,6 @@
 import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
-import { AppLabel } from '@integrated-computer-system/ui-kit';
+import { AppLabel, AppCard } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardFocusBreakdownProps {
@@ -17,13 +17,12 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
   const dashOffset = circumference - (focusPct / 100) * circumference;
 
   return (
-    <div className="bg-card-bg border border-border/60 rounded-3xl p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <AppCard variant="default" padding="md">
+      <div className="flex items-center justify-start">
         <div>
-          <AppLabel as="h4" variant="title" className="!text-sm !font-bold">Inquiry Focus Breakdown</AppLabel>
-          <AppLabel as="p" variant="description" className="text-[10px] mt-0.5">Focus vs Non-Focus share in inquiries</AppLabel>
+          <AppLabel as="h4" variant="title" className="!text-sm !font-bold">Ticket Focus Breakdown</AppLabel>
+          <AppLabel as="p" variant="description" className="text-[10px] mt-0.5">Focus vs Non-Focus share in tickets</AppLabel>
         </div>
-        <MoreHorizontal size={16} className="text-text-info cursor-pointer" />
       </div>
 
       {/* Donut chart */}
@@ -66,6 +65,6 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
           <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{nonFocusCount} ({nonFocusPct}%)</AppLabel>
         </div>
       </div>
-    </div>
+    </AppCard>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   AppLabel,
   AppSidebar,
@@ -13,8 +13,7 @@ import {
 } from 'lucide-react';
 import { SettingsModal } from '@/modules/settings';
 import SearchModal from '@/components/SearchModal';
-import { ComposeModal } from '@/modules/compose/components/ComposeModal';
-import { BrandTypeSelectModal } from '@/modules/compose/components/BrandTypeSelectModal';
+import { ComposeModal, useComposeStore } from '@/modules/compose';
 import { getTicketCountByStatus } from '@/lib/stats';
 import { StatusCount } from '@/lib/types';
 import SidebarAppDropdown from './SidebarAppDropdown';
@@ -24,14 +23,16 @@ import { getSidebarGroups, type SidebarGroup, type SidebarItem } from './Sidebar
 export default function ProportSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentQuery = searchParams ? searchParams.toString() : '';
+  const fullCurrentPath = pathname + (currentQuery ? `?${currentQuery}` : '');
+
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [statusCounts, setStatusCounts] = useState<StatusCount[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [brandSelectOpen, setBrandSelectOpen] = useState(false);
-  const [composeOpen, setComposeOpen] = useState(false);
-  const [selectedBrandType, setSelectedBrandType] = useState<'Focus' | 'Non Focus' | undefined>(undefined);
+  const openCompose = useComposeStore((s) => s.openCompose);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['Focus']);
   const [role, setRole] = useState<string>('super_user');
 
@@ -51,7 +52,9 @@ export default function ProportSidebar() {
 
   useEffect(() => {
     const handleToggle = () => setMobileOpen((prev) => !prev);
-    const handleCompose = () => setBrandSelectOpen(true);
+    const handleCompose = () => {
+      openCompose('Focus');
+    };
     const handleSearch = () => setSearchOpen(true);
     window.addEventListener('tcd-toggle-sidebar', handleToggle);
     window.addEventListener('tcd-open-compose', handleCompose);
@@ -61,13 +64,7 @@ export default function ProportSidebar() {
       window.removeEventListener('tcd-open-compose', handleCompose);
       window.removeEventListener('tcd-open-search', handleSearch);
     };
-  }, []);
-
-  const handleBrandSelect = (type: 'Focus' | 'Non Focus') => {
-    setSelectedBrandType(type);
-    setBrandSelectOpen(false);
-    setComposeOpen(true);
-  };
+  }, [openCompose]);
 
   const totalOpen = statusCounts
     .filter((s) => s.status !== 'closed')
@@ -95,7 +92,7 @@ export default function ProportSidebar() {
               <AppSidebar.Toggle />
               {(role === 'sales' || role === 'super_user') && (
                 <button
-                  onClick={() => setBrandSelectOpen(true)}
+                  onClick={() => openCompose('Focus')}
                   title="Compose Request"
                   className="w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer group">
                   <PenSquare size={15} className="group-hover:scale-110 transition-transform" />
@@ -112,7 +109,7 @@ export default function ProportSidebar() {
                 <div className="px-1">
                   {/* Compose button */}
                   <button
-                    onClick={() => setBrandSelectOpen(true)}
+                    onClick={() => openCompose('Focus')}
                     className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group border border-border hover:text-text hover:bg-hover/60 font-medium"
                   >
                     <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
@@ -132,8 +129,8 @@ export default function ProportSidebar() {
                 {group.items.map((item) => {
                   const hasSubItems = item.subItems && item.subItems.length > 0;
                   const isExpanded = expandedMenus.includes(item.name);
-                  const isSubActive = hasSubItems && item.subItems?.some(sub => pathname + (typeof window !== 'undefined' ? window.location.search : '') === sub.href);
-                  const isActiveLink = !hasSubItems && pathname + (typeof window !== 'undefined' ? window.location.search : '') === item.href;
+                  const isSubActive = hasSubItems && item.subItems?.some(sub => fullCurrentPath === sub.href);
+                  const isActiveLink = !hasSubItems && fullCurrentPath === item.href;
                   const isParentActive = isSubActive || isActiveLink;
                   const Icon = item.icon;
 
@@ -167,7 +164,7 @@ export default function ProportSidebar() {
                         {isExpanded && (
                           <div className="flex flex-col gap-1 ml-6 pl-4 border-l-2 border-border overflow-hidden animate-in slide-in-from-top-1 duration-200 my-1">
                             {item.subItems?.map((sub) => {
-                              const isChildActive = pathname + (typeof window !== 'undefined' ? window.location.search : '') === sub.href;
+                              const isChildActive = fullCurrentPath === sub.href;
                               return (
                                 <button
                                   key={sub.name + '-' + sub.href}
@@ -189,7 +186,7 @@ export default function ProportSidebar() {
                     );
                   }
 
-                  const isActive = pathname + (typeof window !== 'undefined' ? window.location.search : '') === item.href;
+                  const isActive = fullCurrentPath === item.href;
 
                   return (
                     <AppSidebar.Item
@@ -223,16 +220,7 @@ export default function ProportSidebar() {
 
       <SettingsModal visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <BrandTypeSelectModal
-        open={brandSelectOpen}
-        onClose={() => setBrandSelectOpen(false)}
-        onSelect={handleBrandSelect}
-      />
-      <ComposeModal
-        open={composeOpen}
-        onClose={() => setComposeOpen(false)}
-        defaultBrandType={selectedBrandType}
-      />
+      <ComposeModal />
     </>
   );
 }

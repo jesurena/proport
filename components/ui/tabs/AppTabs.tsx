@@ -148,7 +148,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({
                                                 isUnderlined
                                                     ? cn(
                                                           'py-2 text-center text-sm font-semibold border-b-2 transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap border-transparent rounded-none',
-                                                          fullWidth ? 'flex-1' : 'flex-none px-1'
+                                                          fullWidth ? 'flex-1' : 'flex-none min-w-[100px] px-2'
                                                       )
                                                     : cn(
                                                           'flex items-center gap-2 md:gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap border border-transparent',

@@ -167,7 +167,7 @@ export function AppSummernoteEditor({
           background-color: var(--background) !important;
           border-color: var(--border) !important;
           color: var(--foreground) !important;
-          border-radius: var(--radius-xl) !important;
+          border-radius: 0px !important;
           overflow: hidden !important;
         }
 

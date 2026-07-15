@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { AppTable, AppAvatar, AppChip } from '@/components/ui';
+import { AppTable, AppAvatar, AppChip, AppLabel, AppButton } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardTableProps {
@@ -64,9 +64,13 @@ export default function DashboardTable({ recentTickets }: DashboardTableProps) {
       width: 80,
       render: () => (
         <div className="flex justify-end pr-1">
-          <button className="w-8 h-8 rounded-full border border-border/60 hover:bg-accent-1 hover:text-white flex items-center justify-center text-text-info transition-colors cursor-pointer shrink-0">
+          <AppButton
+            variant="neutral"
+            size="icon"
+            className="!w-8 !h-8 rounded-full"
+          >
             <ArrowRight size={13} />
-          </button>
+          </AppButton>
         </div>
       ),
     },
@@ -100,9 +104,13 @@ export default function DashboardTable({ recentTickets }: DashboardTableProps) {
     },
     action: () => (
       <div className="flex justify-end pr-1">
-        <button className="w-8 h-8 rounded-full border border-border/60 hover:bg-accent-1 hover:text-white flex items-center justify-center text-text-info transition-colors cursor-pointer shrink-0">
+        <AppButton
+          variant="neutral"
+          size="icon"
+          className="!w-8 !h-8 rounded-full"
+        >
           <ArrowRight size={13} />
-        </button>
+        </AppButton>
       </div>
     ),
   };
@@ -110,7 +118,7 @@ export default function DashboardTable({ recentTickets }: DashboardTableProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between pb-1">
-        <h3 className="text-base font-bold text-text">Your Inquiries</h3>
+        <AppLabel as="h3" variant="subtitle">Your Inquiries</AppLabel>
         <span onClick={() => router.push('/tickets')} className="text-xs font-semibold text-accent-1 hover:underline cursor-pointer">See all</span>
       </div>
 
