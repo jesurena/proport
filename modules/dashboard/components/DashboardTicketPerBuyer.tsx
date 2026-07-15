@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users } from 'lucide-react';
+import { Users, Award, Box } from 'lucide-react';
 import { AppLabel, AppModal, AppButton } from '@integrated-computer-system/ui-kit';
 import { AppToggle, AppTable, AppChip, AppAvatar } from '@/components/ui';
 import { STATUS_META } from '@/lib/types';
-import type { Ticket as TicketType } from '@/lib/types';
+import type { Ticket as TicketType, TicketStatus } from '@/lib/types';
 
 interface DashboardTicketPerBuyerProps {
   allTickets: TicketType[];
@@ -90,8 +90,8 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
       align: 'center' as const,
       width: '120px',
       render: (status: string) => {
-        const meta = STATUS_META[status as any];
-        return <AppChip variant={meta?.chipVariant ?? 'default'}>{meta?.label ?? status}</AppChip>;
+        const meta = STATUS_META[status as TicketStatus];
+        return <AppChip variant={(meta?.chipVariant as any) ?? 'default'} label={meta?.label ?? status} />;
       },
     },
     {
@@ -103,7 +103,7 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
         <AppAvatar
           name={record.assigneeName ?? 'Unassigned'}
           src={record.assigneeAvatar}
-          size="sm"
+          size={32}
         />
       ),
     },
@@ -112,7 +112,17 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
       dataIndex: 'brandType',
       key: 'brand',
       align: 'left' as const,
-      render: (type: string) => type,
+      render: (type: string) => {
+        if (!type) return <span className="text-text-info text-xs">—</span>;
+        return (
+          <AppChip
+            label={type}
+            color={type === 'Focus' ? '#7c3aed' : '#2563eb'}
+            icon={type === 'Focus' ? <Award /> : <Box />}
+            size="sm"
+          />
+        );
+      },
     },
     {
       title: 'Request Type',
@@ -120,13 +130,13 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
       key: 'requestType',
       align: 'left' as const,
       render: (type: string) => {
-        const variantMap: Record<string, string> = {
+        const variantMap: Record<string, any> = {
           'cost inquiry': 'warning',
           'demo unit': 'info',
           'service schedule': 'success',
-          'eta inquiry': 'primary',
+          'eta inquiry': 'accent',
         };
-        return <AppChip variant={variantMap[type] ?? 'default'}>{type}</AppChip>;
+        return <AppChip variant={variantMap[type] ?? 'default'} label={type} />;
       },
     },
   ];

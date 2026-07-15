@@ -5,6 +5,7 @@ import { Item } from './AppMenuItem';
 import { Title } from './AppMenuTitle';
 import { Description } from './AppMenuDescription';
 import { Action } from './AppMenuAction';
+import { AppFilterPopover } from './AppFilterPopover';
 
 type AppMenuPanelType = typeof AppMenuPanelComponent & {
     Category: typeof Category;
@@ -22,8 +23,9 @@ AppMenuPanel.Title = Title;
 AppMenuPanel.Description = Description;
 AppMenuPanel.Action = Action;
 
-export { AppPopover, AppMenuPanel };
+export { AppPopover, AppMenuPanel, AppFilterPopover };
 export type { AppPopoverProps } from './AppPopover';
+export type { AppFilterPopoverProps, FilterGroupProps } from './AppFilterPopover';
 export type { AppMenuPanelProps, MenuPanelCategory, MenuPanelItem } from './AppMenuPanel';
 export type { CategoryProps } from './AppMenuCategory';
 export type { ItemProps } from './AppMenuItem';

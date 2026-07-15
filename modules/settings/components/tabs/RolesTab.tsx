@@ -17,7 +17,7 @@ const ROLES: { value: Role; label: string; icon: React.ReactNode; color: string 
 const STORAGE_KEY = 'proport_my_role';
 
 export default function RolesTab() {
-    const [myRole, setMyRole] = useState<Role>('admin');
+    const [myRole, setMyRole] = useState<Role>('super_user');
     const [saved, setSaved] = useState(false);
 
     useEffect(() => {

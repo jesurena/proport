@@ -96,7 +96,7 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
     {
       title: 'System',
       items: [
-        { name: 'Brand Maintenance', href: '/maintenance/brands', icon: Tag },
+        { name: 'Brand Maintenance', href: '/brands', icon: Tag },
       ],
     },
   ];

@@ -53,6 +53,9 @@ export interface Ticket {
   requestType?: string;
   businessUnitId: string;
   businessUnitName: string;
+  aoId?: string;
+  aoName?: string;
+  cc?: string[];
   createdAt: string;   // ISO string
   updatedAt: string;   // ISO string
   closedAt?: string;   // ISO string
@@ -63,6 +66,9 @@ export interface Ticket {
   supplierName?: string;
   targetPrice?: number;
   estimatedQuantity?: number;
+  customerName?: string;
+  projectName?: string;
+  brandName?: string;
 }
 
 // ─── Stat Types ─────────────────────────────────────────────────────────────

@@ -24,7 +24,8 @@ const MODULES: ModuleItem[] = [
   { id: 'compose', label: 'Compose Inquiry', path: '/compose', description: 'Create a new price inquiry request' },
   { id: 'tickets', label: 'All Inquiries', path: '/tickets', description: 'View and filter all pricing inquiries' },
   { id: 'reports', label: 'Reports', path: '/reports', description: 'Analytics and pricing trends' },
-  { id: 'suppliers', label: 'Supplier Settings', path: '/maintenance/suppliers', description: 'Manage supplier definitions' },
+  { id: 'brands', label: 'Brand Maintenance', path: '/brands', description: 'Manage global brand catalog and focus classification' },
+  { id: 'suppliers', label: 'Supplier Settings', path: '/suppliers', description: 'Manage supplier definitions' },
   { id: 'logs', label: 'User Logs', path: '/logs', description: 'Audit trails and security logs' },
 ];
 

@@ -14,6 +14,7 @@ import {
 import { SettingsModal } from '@/modules/settings';
 import SearchModal from '@/components/SearchModal';
 import { ComposeModal } from '@/modules/compose/components/ComposeModal';
+import { BrandTypeSelectModal } from '@/modules/compose/components/BrandTypeSelectModal';
 import { getTicketCountByStatus } from '@/lib/stats';
 import { StatusCount } from '@/lib/types';
 import SidebarAppDropdown from './SidebarAppDropdown';
@@ -28,9 +29,11 @@ export default function ProportSidebar() {
   const [statusCounts, setStatusCounts] = useState<StatusCount[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [brandSelectOpen, setBrandSelectOpen] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
+  const [selectedBrandType, setSelectedBrandType] = useState<'Focus' | 'Non Focus' | undefined>(undefined);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['Focus']);
-  const [role, setRole] = useState<string>('admin');
+  const [role, setRole] = useState<string>('super_user');
 
   const toggleSubMenu = (name: string) => {
     setExpandedMenus((prev) =>
@@ -48,7 +51,7 @@ export default function ProportSidebar() {
 
   useEffect(() => {
     const handleToggle = () => setMobileOpen((prev) => !prev);
-    const handleCompose = () => setComposeOpen(true);
+    const handleCompose = () => setBrandSelectOpen(true);
     const handleSearch = () => setSearchOpen(true);
     window.addEventListener('tcd-toggle-sidebar', handleToggle);
     window.addEventListener('tcd-open-compose', handleCompose);
@@ -59,6 +62,12 @@ export default function ProportSidebar() {
       window.removeEventListener('tcd-open-search', handleSearch);
     };
   }, []);
+
+  const handleBrandSelect = (type: 'Focus' | 'Non Focus') => {
+    setSelectedBrandType(type);
+    setBrandSelectOpen(false);
+    setComposeOpen(true);
+  };
 
   const totalOpen = statusCounts
     .filter((s) => s.status !== 'closed')
@@ -84,18 +93,14 @@ export default function ProportSidebar() {
           {collapsed ? (
             <div className="flex flex-col items-center gap-3 w-full">
               <AppSidebar.Toggle />
-              <button
-                onClick={() => setComposeOpen(true)}
-                title={role === 'sales' ? 'Compose Request' : 'Compose Inquiry'}
-                className={cn(
-                  "w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer group",
-                  role === 'sales'
-                    ? "bg-[#d946ef] text-white hover:bg-[#c084fc] border-none"
-                    : "border border-border text-text-info hover:text-text hover:bg-hover/60"
-                )}
-              >
-                <PenSquare size={15} className="group-hover:scale-110 transition-transform" />
-              </button>
+              {(role === 'sales' || role === 'super_user') && (
+                <button
+                  onClick={() => setBrandSelectOpen(true)}
+                  title="Compose Request"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer group">
+                  <PenSquare size={15} className="group-hover:scale-110 transition-transform" />
+                </button>
+              )}
             </div>
           ) : (
             <div className="flex flex-col gap-3 w-full">
@@ -103,21 +108,23 @@ export default function ProportSidebar() {
                 <SidebarAppDropdown />
                 <AppSidebar.Toggle className="h-8 w-8 shrink-0" />
               </div>
-              <div className="px-1">
-                {/* Compose button */}
-                <button
-                  onClick={() => setComposeOpen(true)}
-                  className={cn(
-                    "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group",
-                    role === 'sales'
-                      ? "bg-[#d946ef] text-white hover:bg-[#c084fc] font-semibold border-none"
-                      : "border border-border hover:text-text hover:bg-hover/60 font-medium"
-                  )}
-                >
-                  <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
-                  <span>{role === 'sales' ? 'Compose Request' : 'Compose'}</span>
-                </button>
-              </div>
+              {(role === 'sales' || role === 'super_user') && (
+                <div className="px-1">
+                  {/* Compose button */}
+                  <button
+                    onClick={() => setBrandSelectOpen(true)}
+                    className={cn(
+                      "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group",
+                      role === 'sales'
+                        ? "bg-[#d946ef] text-white hover:bg-[#c084fc] font-semibold border-none"
+                        : "border border-border hover:text-text hover:bg-hover/60 font-medium"
+                    )}
+                  >
+                    <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
+                    <span>{role === 'sales' ? 'Compose Request' : 'Compose'}</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </AppSidebar.Header>
@@ -221,7 +228,16 @@ export default function ProportSidebar() {
 
       <SettingsModal visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <ComposeModal open={composeOpen} onClose={() => setComposeOpen(false)} />
+      <BrandTypeSelectModal
+        open={brandSelectOpen}
+        onClose={() => setBrandSelectOpen(false)}
+        onSelect={handleBrandSelect}
+      />
+      <ComposeModal
+        open={composeOpen}
+        onClose={() => setComposeOpen(false)}
+        defaultBrandType={selectedBrandType}
+      />
     </>
   );
 }

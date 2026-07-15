@@ -8,7 +8,7 @@ import {
   BrandMaintenanceTable,
   BrandModal,
   useBrandMaintenance,
-} from '@/modules/maintenance';
+} from '@/modules/brand';
 
 export default function BrandsPage() {
   const {

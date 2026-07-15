@@ -57,6 +57,12 @@ export function createTicket(data: {
   supplierName?: string;
   targetPrice?: number;
   estimatedQuantity?: number;
+  brandType?: string;
+  aoId?: string;
+  cc?: string[];
+  customerName?: string;
+  projectName?: string;
+  brandName?: string;
 }): Ticket {
   const tickets = getTickets();
   const users = getUsers();
@@ -65,6 +71,7 @@ export function createTicket(data: {
 
   const requester = users.find((u) => u.id === (data.requesterId || 'user-1'));
   const bu = businessUnits.find((b) => b.id === data.businessUnitId);
+  const aoUser = data.aoId ? users.find((u) => u.id === data.aoId) : undefined;
 
   const now = new Date().toISOString();
   const ticket: Ticket = {
@@ -78,6 +85,9 @@ export function createTicket(data: {
     requesterName: requester?.name || 'Unknown User',
     businessUnitId: data.businessUnitId,
     businessUnitName: bu?.name || 'Unknown',
+    aoId: aoUser?.id,
+    aoName: aoUser?.name,
+    cc: data.cc,
     createdAt: now,
     updatedAt: now,
     replies: [],
@@ -86,6 +96,10 @@ export function createTicket(data: {
     supplierName: data.supplierName,
     targetPrice: data.targetPrice,
     estimatedQuantity: data.estimatedQuantity,
+    brandType: data.brandType,
+    customerName: data.customerName,
+    projectName: data.projectName,
+    brandName: data.brandName,
   };
 
   tickets.unshift(ticket);

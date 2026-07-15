@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Trash2, MoreVertical, Target, Circle } from 'lucide-react';
+import { Edit, Trash2, MoreVertical, Award, Box } from 'lucide-react';
 import { AppChip } from '@integrated-computer-system/ui-kit';
 import { AppDropdown, AppTable } from '@/components/ui';
 import type { Brand } from '@/lib/brands';
@@ -31,7 +31,7 @@ export default function BrandMaintenanceTable({
         <AppChip
           label={type}
           color={type === 'Focus' ? '#7c3aed' : '#2563eb'}
-          icon={type === 'Focus' ? <Target /> : <Circle />}
+          icon={type === 'Focus' ? <Award /> : <Box />}
           size="sm"
         />
       ),

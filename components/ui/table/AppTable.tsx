@@ -19,7 +19,7 @@ export interface AppTableColumnType<RecordType> {
 export interface AppTableProps<RecordType> extends Omit<TableProps<RecordType>, 'columns'> {
   columns: AppTableColumnType<RecordType>[];
   dataSource: RecordType[];
-
+  slots?: Record<string, (value: any, record: RecordType, index: number) => React.ReactNode>;
   className?: string;
 }
 
@@ -28,9 +28,23 @@ export function AppTable<RecordType extends object>({
   dataSource,
   className,
   pagination,
+  slots,
   ...props
 }: AppTableProps<RecordType>) {
-  const resolvedColumns = React.useMemo(() => columns, [columns]);
+  const resolvedColumns = React.useMemo(() => {
+    if (!slots) return columns;
+    return columns.map((col) => {
+      const slot = col.slotName;
+      if (slot && slots[slot]) {
+        return {
+          ...col,
+          render: (value: any, record: RecordType, index: number) =>
+            slots[slot](value, record, index),
+        };
+      }
+      return col;
+    });
+  }, [columns, slots]);
 
   const resolvedPagination = pagination;
 
