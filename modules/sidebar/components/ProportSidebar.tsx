@@ -113,12 +113,7 @@ export default function ProportSidebar() {
                   {/* Compose button */}
                   <button
                     onClick={() => setBrandSelectOpen(true)}
-                    className={cn(
-                      "flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group",
-                      role === 'sales'
-                        ? "bg-[#d946ef] text-white hover:bg-[#c084fc] font-semibold border-none"
-                        : "border border-border hover:text-text hover:bg-hover/60 font-medium"
-                    )}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group border border-border hover:text-text hover:bg-hover/60 font-medium"
                   >
                     <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
                     <span>{role === 'sales' ? 'Compose Request' : 'Compose'}</span>
