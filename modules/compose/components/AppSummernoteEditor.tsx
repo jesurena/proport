@@ -161,6 +161,107 @@ export function AppSummernoteEditor({
         onLoad={handleSummernoteLoad}
       />
 
+      <style>{`
+        /* Note Frame Wrapper */
+        .note-editor.note-frame {
+          background-color: var(--background) !important;
+          border-color: var(--border) !important;
+          color: var(--foreground) !important;
+          border-radius: var(--radius-xl) !important;
+          overflow: hidden !important;
+        }
+
+        /* Toolbar */
+        .note-editor .note-toolbar {
+          background-color: var(--neutral) !important;
+          border-bottom: 1px solid var(--border) !important;
+          color: var(--foreground) !important;
+          padding: 6px 12px !important;
+        }
+
+        /* Buttons in toolbar */
+        .note-editor .note-btn {
+          background-color: transparent !important;
+          border-color: transparent !important;
+          color: var(--text-info) !important;
+          transition: all 0.15s ease !important;
+        }
+
+        .note-editor .note-btn:hover {
+          background-color: var(--hover-bg) !important;
+          color: var(--foreground) !important;
+        }
+
+        .note-editor .note-btn.active {
+          background-color: var(--hover-bg) !important;
+          color: var(--accent-1) !important;
+        }
+
+        /* Editable Text Area */
+        .note-editor .note-editable {
+          background-color: var(--background) !important;
+          color: var(--foreground) !important;
+        }
+
+        /* Placeholder inside editable area */
+        .note-editor .note-placeholder {
+          color: var(--text-info) !important;
+          opacity: 0.4 !important;
+        }
+
+        /* Dropdown Menu inside Summernote */
+        .note-dropdown-menu {
+          background-color: var(--neutral) !important;
+          border: 1px solid var(--border) !important;
+          border-radius: var(--radius-md) !important;
+          box-shadow: var(--shadow-lg) !important;
+        }
+
+        .note-dropdown-menu .note-dropdown-item {
+          color: var(--foreground) !important;
+        }
+
+        .note-dropdown-menu .note-dropdown-item:hover {
+          background-color: var(--hover-bg) !important;
+        }
+
+        /* Modal/Dialog for link/image/table */
+        .note-modal-content {
+          background-color: var(--neutral) !important;
+          border: 1px solid var(--border) !important;
+          color: var(--foreground) !important;
+        }
+
+        .note-modal-header {
+          border-bottom: 1px solid var(--border) !important;
+        }
+
+        .note-modal-footer {
+          border-top: 1px solid var(--border) !important;
+        }
+
+        .note-form-label {
+          color: var(--text-info) !important;
+        }
+
+        .note-input {
+          background-color: var(--background) !important;
+          border: 1px solid var(--border) !important;
+          color: var(--foreground) !important;
+          border-radius: var(--radius-md) !important;
+        }
+
+        /* Status Bar / Bottom resize bar */
+        .note-statusbar {
+          background-color: var(--neutral) !important;
+          border-top: 1px solid var(--border) !important;
+        }
+
+        .note-statusbar .note-resizebar {
+          border-top: 1px solid var(--border) !important;
+        }
+      `}</style>
+
       <div className={className}>
         <div ref={editorRef} />
       </div>
