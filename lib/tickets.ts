@@ -63,6 +63,7 @@ export function createTicket(data: {
   customerName?: string;
   projectName?: string;
   brandName?: string;
+  tags?: string[];
 }): Ticket {
   const tickets = getTickets();
   const users = getUsers();
@@ -91,6 +92,7 @@ export function createTicket(data: {
     createdAt: now,
     updatedAt: now,
     replies: [],
+    tags: data.tags || [],
     
     // Pricing Fields
     supplierName: data.supplierName,
@@ -165,6 +167,20 @@ export function updateTicketAssignee(ticketId: string, assigneeId: string): Tick
   tickets[idx].assigneeId = assignee.id;
   tickets[idx].assigneeName = assignee.name;
   tickets[idx].status = 'assigned';
+  tickets[idx].updatedAt = new Date().toISOString();
+
+  setItem(STORAGE_KEYS.TICKETS, tickets);
+  return tickets[idx];
+}
+
+export function addTicketTags(ticketId: string, tags: string[]): Ticket | null {
+  const tickets = getTickets();
+  const idx = tickets.findIndex((t) => t.id === ticketId);
+  if (idx === -1) return null;
+
+  const currentTags = tickets[idx].tags || [];
+  const newTags = Array.from(new Set([...currentTags, ...tags]));
+  tickets[idx].tags = newTags;
   tickets[idx].updatedAt = new Date().toISOString();
 
   setItem(STORAGE_KEYS.TICKETS, tickets);

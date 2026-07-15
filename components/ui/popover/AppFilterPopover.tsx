@@ -36,7 +36,7 @@ export function FilterGroup({
                     </button>
                 )}
             </div>
-            <div className="text-sm bg-neutral/40 rounded-xl px-2 py-0.5 border border-border/40">
+            <div className="text-sm bg-neutral/40 rounded-md px-2 py-0.5 border border-border/40">
                 {children}
             </div>
         </div>
@@ -90,7 +90,7 @@ export function AppFilterPopover({
 
             {/* Footer Actions */}
             {(onClose || onApply) && (
-                <div className="flex items-center gap-2 mt-2 pt-3 border-t border-border/40">
+                <div className="flex items-center gap-2">
                     {onClose && (
                         <AppButton
                             variant="neutral"

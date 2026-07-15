@@ -29,6 +29,7 @@ export function AppCustomerSelectModal({
   const [salesAreaFilter, setSalesAreaFilter] = useState('All');
   const [tempSalesAreaFilter, setTempSalesAreaFilter] = useState('All');
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
+  const activeFiltersCount = salesAreaFilter !== 'All' ? 1 : 0;
 
   const customers = useMemo(() => getCustomers(), []);
 
@@ -174,14 +175,8 @@ export function AppCustomerSelectModal({
               <AppButton
                 variant="neutral"
                 leftIcon={<Filter size={15} />}
-                className="shrink-0"
               >
-                <span>Filter</span>
-                {salesAreaFilter !== 'All' && (
-                  <span className="flex items-center justify-center bg-accent-1 text-white text-[9px] font-bold h-4 w-4 rounded-full ml-1.5">
-                    1
-                  </span>
-                )}
+                Filter {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}
               </AppButton>
             }
           >

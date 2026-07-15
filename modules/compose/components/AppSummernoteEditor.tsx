@@ -49,8 +49,8 @@ export function AppSummernoteEditor({
         ['color', ['color']],
         ['para', ['ul', 'ol', 'paragraph']],
         ['table', ['table']],
-        ['insert', ['link', 'picture', 'hr']],
-        ['view', ['codeview', 'undo', 'redo']],
+        ['insert', ['link', 'picture']],
+        ['view', ['codeview']],
       ],
       fontNames: [
         'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Georgia',
@@ -181,19 +181,23 @@ export function AppSummernoteEditor({
 
         /* Buttons in toolbar */
         .note-editor .note-btn {
-          background-color: transparent !important;
-          border-color: transparent !important;
+          background-color: var(--card-bg) !important;
+          border: 1px solid var(--border) !important;
           color: var(--text-info) !important;
+          border-radius: var(--radius-md) !important;
+          margin: 0 2px !important;
           transition: all 0.15s ease !important;
         }
 
         .note-editor .note-btn:hover {
           background-color: var(--hover-bg) !important;
+          border-color: var(--text-info) !important;
           color: var(--foreground) !important;
         }
 
         .note-editor .note-btn.active {
           background-color: var(--hover-bg) !important;
+          border-color: var(--accent-1) !important;
           color: var(--accent-1) !important;
         }
 

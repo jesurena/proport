@@ -30,7 +30,8 @@ import {
 } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
 import TicketThread from '@/components/tickets/TicketThread';
-import { getTicketById, addReply, updateTicketStatus, updateTicketAssignee, getUsers } from '@/lib/tickets';
+import { AppAttachmentCard, AppFilePreview } from '@/components/ui';
+import { getTicketById, addReply, updateTicketStatus, updateTicketAssignee, getUsers, addTicketTags } from '@/lib/tickets';
 import { STATUS_META, PRIORITY_META } from '@/lib/types';
 import type { Ticket, TicketStatus } from '@/lib/types';
 
@@ -44,6 +45,7 @@ export default function TicketDetailPage() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [infoExpanded, setInfoExpanded] = useState(true);
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(true);
+  const [previewFile, setPreviewFile] = useState<File | string | null>(null);
 
   const [cc, setCc] = useState('');
 
@@ -74,6 +76,10 @@ export default function TicketDetailPage() {
     setSending(true);
     await new Promise((r) => setTimeout(r, 300));
     addReply(ticketId, { content: contentText });
+    
+    if (attachments.length > 0) {
+      addTicketTags(ticketId, attachments.map(f => f.name));
+    }
     
     if (descRef.current) descRef.current.innerHTML = '';
     setAttachments([]);
@@ -241,15 +247,16 @@ export default function TicketDetailPage() {
 
                 {/* Attachment chips */}
                 {attachments.length > 0 && (
-                  <div className="px-5 py-2.5 flex flex-wrap gap-1.5 border-t border-border/20 bg-neutral/5">
+                  <div className="px-5 py-2.5 flex flex-wrap gap-2.5 border-t border-border/20 bg-neutral/5 max-h-[140px] overflow-y-auto">
                     {attachments.map((f, i) => (
-                      <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-card-bg border border-border/60 text-xs font-medium text-text">
-                        <Paperclip size={11} className="text-text-info" />
-                        <span className="max-w-[150px] truncate">{f.name}</span>
-                        <button onClick={() => setAttachments((p) => p.filter((_, idx) => idx !== i))} className="text-text-info hover:text-danger cursor-pointer ml-1">
-                          <XCircle size={12} className="opacity-70" />
-                        </button>
-                      </span>
+                      <AppAttachmentCard
+                        key={i}
+                        name={f.name}
+                        size={f.size}
+                        onRemove={() => setAttachments((p) => p.filter((_, idx) => idx !== i))}
+                        onClick={() => setPreviewFile(f)}
+                        variant="uploading"
+                      />
                     ))}
                   </div>
                 )}
@@ -495,18 +502,18 @@ export default function TicketDetailPage() {
                 {attachmentsExpanded ? <ChevronUp size={14} className="text-text-info" /> : <ChevronDown size={14} className="text-text-info" />}
               </div>
               {attachmentsExpanded && (
-                <div className="p-4 space-y-3">
+                <div className="p-4 space-y-3 flex flex-col items-center">
                   {ticket.tags && ticket.tags.length > 0 ? (
                     ticket.tags.map((tag, idx) => (
-                      <div key={idx} className="flex items-center gap-3 text-sm">
-                        <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-[10px] font-bold shrink-0">
-                          <FileText size={16} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-text truncate">{tag}</p>
-                          <p className="text-[11px] text-text-info">Shared with inquiry</p>
-                        </div>
-                      </div>
+                      <AppAttachmentCard
+                        key={idx}
+                        name={tag}
+                        variant="shared"
+                        onClick={() => setPreviewFile(tag)}
+                        onDownload={() => {
+                          alert(`Downloading: ${tag}`);
+                        }}
+                      />
                     ))
                   ) : (
                     <span className="text-xs text-text-info italic">No files shared</span>
@@ -559,6 +566,12 @@ export default function TicketDetailPage() {
           </div>
         </div>
       )}
+
+      <AppFilePreview
+        open={!!previewFile}
+        onClose={() => setPreviewFile(null)}
+        file={previewFile}
+      />
     </>
   );
 }

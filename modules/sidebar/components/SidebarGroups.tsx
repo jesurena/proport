@@ -60,7 +60,7 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
       title: 'Navigation',
       items: [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-        { name: 'All Inquiries', href: '/tickets', icon: Ticket, badge: totalOpen },
+        { name: 'All Tickets', href: '/tickets', icon: Ticket, badge: totalOpen },
         { name: 'Reports', href: '/reports', icon: FileBarChart },
       ],
     },
@@ -83,8 +83,8 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
           subItems: [
             { name: 'BU Head Approval', href: '/tickets?tab=bu-approval' },
             { name: 'Declined by BU Head', href: '/tickets?tab=bu-declined' },
-            { name: 'Final Approval', href: '/tickets?tab=non-focus&status=final-approval' },
-            { name: 'Declined by Adel', href: '/tickets?tab=non-focus&status=adel-declined' },
+            { name: 'Final Approval', href: '/tickets?tab=final-approval' },
+            { name: 'Declined by Adel', href: '/tickets?tab=adel-declined' },
             { name: 'Pending Request', href: '/tickets?tab=non-focus&status=pending' },
             { name: 'Answered Request', href: '/tickets?tab=non-focus&status=answered' },
             { name: 'Closed Request', href: '/tickets?tab=non-focus&status=closed' },

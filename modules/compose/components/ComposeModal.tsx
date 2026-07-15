@@ -13,6 +13,7 @@ import { AppUserSelect } from './AppUserSelect';
 import { AppUserSelectModal } from './AppUserSelectModal';
 import { AppCustomerSelectModal } from './AppCustomerSelectModal';
 import { AppSummernoteEditor } from './AppSummernoteEditor';
+import { AppAttachmentCard, AppFilePreview } from '@/components/ui';
 import { useComposeStore } from '../stores';
 import { getBrands, type Brand } from '@/lib/brands';
 import { createTicket, getBusinessUnits, getUsers } from '@/lib/tickets';
@@ -97,6 +98,7 @@ export function ComposeModal() {
   const [submitting, setSubmitting] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [description, setDescription] = useState('');
+  const [previewFile, setPreviewFile] = useState<File | string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const buyerOptions = [
@@ -133,6 +135,7 @@ export function ComposeModal() {
       setCustomerName(''); setProjectName(''); setCustomerModalOpen(false);
       setAttachments([]); setShowDetails(false);
       setDescription('');
+      setPreviewFile(null);
     }
   }, [isOpen, defaultBrandType]);
 
@@ -183,6 +186,7 @@ export function ComposeModal() {
       cc: selectedCcUsers.length ? selectedCcUsers.map((u) => u.email) : undefined,
       customerName: customerName.trim() || undefined,
       projectName: projectName.trim() || undefined,
+      tags: attachments.map((f) => f.name),
     });
     setSubmitting(false);
     closeCompose();
@@ -201,7 +205,7 @@ export function ComposeModal() {
     borderTopRightRadius: '0px',
   } : {
     top: `calc(100vh - ${normalHeight})`,
-    left: `max(12px, calc(100vw - 780px - 24px))`,
+    left: `max(12px, calc(100vw - 820px - 24px))`,
     right: '24px',
     bottom: '0px',
     borderTopLeftRadius: '14px',
@@ -489,15 +493,16 @@ export function ComposeModal() {
 
             {/* ── Attachment chips ── */}
             {attachments.length > 0 && (
-              <div className="px-4 py-2 flex flex-wrap gap-1.5 border-t border-border/40 shrink-0">
+              <div className="px-4 py-2 flex flex-wrap gap-2.5 border-t border-border/40 shrink-0 max-h-[140px] overflow-y-auto">
                 {attachments.map((f, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral border border-border text-xs font-medium text-text">
-                    <Paperclip size={9} className="text-text-info" />
-                    <span className="max-w-[100px] truncate">{f.name}</span>
-                    <button onClick={() => setAttachments((p) => p.filter((_, idx) => idx !== i))} className="text-text-info hover:text-danger cursor-pointer">
-                      <X size={9} />
-                    </button>
-                  </span>
+                  <AppAttachmentCard
+                    key={i}
+                    name={f.name}
+                    size={f.size}
+                    onRemove={() => setAttachments((p) => p.filter((_, idx) => idx !== i))}
+                    onClick={() => setPreviewFile(f)}
+                    variant="uploading"
+                  />
                 ))}
               </div>
             )}
@@ -540,6 +545,12 @@ export function ComposeModal() {
         onClose={() => setCustomerModalOpen(false)}
         onSelect={setCustomerName}
         initialSearch={customerName}
+      />
+
+      <AppFilePreview
+        open={!!previewFile}
+        onClose={() => setPreviewFile(null)}
+        file={previewFile}
       />
     </>
   );

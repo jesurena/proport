@@ -112,14 +112,14 @@ export default function ProportNavbar({ title, children }: ProportNavbarProps) {
     }
     const items = [{ label: 'Home', href: '/' }];
     if (pathname.startsWith('/tickets')) {
-      items.push({ label: 'Inquiries', href: '/tickets' });
+      items.push({ label: 'Tickets', href: '/tickets' });
       const parts = pathname.split('/');
       if (parts.length > 2 && parts[2]) {
         const cleanPart = parts[2].substring(0, 8);
-        items.push({ label: cleanPart.match(/^[0-9a-fA-F-]+$/) ? `Inquiry Details` : `Inquiry #${cleanPart}`, href: pathname });
+        items.push({ label: cleanPart.match(/^[0-9a-fA-F-]+$/) ? `Ticket Details` : `Ticket #${cleanPart}`, href: pathname });
       }
     } else if (pathname === '/compose') {
-      items.push({ label: 'Compose Inquiry', href: '/compose' });
+      items.push({ label: 'Compose Ticket', href: '/compose' });
     } else if (pathname === '/reports') {
       items.push({ label: 'Reports', href: '/reports' });
     } else if (pathname === '/brands') {

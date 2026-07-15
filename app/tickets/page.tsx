@@ -10,7 +10,7 @@ import {
   AppAvatar,
   AppInput,
 } from '@integrated-computer-system/ui-kit';
-import { AppTabs } from '@/components/ui';
+import { AppTabs, AppLabel, AppPopover, AppFilterPopover } from '@/components/ui';
 import { Search, Plus, Eye, MoreHorizontal, Filter, SlidersHorizontal, CalendarDays, MapPin, MessageSquareText, Building2, UserRound, Clock3, Tag, DollarSign, Layers } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
 import { getTickets } from '@/lib/tickets';
@@ -42,6 +42,8 @@ const STATUS_TABS = [
   { id: 'non-focus', label: 'Non Focus' },
   { id: 'bu-approval', label: 'BU Head Approval' },
   { id: 'bu-declined', label: 'BU Head Declined' },
+  { id: 'final-approval', label: 'Final Approval' },
+  { id: 'adel-declined', label: 'Declined by Adel' },
 ];
 
 function formatCardDate(dateStr: string): string {
@@ -66,7 +68,7 @@ export default function TicketsPage() {
 
   const getTabFromParams = () => {
     if (tabParam) return tabParam;
-    if (statusParam === 'bu-approval' || statusParam === 'bu-declined') {
+    if (statusParam === 'bu-approval' || statusParam === 'bu-declined' || statusParam === 'final-approval' || statusParam === 'adel-declined') {
       return statusParam;
     }
     return 'all';
@@ -75,6 +77,11 @@ export default function TicketsPage() {
   const [activeTab, setActiveTab] = useState(getTabFromParams());
   const [searchQuery, setSearchQuery] = useState('');
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [sortBy, setSortBy] = useState<'recent' | 'oldest' | 'price-desc' | 'price-asc' | 'qty-desc'>('recent');
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedBrandTypes, setSelectedBrandTypes] = useState<string[]>([]);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     setTickets(getTickets());
@@ -82,6 +89,11 @@ export default function TicketsPage() {
 
   useEffect(() => {
     setActiveTab(getTabFromParams());
+    if (statusParam) {
+      setSelectedStatuses([statusParam]);
+    } else {
+      setSelectedStatuses([]);
+    }
   }, [tabParam, statusParam]);
 
   const handleTabChange = (tabId: string) => {
@@ -95,21 +107,36 @@ export default function TicketsPage() {
 
   const filteredTickets = useMemo(() => {
     let result = tickets;
-    
+
     // 1. Tab filtering
     if (activeTab === 'focus') {
       result = result.filter((t) => t.brandType === 'Focus');
     } else if (activeTab === 'non-focus') {
       result = result.filter((t) => t.brandType !== 'Focus');
     } else if (activeTab === 'bu-approval') {
-      result = result.filter((t) => t.brandType !== 'Focus' && t.status === 'bu-approval');
+      result = result.filter((t) => t.status === 'bu-approval');
     } else if (activeTab === 'bu-declined') {
-      result = result.filter((t) => t.brandType !== 'Focus' && t.status === 'bu-declined');
+      result = result.filter((t) => t.status === 'bu-declined');
+    } else if (activeTab === 'final-approval') {
+      result = result.filter((t) => t.status === 'final-approval');
+    } else if (activeTab === 'adel-declined') {
+      result = result.filter((t) => t.status === 'adel-declined');
     }
 
-    // 2. Optional status parameter filtering
-    if (statusParam && activeTab !== 'bu-approval' && activeTab !== 'bu-declined') {
-      result = result.filter((t) => t.status === statusParam);
+    // Exclude 'adel-declined' (Sales Declined by Adel) from standard views by default
+    if (activeTab === 'all' || activeTab === 'focus' || activeTab === 'non-focus') {
+      result = result.filter((t) => t.status !== 'adel-declined');
+    }
+
+
+    // 3. Brand type filter
+    if (selectedBrandTypes.length > 0) {
+      result = result.filter((t) => selectedBrandTypes.includes(t.brandType || ''));
+    }
+
+    // 4. Status filter
+    if (selectedStatuses.length > 0) {
+      result = result.filter((t) => selectedStatuses.includes(t.status));
     }
 
     if (searchQuery.trim()) {
@@ -124,8 +151,22 @@ export default function TicketsPage() {
           String(t.ticketNumber).includes(q)
       );
     }
-    return result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  }, [tickets, activeTab, statusParam, searchQuery]);
+
+    // 6. Sorting
+    if (sortBy === 'recent') {
+      result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    } else if (sortBy === 'oldest') {
+      result.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+    } else if (sortBy === 'price-desc') {
+      result.sort((a, b) => (b.targetPrice || 0) - (a.targetPrice || 0));
+    } else if (sortBy === 'price-asc') {
+      result.sort((a, b) => (a.targetPrice || 0) - (b.targetPrice || 0));
+    } else if (sortBy === 'qty-desc') {
+      result.sort((a, b) => (b.estimatedQuantity || 0) - (a.estimatedQuantity || 0));
+    }
+
+    return result;
+  }, [tickets, activeTab, statusParam, searchQuery, sortBy, selectedStatuses, selectedBrandTypes]);
 
   const emptyState = useMemo(() => {
     if (searchQuery.trim()) {
@@ -156,6 +197,20 @@ export default function TicketsPage() {
         description: 'Tickets declined by BU heads will appear here.',
       };
     }
+    if (activeTab === 'final-approval') {
+      return {
+        imageSrc: '/aria-mascott-happy.svg',
+        title: 'No final approvals',
+        description: 'Tickets with final approval status will appear here.',
+      };
+    }
+    if (activeTab === 'adel-declined') {
+      return {
+        imageSrc: '/aria-mascott-sad.svg',
+        title: 'No tickets declined by Adel',
+        description: 'Tickets declined by Adel will appear here.',
+      };
+    }
     const tabLabel = activeTab === 'focus' ? 'Focus' : 'Non Focus';
     const statusLabel = statusParam ? `${statusParam} ` : '';
     return {
@@ -165,6 +220,8 @@ export default function TicketsPage() {
     };
   }, [activeTab, statusParam, searchQuery]);
 
+  const activeFiltersCount = selectedStatuses.length + selectedBrandTypes.length;
+
   return (
     <>
       <ProportNavbar title="Inquiries" />
@@ -172,10 +229,9 @@ export default function TicketsPage() {
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-text">Price Inquiries</h1>
-            <p className="text-sm text-text-info mt-1">Manage sales pricing questions and track quotes progress in a card-based workspace.</p>
+            <AppLabel as="h2" variant="title" className="!text-lg !font-bold">Tickets</AppLabel>
+            <AppLabel as="p" variant="description" className="text-sm">Manage sales pricing questions and track quotes progress in a card-based workspace.</AppLabel>
           </div>
-
           <AppButton
             variant="primary"
             leftIcon={<Plus size={16} />}
@@ -213,18 +269,111 @@ export default function TicketsPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <AppButton
-                  variant="neutral"
-                  leftIcon={<SlidersHorizontal size={14} />}
+                <AppPopover
+                  content={
+                    <div className="w-[200px] p-2 flex flex-col gap-1">
+                      {[
+                        { value: 'recent', label: 'Most Recent' },
+                        { value: 'oldest', label: 'Oldest' },
+                        { value: 'price-desc', label: 'Cost (High to Low)' },
+                        { value: 'price-asc', label: 'Cost (Low to High)' },
+                        { value: 'qty-desc', label: 'Quantity (High to Low)' },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => {
+                            setSortBy(opt.value as any);
+                            setSortOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${sortBy === opt.value
+                            ? 'bg-accent-1/10 text-accent-1'
+                            : 'text-text-info hover:bg-hover hover:text-text'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  }
+                  open={sortOpen}
+                  onOpenChange={setSortOpen}
+                  placement="bottomLeft"
                 >
-                  Sort
-                </AppButton>
-                <AppButton
-                  variant="neutral"
-                  leftIcon={<Filter size={14} />}
+                  <AppButton
+                    variant="neutral"
+                    leftIcon={<SlidersHorizontal size={14} />}
+                  >
+                    Sort
+                  </AppButton>
+                </AppPopover>
+
+                <AppFilterPopover
+                  trigger={
+                    <AppButton
+                      variant="neutral"
+                      leftIcon={<Filter size={14} />}
+                    >
+                      Filter {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}
+                    </AppButton>
+                  }
+                  open={filterOpen}
+                  onOpenChange={setFilterOpen}
+                  title="Filter Tickets"
+                  onResetAll={() => {
+                    setSelectedStatuses([]);
+                    setSelectedBrandTypes([]);
+                  }}
+                  onApply={() => setFilterOpen(false)}
+                  onClose={() => setFilterOpen(false)}
                 >
-                  Filter
-                </AppButton>
+                  <AppFilterPopover.Group title="Brand Type">
+                    <div className="flex flex-col gap-1 p-1">
+                      {['Focus', 'Non Focus'].map((brandType) => {
+                        const isChecked = selectedBrandTypes.includes(brandType);
+                        return (
+                          <label key={brandType} className="flex items-center gap-2 px-2 py-1.5 hover:bg-hover rounded-lg cursor-pointer text-xs text-text font-semibold">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => {
+                                setSelectedBrandTypes((prev) =>
+                                  isChecked ? prev.filter((b) => b !== brandType) : [...prev, brandType]
+                                );
+                              }}
+                              className="rounded border-border text-accent-1 focus:ring-accent-1"
+                            />
+                            {brandType}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </AppFilterPopover.Group>
+
+                  <AppFilterPopover.Group title="Status">
+                    <div className="flex flex-col gap-1 p-1 max-h-[160px] overflow-y-auto">
+                      {Object.entries(STATUS_META)
+                        .filter(([statusKey]) => ['unassigned', 'bu-declined', 'pending', 'answered', 'closed', 'reassigned'].includes(statusKey))
+                        .map(([statusKey, meta]) => {
+                          const isChecked = selectedStatuses.includes(statusKey);
+                          return (
+                            <label key={statusKey} className="flex items-center gap-2 px-2 py-1.5 hover:bg-hover rounded-lg cursor-pointer text-xs text-text font-semibold">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  setSelectedStatuses((prev) =>
+                                    isChecked ? prev.filter((s) => s !== statusKey) : [...prev, statusKey]
+                                  );
+                                }}
+                                className="rounded border-border text-accent-1 focus:ring-accent-1"
+                              />
+                            {meta.label}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </AppFilterPopover.Group>
+                </AppFilterPopover>
               </div>
             </div>
           </div>
