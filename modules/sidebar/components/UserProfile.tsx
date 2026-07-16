@@ -59,7 +59,7 @@ export default function UserProfile({ collapsed, setSettingsOpen }: UserProfileP
     return (
         <AppDropdown items={userMenuItems} placement="topRight" trigger={['click']}>
             <div id="tour-user-profile" className="flex items-center justify-between cursor-pointer group select-none">
-                <div className="flex items-center gap-3 overflow-hidden w-full">
+                <div className="flex items-center p-2 gap-3 overflow-hidden w-full">
                     <AppAvatar
                         src="https://api.dicebear.com/7.x/initials/svg?seed=JD"
                         name="John Dela Cruz"
@@ -67,7 +67,7 @@ export default function UserProfile({ collapsed, setSettingsOpen }: UserProfileP
                         className="bg-accent-1 text-white font-bold shadow-sm group-hover:scale-105 transition-transform shrink-0"
                     />
                     <div className="flex flex-col text-left overflow-hidden">
-                        <AppLabel as="span" className="leading-none mb-1 truncate text-[13px] font-semibold text-foreground">
+                        <AppLabel as="span" className="leading-none truncate text-[13px] font-semibold text-foreground">
                             John Dela Cruz
                         </AppLabel>
                         <AppLabel as="span" variant="description" className="truncate text-[11px]">

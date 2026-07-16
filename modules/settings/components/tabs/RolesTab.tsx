@@ -7,11 +7,10 @@ import { Shield, ShieldCheck, Wrench, User, Crown, Check } from 'lucide-react';
 type Role = 'super_user' | 'admin' | 'buyer' | 'sales' | 'user';
 
 const ROLES: { value: Role; label: string; icon: React.ReactNode; color: string }[] = [
-    { value: 'super_user', label: 'Super User', icon: <Crown size={11} />,      color: 'bg-amber-500/10 text-amber-600 border-amber-400/30' },
-    { value: 'admin',      label: 'Admin',      icon: <ShieldCheck size={11} />, color: 'bg-red-500/10 text-red-600 border-red-400/30' },
-    { value: 'buyer',      label: 'Buyer',      icon: <Wrench size={11} />,     color: 'bg-blue-500/10 text-blue-600 border-blue-400/30' },
-    { value: 'sales',      label: 'Sales',      icon: <Shield size={11} />,     color: 'bg-emerald-500/10 text-emerald-600 border-emerald-400/30' },
-    { value: 'user',       label: 'User',       icon: <User size={11} />,       color: 'bg-neutral-500/10 text-neutral-600 border-neutral-400/30' },
+    { value: 'super_user', label: 'Super User', icon: <Crown size={11} />, color: 'bg-amber-500/10 text-amber-600 border-amber-400/30' },
+    { value: 'admin', label: 'Admin', icon: <ShieldCheck size={11} />, color: 'bg-red-500/10 text-red-600 border-red-400/30' },
+    { value: 'buyer', label: 'Buyer', icon: <Wrench size={11} />, color: 'bg-blue-500/10 text-blue-600 border-blue-400/30' },
+    { value: 'sales', label: 'Sales', icon: <Shield size={11} />, color: 'bg-emerald-500/10 text-emerald-600 border-emerald-400/30' },
 ];
 
 const STORAGE_KEY = 'proport_my_role';
