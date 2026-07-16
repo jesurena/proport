@@ -15,6 +15,10 @@ export function useBrandMaintenance() {
   const [brandName, setBrandName] = useState('');
   const [brandType, setBrandType] = useState<'Focus' | 'Non Focus'>('Focus');
 
+  // Filter states
+  const [selectedBrandTypes, setSelectedBrandTypes] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
+
   // Load brands
   const loadBrands = () => {
     setBrands(getBrands());
@@ -26,14 +30,25 @@ export function useBrandMaintenance() {
 
   // Filtered brands
   const filteredBrands = useMemo(() => {
-    if (!searchQuery.trim()) return brands;
-    const q = searchQuery.toLowerCase();
-    return brands.filter(
-      (b) =>
-        b.name.toLowerCase().includes(q) ||
-        b.type.toLowerCase().includes(q)
-    );
-  }, [brands, searchQuery]);
+    let result = brands;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (b) =>
+          b.name.toLowerCase().includes(q) ||
+          b.type.toLowerCase().includes(q)
+      );
+    }
+
+    if (selectedBrandTypes.length > 0) {
+      result = result.filter((b) => selectedBrandTypes.includes(b.type));
+    }
+
+    return result;
+  }, [brands, searchQuery, selectedBrandTypes]);
+
+  const activeFiltersCount = selectedBrandTypes.length;
 
   // Open modal for add
   const handleOpenAdd = () => {
@@ -113,6 +128,11 @@ export function useBrandMaintenance() {
     brandType,
     setBrandType,
     filteredBrands,
+    selectedBrandTypes,
+    setSelectedBrandTypes,
+    filterOpen,
+    setFilterOpen,
+    activeFiltersCount,
     handleOpenAdd,
     handleOpenEdit,
     handleSave,

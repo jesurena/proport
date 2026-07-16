@@ -4,7 +4,7 @@ import SalesDashboardMetricCard from './SalesDashboardMetricCard';
 import DashboardRecentTickets from './DashboardRecentTickets';
 import DashboardTicketCountAo from './DashboardTicketCountAo';
 import DashboardFocusBreakdown from './DashboardFocusBreakdown';
-import DashboardPinnedTickets from './DashboardPinnedTickets';
+import DashboardBookmarkedTickets from './DashboardBookmarkedTickets';
 
 interface SalesDashboardProps {
   totalCount: number;
@@ -32,7 +32,7 @@ export default function SalesDashboard({
       {/* ── RIGHT COLUMN ── */}
       <div className="xl:w-[300px] shrink-0 space-y-4">
         <DashboardFocusBreakdown allTickets={allTickets} />
-        <DashboardPinnedTickets allTickets={allTickets} />
+        <DashboardBookmarkedTickets allTickets={allTickets} />
       </div>
     </div>
   );

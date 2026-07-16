@@ -50,6 +50,14 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
       return () => {
         URL.revokeObjectURL(url);
       };
+    } else if (typeof file === 'string') {
+      const extension = file.split('.').pop()?.toLowerCase() || '';
+      const isImg = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(extension);
+      if (isImg) {
+        setBlobUrl(`https://picsum.photos/seed/${file}/800/600`);
+      } else if (extension === 'pdf') {
+        setBlobUrl('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
+      }
     }
   }, [open, file]);
 

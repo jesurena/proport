@@ -4,7 +4,7 @@ import DashboardMetricCard from './DashboardMetricCard';
 import DashboardTable from './DashboardTable';
 import DashboardTicketPerBuyer from './DashboardTicketPerBuyer';
 import DashboardFocusBreakdown from './DashboardFocusBreakdown';
-import DashboardPinnedTickets from './DashboardPinnedTickets';
+import DashboardBookmarkedTickets from './DashboardBookmarkedTickets';
 
 interface BuyerDashboardProps {
   totalCount: number;
@@ -31,7 +31,7 @@ export default function BuyerDashboard({
       {/* ── RIGHT COLUMN ── */}
       <div className="xl:w-[300px] shrink-0 space-y-4">
         <DashboardFocusBreakdown allTickets={allTickets} />
-        <DashboardPinnedTickets allTickets={allTickets} />
+        <DashboardBookmarkedTickets allTickets={allTickets} />
         <DashboardTicketPerBuyer allTickets={allTickets} />
       </div>
     </div>

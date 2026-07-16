@@ -55,15 +55,18 @@ export const SEED_TICKETS: Ticket[] = [
   {
     id: nextId(), ticketNumber: 1,
     subject: 'Price inquiry for 50x Microsoft Office 365 Business Premium licenses',
-    description: 'A prospective client is looking to purchase 50 Microsoft O365 Business Premium annual licenses. What is our current distributor cost and what margin can we offer?',
+    description: 'A prospective client is looking to purchase 50 Microsoft O365 Business Premium annual licenses. What is our distributor cost and margin options?',
     status: 'unassigned', priority: 'medium',
     requesterId: 'user-7', requesterName: 'Jose Ramos',
     businessUnitId: 'bu-1', businessUnitName: 'Manila Office',
     createdAt: hoursAgo(2), updatedAt: hoursAgo(2),
     replies: [],
-    supplierName: 'Ingram Micro',
-    targetPrice: 22,
-    estimatedQuantity: 50,
+    requestType: 'cost',
+    brandType: 'Focus',
+    brandName: '1CLOUDHUB',
+    customerName: 'Manila School of Business',
+    projectName: 'Office 365 Deployment',
+    cc: ['mvillanueva@proport.com'],
   },
   {
     id: nextId(), ticketNumber: 2,
@@ -74,23 +77,23 @@ export const SEED_TICKETS: Ticket[] = [
     businessUnitId: 'bu-1', businessUnitName: 'Manila Office',
     createdAt: hoursAgo(5), updatedAt: hoursAgo(5),
     replies: [],
-    supplierName: 'Synnex',
-    targetPrice: 4500,
-    estimatedQuantity: 12,
+    requestType: 'cost',
+    brandType: 'Focus',
+    brandName: '1CLOUDHUB',
+    customerName: 'Delta Bank Corp',
+    projectName: 'Network Switch Upgrade',
+    cc: [],
   },
   // ── Assigned ──
   {
     id: nextId(), ticketNumber: 3,
     subject: 'Volume discount pricing for 100x Lenovo ThinkPad L14',
-    description: 'Sales needs a special bid pricing for 100 units of Lenovo ThinkPad L14 Gen 4. Target price from client is $850 per unit. Can we check with Tech Data or Lenovo direct bid team if we can get a special cost of $720?',
+    description: 'Sales needs a special bid pricing for 100 units of Lenovo ThinkPad L14 Gen 4. Target price from client is $850 per unit. Can we check if we can get a special cost?',
     status: 'assigned', priority: 'high',
     requesterId: 'user-8', requesterName: 'Diana Torres',
     assigneeId: 'user-2', assigneeName: 'Maria Santos',
     businessUnitId: 'bu-2', businessUnitName: 'Cebu Office',
     createdAt: daysAgo(1), updatedAt: hoursAgo(8),
-    supplierName: 'Tech Data',
-    targetPrice: 850,
-    estimatedQuantity: 100,
     replies: [
       {
         id: 'reply-1', ticketId: 'ticket-3', authorId: 'user-2', authorName: 'Maria Santos',
@@ -99,6 +102,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: hoursAgo(8),
       },
     ],
+    requestType: 'cost',
+    brandType: 'Focus',
+    brandName: 'ACER',
+    customerName: 'Prime Tech Solutions',
+    projectName: 'Laptop Fleet Renewal',
+    cc: ['msantos@proport.com'],
   },
   {
     id: nextId(), ticketNumber: 4,
@@ -109,10 +118,13 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-3', assigneeName: 'Rico Mendoza',
     businessUnitId: 'bu-1', businessUnitName: 'Manila Office',
     createdAt: daysAgo(2), updatedAt: daysAgo(1),
-    supplierName: 'Arrow Electronics',
-    targetPrice: 1200,
-    estimatedQuantity: 2,
     replies: [],
+    requestType: 'cost',
+    brandType: 'Non Focus',
+    brandName: 'ACCUPOWER',
+    customerName: 'Apex Medical Center',
+    projectName: 'Firewall Deployment',
+    cc: [],
   },
   // ── Pending ──
   {
@@ -124,9 +136,6 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-2', assigneeName: 'Maria Santos',
     businessUnitId: 'bu-1', businessUnitName: 'Manila Office',
     createdAt: daysAgo(5), updatedAt: daysAgo(2),
-    supplierName: 'D&H Distributing',
-    targetPrice: 18000,
-    estimatedQuantity: 1,
     replies: [
       {
         id: 'reply-2', ticketId: 'ticket-5', authorId: 'user-2', authorName: 'Maria Santos',
@@ -141,6 +150,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: daysAgo(2),
       },
     ],
+    requestType: 'service',
+    brandType: 'Focus',
+    brandName: 'ACER',
+    customerName: 'National Data Agency',
+    projectName: 'Government Security Cloud',
+    cc: [],
   },
   {
     id: nextId(), ticketNumber: 6,
@@ -151,9 +166,6 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-3', assigneeName: 'Rico Mendoza',
     businessUnitId: 'bu-2', businessUnitName: 'Cebu Office',
     createdAt: daysAgo(7), updatedAt: daysAgo(4),
-    supplierName: 'Synnex',
-    targetPrice: 6200,
-    estimatedQuantity: 1,
     replies: [
       {
         id: 'reply-4', ticketId: 'ticket-6', authorId: 'user-3', authorName: 'Rico Mendoza',
@@ -162,6 +174,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: daysAgo(4),
       },
     ],
+    requestType: 'cost',
+    brandType: 'Non Focus',
+    brandName: 'ACCUTONE',
+    customerName: 'Alpha FinTech Group',
+    projectName: 'HPE Server Cluster',
+    cc: [],
   },
   // ── Answered ──
   {
@@ -173,9 +191,6 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-2', assigneeName: 'Maria Santos',
     businessUnitId: 'bu-1', businessUnitName: 'Manila Office',
     createdAt: daysAgo(3), updatedAt: daysAgo(1),
-    supplierName: 'Ingram Micro',
-    targetPrice: 180,
-    estimatedQuantity: 200,
     replies: [
       {
         id: 'reply-5', ticketId: 'ticket-7', authorId: 'user-2', authorName: 'Maria Santos',
@@ -184,6 +199,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: daysAgo(1),
       },
     ],
+    requestType: 'cost',
+    brandType: 'Focus',
+    brandName: '1CLOUDHUB',
+    customerName: 'Pacific University Manila',
+    projectName: 'Adobe Campus Agreement',
+    cc: [],
   },
   {
     id: nextId(), ticketNumber: 8,
@@ -194,9 +215,6 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-3', assigneeName: 'Rico Mendoza',
     businessUnitId: 'bu-1', businessUnitName: 'Manila Office',
     createdAt: daysAgo(4), updatedAt: daysAgo(2),
-    supplierName: 'Arrow Electronics',
-    targetPrice: 550,
-    estimatedQuantity: 5,
     replies: [
       {
         id: 'reply-6', ticketId: 'ticket-8', authorId: 'user-3', authorName: 'Rico Mendoza',
@@ -205,6 +223,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: daysAgo(2),
       },
     ],
+    requestType: 'cost',
+    brandType: 'Non Focus',
+    brandName: 'ACCUPOWER',
+    customerName: 'Vanguard Retail',
+    projectName: 'Fortigate Renewal',
+    cc: [],
   },
   // ── Closed ──
   {
@@ -216,9 +240,6 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-2', assigneeName: 'Maria Santos',
     businessUnitId: 'bu-2', businessUnitName: 'Cebu Office',
     createdAt: daysAgo(6), updatedAt: daysAgo(5), closedAt: daysAgo(5),
-    supplierName: 'Tech Data',
-    targetPrice: 920,
-    estimatedQuantity: 15,
     replies: [
       {
         id: 'reply-7', ticketId: 'ticket-9', authorId: 'user-2', authorName: 'Maria Santos',
@@ -233,6 +254,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: daysAgo(5),
       },
     ],
+    requestType: 'cost',
+    brandType: 'Focus',
+    brandName: 'ACER',
+    customerName: 'Summit Conglomerate',
+    projectName: 'Latitude Standard Procurement',
+    cc: [],
   },
   {
     id: nextId(), ticketNumber: 10,
@@ -243,9 +270,6 @@ export const SEED_TICKETS: Ticket[] = [
     assigneeId: 'user-3', assigneeName: 'Rico Mendoza',
     businessUnitId: 'bu-3', businessUnitName: 'Davao Office',
     createdAt: daysAgo(10), updatedAt: daysAgo(8), closedAt: daysAgo(8),
-    supplierName: 'Synnex',
-    targetPrice: 12000,
-    estimatedQuantity: 1,
     replies: [
       {
         id: 'reply-9', ticketId: 'ticket-10', authorId: 'user-3', authorName: 'Rico Mendoza',
@@ -254,6 +278,12 @@ export const SEED_TICKETS: Ticket[] = [
         createdAt: daysAgo(8),
       },
     ],
+    requestType: 'cost',
+    brandType: 'Non Focus',
+    brandName: 'ACCUTONE',
+    customerName: 'Evergreen Insurance Corp',
+    projectName: 'MSA Array Expansion',
+    cc: [],
   },
 ];
 

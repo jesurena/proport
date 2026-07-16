@@ -96,17 +96,17 @@ export interface MonthlyTrend {
 // ─── Status metadata ────────────────────────────────────────────────────────
 
 export const STATUS_META: Record<TicketStatus, { label: string; color: string; chipVariant: string }> = {
-  unassigned: { label: 'Unassigned', color: '#8b8b8b', chipVariant: 'muted' },
-  assigned:   { label: 'Assigned',   color: '#3b82f6', chipVariant: 'info' },
-  pending:    { label: 'Pending',    color: '#f59e0b', chipVariant: 'warning' },
-  answered:   { label: 'Answered',   color: '#10b981', chipVariant: 'success' },
-  closed:     { label: 'Closed',     color: '#6b7280', chipVariant: 'default' },
-  escalated:  { label: 'Escalated',  color: '#ef4444', chipVariant: 'danger' },
-  reassigned: { label: 'Reassigned', color: '#8b5cf6', chipVariant: 'accent' },
-  'bu-approval': { label: 'BU Approval', color: '#ec4899', chipVariant: 'assigned' },
-  'bu-declined': { label: 'BU Declined', color: '#ef4444', chipVariant: 'danger' },
-  'final-approval': { label: 'Final Approval', color: '#10b981', chipVariant: 'success' },
-  'adel-declined': { label: 'Adel Declined', color: '#ef4444', chipVariant: 'danger' },
+  unassigned: { label: 'Unassigned', color: '#8b8b8b', chipVariant: 'unassigned' },
+  assigned:   { label: 'Assigned',   color: '#3b82f6', chipVariant: 'assigned' },
+  pending:    { label: 'Pending',    color: '#f59e0b', chipVariant: 'pending' },
+  answered:   { label: 'Answered',   color: '#10b981', chipVariant: 'answered' },
+  closed:     { label: 'Closed',     color: '#6b7280', chipVariant: 'closed' },
+  escalated:  { label: 'Escalated',  color: '#ef4444', chipVariant: 'escalated' },
+  reassigned: { label: 'Reassigned', color: '#8b5cf6', chipVariant: 'reassigned' },
+  'bu-approval': { label: 'BU Approval', color: '#ec4899', chipVariant: 'bu-approval' },
+  'bu-declined': { label: 'BU Declined', color: '#ef4444', chipVariant: 'bu-declined' },
+  'final-approval': { label: 'Final Approval', color: '#10b981', chipVariant: 'final-approval' },
+  'adel-declined': { label: 'Declined by Adel', color: '#ef4444', chipVariant: 'adel-declined' },
 };
 
 export const PRIORITY_META: Record<TicketPriority, { label: string; color: string }> = {

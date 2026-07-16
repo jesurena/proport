@@ -29,10 +29,10 @@ export function removeItem(key: string): void {
 // ─── Storage Keys ───────────────────────────────────────────────────────────
 
 export const STORAGE_KEYS = {
-  TICKETS: 'tcd_tickets',
+  TICKETS: 'tcd_tickets_v3',
   USERS: 'tcd_users',
   BUSINESS_UNITS: 'tcd_business_units',
   NEXT_TICKET_NUMBER: 'tcd_next_ticket_number',
-  SEEDED: 'tcd_seeded',
+  SEEDED: 'tcd_seeded_v3',
   THEME: 'tcd_theme',
 } as const;

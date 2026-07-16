@@ -44,18 +44,18 @@ export default function DashboardWelcomeBanner({ role }: DashboardWelcomeBannerP
       </svg>
       <div className="relative z-10">
         <span className="text-[11px] font-bold uppercase tracking-widest text-white/80 mb-3 block">
-          PROPORT · {isSales ? 'PRICING INQUIRY HUB' : 'BUYER WORKSPACE'}
+          PROPORT · {isSales ? 'PRICING TICKET HUB' : 'BUYER WORKSPACE'}
         </span>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight max-w-xl text-white">
           {isSales
-            ? "Need help with product pricing or quotes? Submit an inquiry and our buyers will get the best pricing options from suppliers."
-            : "Welcome back! Help sales obtain the best price quotes from suppliers, resolve incoming inquiries, and manage quotes."}
+            ? "Need help with product pricing or quotes? Submit a ticket and our buyers will get the best pricing options from suppliers."
+            : "Welcome back! Help sales obtain the best price quotes from suppliers, resolve incoming tickets, and manage quotes."}
         </h2>
         <button
           onClick={handleAction}
           className="flex items-center gap-3 px-5 py-2.5 bg-black text-white hover:bg-neutral-900 rounded-full font-semibold text-xs mt-6 transition-all select-none w-fit cursor-pointer"
         >
-          <span>{isSales ? 'Compose Inquiry' : 'View Inquiries'}</span>
+          <span>{isSales ? 'Compose Ticket' : 'View Tickets'}</span>
           <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-black shrink-0">
             <ChevronRight size={12} className="stroke-[3]" />
           </div>

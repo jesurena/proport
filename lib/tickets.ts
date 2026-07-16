@@ -155,18 +155,26 @@ export function updateTicketStatus(ticketId: string, status: TicketStatus): Tick
   return tickets[idx];
 }
 
-export function updateTicketAssignee(ticketId: string, assigneeId: string): Ticket | null {
+export function updateTicketAssignee(ticketId: string, assigneeId?: string): Ticket | null {
   const tickets = getTickets();
   const idx = tickets.findIndex((t) => t.id === ticketId);
   if (idx === -1) return null;
 
-  const users = getUsers();
-  const assignee = users.find((u) => u.id === assigneeId);
-  if (!assignee) return null;
+  if (!assigneeId) {
+    tickets[idx].assigneeId = undefined;
+    tickets[idx].assigneeName = undefined;
+    tickets[idx].status = 'unassigned';
+  } else {
+    const users = getUsers();
+    const ids = assigneeId.split(',').map((id) => id.trim());
+    const selectedUsers = users.filter((u) => ids.includes(u.id));
+    if (selectedUsers.length === 0) return null;
 
-  tickets[idx].assigneeId = assignee.id;
-  tickets[idx].assigneeName = assignee.name;
-  tickets[idx].status = 'assigned';
+    tickets[idx].assigneeId = selectedUsers.map((u) => u.id).join(',');
+    tickets[idx].assigneeName = selectedUsers.map((u) => u.name).join(', ');
+    tickets[idx].status = 'assigned';
+  }
+
   tickets[idx].updatedAt = new Date().toISOString();
 
   setItem(STORAGE_KEYS.TICKETS, tickets);
@@ -181,6 +189,18 @@ export function addTicketTags(ticketId: string, tags: string[]): Ticket | null {
   const currentTags = tickets[idx].tags || [];
   const newTags = Array.from(new Set([...currentTags, ...tags]));
   tickets[idx].tags = newTags;
+  tickets[idx].updatedAt = new Date().toISOString();
+
+  setItem(STORAGE_KEYS.TICKETS, tickets);
+  return tickets[idx];
+}
+
+export function updateTicketCc(ticketId: string, cc: string[]): Ticket | null {
+  const tickets = getTickets();
+  const idx = tickets.findIndex((t) => t.id === ticketId);
+  if (idx === -1) return null;
+
+  tickets[idx].cc = cc;
   tickets[idx].updatedAt = new Date().toISOString();
 
   setItem(STORAGE_KEYS.TICKETS, tickets);

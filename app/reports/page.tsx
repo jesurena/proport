@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AppEmptyState } from '@integrated-computer-system/ui-kit';
-import { FileBarChart } from 'lucide-react';
+import { AppEmptyState } from '@/components/ui';
 import { ProportNavbar } from '@/modules/sidebar';
 
 export default function ReportsPage() {
@@ -11,9 +10,10 @@ export default function ReportsPage() {
       <ProportNavbar title="Reports" />
       <div className="flex items-center justify-center h-[70vh] p-6">
         <AppEmptyState
-          title="Reports Coming Soon"
-          description="We're building powerful reporting features including inquiry analytics, trend analysis, and exportable datasheets."
-          icon={FileBarChart}
+          title="Reports Module is Under Construction"
+          description="We are currently working on building this module, p  lease bear with us."
+          imageSrc="/aria-mascott-wip.svg"
+          imageSize={180}
         />
       </div>
     </>

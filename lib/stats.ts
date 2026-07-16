@@ -2,7 +2,7 @@ import { StatusCount, BusinessUnitCount, MonthlyTrend, TicketStatus } from './ty
 import { getTickets } from './tickets';
 
 const ALL_STATUSES: TicketStatus[] = [
-  'unassigned', 'assigned', 'pending', 'answered', 'closed', 'escalated', 'reassigned',
+  'unassigned', 'assigned', 'pending', 'answered', 'closed', 'reassigned',
 ];
 
 export function getTicketCountByStatus(): StatusCount[] {

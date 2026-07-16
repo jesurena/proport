@@ -21,7 +21,6 @@ export default function DashboardMetricCard({ totalCount, getCount }: DashboardM
   const extraCards = [
     { label: 'Answered', status: 'answered', icon: <CheckCircle2 size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
     { label: 'Closed', status: 'closed', icon: <XCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
-    { label: 'Escalated', status: 'escalated', icon: <AlertTriangle size={18} />, iconBg: 'bg-red-500/10', iconColor: 'text-red-600' },
   ];
 
   const cardsToRender = showAllCards ? [...initialCards, ...extraCards] : initialCards;

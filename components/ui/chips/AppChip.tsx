@@ -1,7 +1,19 @@
 'use client';
 
 import React from 'react';
-import { X, CheckCircle2, AlertTriangle, XCircle, Info, Clock, Archive, CircleDot, Inbox } from 'lucide-react';
+import { 
+  X, 
+  CheckCircle2, 
+  AlertTriangle, 
+  XCircle, 
+  Info, 
+  Clock, 
+  Archive, 
+  UserCheck, 
+  UserMinus,
+  Award,
+  Box
+} from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 export type AppChipVariant =
@@ -15,7 +27,18 @@ export type AppChipVariant =
     | 'soon'
     | 'archive'
     | 'assigned'
-    | 'unassigned';
+    | 'unassigned'
+    | 'pending'
+    | 'answered'
+    | 'closed'
+    | 'escalated'
+    | 'reassigned'
+    | 'bu-approval'
+    | 'bu-declined'
+    | 'final-approval'
+    | 'adel-declined'
+    | 'focus'
+    | 'non-focus';
 
 export interface AppChipProps {
     label: string;
@@ -40,8 +63,19 @@ const VARIANT_CLASSES: Record<AppChipVariant, string> = {
     muted:    'bg-foreground/10 text-foreground/60',
     soon:     'bg-foreground/10 text-foreground/40',
     archive:  'bg-gray-100 text-gray-500 border border-gray-200 dark:bg-neutral/40 dark:text-foreground/60 dark:border-border/40',
-    assigned: 'bg-pink-500 text-white',
-    unassigned: 'bg-purple-600 text-white',
+    assigned: 'bg-emerald-600 text-white',
+    unassigned: 'bg-zinc-500 text-white',
+    pending: 'bg-amber-500 text-white',
+    answered: 'bg-teal-600 text-white',
+    closed: 'bg-emerald-600 text-white',
+    escalated: 'bg-red-600 text-white',
+    reassigned: 'bg-indigo-600 text-white',
+    'bu-approval': 'bg-emerald-800 text-white',
+    'bu-declined': 'bg-red-600 text-white',
+    'final-approval': 'bg-emerald-600 text-white',
+    'adel-declined': 'bg-red-600 text-white',
+    focus: 'bg-purple-600 text-white',
+    'non-focus': 'bg-blue-600 text-white',
 };
 
 const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>> = {
@@ -51,8 +85,19 @@ const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>>
     info:    <Info />,
     soon:    <Clock />,
     archive: <Archive />,
-    assigned: <CircleDot />,
-    unassigned: <Inbox />,
+    assigned: <UserCheck />,
+    unassigned: <UserMinus />,
+    pending: <Clock />,
+    answered: <CheckCircle2 />,
+    closed: <CheckCircle2 />,
+    escalated: <AlertTriangle />,
+    reassigned: <Clock />,
+    'bu-approval': <Clock />,
+    'bu-declined': <XCircle />,
+    'final-approval': <CheckCircle2 />,
+    'adel-declined': <XCircle />,
+    focus: <Award />,
+    'non-focus': <Box />,
 };
 
 export const AppChip: React.FC<AppChipProps> = ({

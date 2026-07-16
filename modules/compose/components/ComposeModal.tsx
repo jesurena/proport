@@ -228,7 +228,7 @@ export function ComposeModal() {
           }}
         >
           <span className="text-white text-sm font-semibold truncate">
-            {subject || 'Compose New Price Inquiry'}
+            {subject || 'Compose New Price Ticket'}
           </span>
           <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
             <button

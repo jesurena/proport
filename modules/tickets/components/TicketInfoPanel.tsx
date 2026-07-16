@@ -26,7 +26,7 @@ export default function TicketInfoPanel({ ticket }: TicketInfoPanelProps) {
 
   return (
     <div className="rounded-2xl bg-card-bg border border-border/60 p-5 space-y-4 shadow-sm">
-      <h3 className="text-sm font-semibold text-text mb-3">Inquiry Information</h3>
+      <h3 className="text-sm font-semibold text-text mb-3">Ticket Information</h3>
 
       {/* Assignee */}
       <div className="space-y-1.5">

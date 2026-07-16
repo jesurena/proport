@@ -93,7 +93,7 @@ export default function ProportSidebar() {
               {(role === 'sales' || role === 'super_user') && (
                 <button
                   onClick={() => openCompose('Focus')}
-                  title="Compose Request"
+                  title="Compose Ticket"
                   className="w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer group">
                   <PenSquare size={15} className="group-hover:scale-110 transition-transform" />
                 </button>
@@ -113,7 +113,7 @@ export default function ProportSidebar() {
                     className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group border border-border hover:text-text hover:bg-hover/60 font-medium"
                   >
                     <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
-                    <span>{role === 'sales' ? 'Compose Request' : 'Compose'}</span>
+                    <span>{role === 'sales' ? 'Compose Ticket' : 'Compose'}</span>
                   </button>
                 </div>
               )}
@@ -129,7 +129,17 @@ export default function ProportSidebar() {
                 {group.items.map((item) => {
                   const hasSubItems = item.subItems && item.subItems.length > 0;
                   const isExpanded = expandedMenus.includes(item.name);
-                  const isSubActive = hasSubItems && item.subItems?.some(sub => fullCurrentPath === sub.href);
+                  const tabParam = searchParams ? searchParams.get('tab') : null;
+                  const isTabFocus = tabParam === 'focus';
+                  const isTabNonFocus = ['non-focus', 'bu-approval', 'bu-declined', 'final-approval', 'adel-declined'].includes(tabParam || '');
+
+                  let isSubActive = hasSubItems && (item.subItems?.some(sub => fullCurrentPath === sub.href) || false);
+                  if (item.name === 'Focus' && isTabFocus) {
+                    isSubActive = true;
+                  }
+                  if (item.name === 'Non Focus' && isTabNonFocus) {
+                    isSubActive = true;
+                  }
                   const isActiveLink = !hasSubItems && fullCurrentPath === item.href;
                   const isParentActive = isSubActive || isActiveLink;
                   const Icon = item.icon;
@@ -195,6 +205,7 @@ export default function ProportSidebar() {
                       active={isActive}
                       onClick={() => navigate(item.href || '#')}
                       className={cn(collapsed && "self-center")}
+                      aria-wip={item.isWip ? "true" : undefined}
                     >
                       <div className="flex items-center justify-between w-full">
                         <span>{item.name}</span>

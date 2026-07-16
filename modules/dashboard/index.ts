@@ -7,6 +7,6 @@ export { default as DashboardTicketPerBuyer } from './components/DashboardTicket
 export { default as SalesDashboard } from './components/SalesDashboard';
 export { default as BuyerDashboard } from './components/BuyerDashboard';
 export { default as DashboardTicketCountAo } from './components/DashboardTicketCountAo';
-export { default as DashboardPinnedTickets } from './components/DashboardPinnedTickets';
+export { default as DashboardBookmarkedTickets } from './components/DashboardBookmarkedTickets';
 export { default as SalesDashboardMetricCard } from './components/SalesDashboardMetricCard';
 export { useDashboard } from './hooks/useDashboard';

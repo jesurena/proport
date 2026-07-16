@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Filter } from 'lucide-react';
 import { AppButton, AppInput, AppLabel } from '@integrated-computer-system/ui-kit';
+import { AppFilterPopover } from '@/components/ui';
 import { ProportNavbar } from '@/modules/sidebar';
 import {
   BrandMaintenanceTable,
@@ -22,6 +23,11 @@ export default function BrandsPage() {
     brandType,
     setBrandType,
     filteredBrands,
+    selectedBrandTypes,
+    setSelectedBrandTypes,
+    filterOpen,
+    setFilterOpen,
+    activeFiltersCount,
     handleOpenAdd,
     handleOpenEdit,
     handleSave,
@@ -50,19 +56,64 @@ export default function BrandsPage() {
           </AppButton>
         </div>
 
-        {/* Filters and Search */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+          <div className="flex-1 min-w-0">
             <AppInput
               preset="search"
               placeholder="Search brands by name or type..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
             />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <AppFilterPopover
+              trigger={
+                <AppButton
+                  variant="neutral"
+                  leftIcon={<Filter size={14} />}
+                >
+                  Filter {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}
+                </AppButton>
+              }
+              open={filterOpen}
+              onOpenChange={setFilterOpen}
+              title="Filter Brands"
+              onResetAll={() => {
+                setSelectedBrandTypes([]);
+              }}
+              onApply={() => setFilterOpen(false)}
+              onClose={() => setFilterOpen(false)}
+            >
+              <AppFilterPopover.Group title="Brand Type">
+                <div className="flex flex-col gap-1 p-1">
+                  {['Focus', 'Non Focus'].map((type) => {
+                    const isChecked = selectedBrandTypes.includes(type);
+                    return (
+                      <label
+                        key={type}
+                        className="flex items-center gap-2 px-2 py-1.5 hover:bg-hover rounded-lg cursor-pointer text-xs text-text font-semibold"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            setSelectedBrandTypes((prev) =>
+                              isChecked ? prev.filter((b) => b !== type) : [...prev, type]
+                            );
+                          }}
+                          className="rounded border-border text-accent-1 focus:ring-accent-1"
+                        />
+                        {type}
+                      </label>
+                    );
+                  })}
+                </div>
+              </AppFilterPopover.Group>
+            </AppFilterPopover>
           </div>
         </div>
 
-        {/* Table */}
         <BrandMaintenanceTable
           filteredBrands={filteredBrands}
           onEdit={handleOpenEdit}
@@ -70,7 +121,6 @@ export default function BrandsPage() {
         />
       </div>
 
-      {/* Brand Form Modal */}
       <BrandModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

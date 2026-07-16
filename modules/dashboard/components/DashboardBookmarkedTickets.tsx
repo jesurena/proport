@@ -1,63 +1,69 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Pin, ArrowRight } from 'lucide-react';
+import { Bookmark, ArrowRight } from 'lucide-react';
 import { AppLabel, AppCard, AppButton, AppChip } from '@/components/ui';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 import type { Ticket as TicketType } from '@/lib/types';
 
-interface DashboardPinnedTicketsProps {
+interface DashboardBookmarkedTicketsProps {
   allTickets: TicketType[];
 }
 
-export default function DashboardPinnedTickets({ allTickets }: DashboardPinnedTicketsProps) {
+export default function DashboardBookmarkedTickets({ allTickets }: DashboardBookmarkedTicketsProps) {
   const router = useRouter();
-  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
 
-  const loadPins = () => {
+  const loadBookmarks = () => {
     const stored = localStorage.getItem('proport_pinned_tickets');
     if (stored) {
-      setPinnedIds(JSON.parse(stored));
+      setBookmarkedIds(JSON.parse(stored));
     } else {
-      setPinnedIds([]);
+      setBookmarkedIds([]);
     }
   };
 
   useEffect(() => {
-    loadPins();
-    window.addEventListener('proport-pins-updated', loadPins);
+    loadBookmarks();
+    // Listen to standard storage events as well as custom event updates
+    window.addEventListener('storage', loadBookmarks);
+    window.addEventListener('proport-pins-updated', loadBookmarks);
     return () => {
-      window.removeEventListener('proport-pins-updated', loadPins);
+      window.removeEventListener('storage', loadBookmarks);
+      window.removeEventListener('proport-pins-updated', loadBookmarks);
     };
   }, []);
 
-  const handleUnpin = (ticketId: string, e: React.MouseEvent) => {
+  const handleRemoveBookmark = (ticketId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = pinnedIds.filter((id) => id !== ticketId);
-    setPinnedIds(updated);
+    const updated = bookmarkedIds.filter((id) => id !== ticketId);
+    setBookmarkedIds(updated);
     localStorage.setItem('proport_pinned_tickets', JSON.stringify(updated));
+    window.dispatchEvent(new Event('storage'));
     window.dispatchEvent(new CustomEvent('proport-pins-updated'));
   };
 
-  const pinnedTickets = allTickets.filter((t) => pinnedIds.includes(t.id));
+  const bookmarkedTickets = allTickets.filter((t) => bookmarkedIds.includes(t.id));
 
   return (
     <AppCard variant="default" padding="md" className="space-y-3">
       <div>
-        <AppLabel as="h4" variant="title" className="!text-sm !font-bold">Pinned Tickets</AppLabel>
-        <AppLabel as="p" variant="description" className="text-[10px] mt-0.5">Quick access to marked tickets</AppLabel>
+        <AppLabel as="h4" variant="title" className="!text-sm !font-bold">Bookmarked Tickets</AppLabel>
+        <AppLabel as="p" variant="description" className="text-[10px] mt-0.5">Quick access to bookmarked tickets</AppLabel>
       </div>
 
-      {pinnedTickets.length === 0 ? (
+      {bookmarkedTickets.length === 0 ? (
         <AppEmptyState
-          title="No pinned tickets"
-          description="Mark tickets to keep them here."
+          title="No bookmarked tickets"
+          description="Bookmark tickets to keep them here."
           imageSrc="/aria-mascott-sad.svg"
           imageSize={50}
           className="py-4 border-none bg-transparent"
         />
       ) : (
         <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-          {pinnedTickets.map((ticket) => {
+          {bookmarkedTickets.map((ticket) => {
             let chipVariant: any = 'muted';
             if (ticket.status === 'answered') chipVariant = 'success';
             else if (ticket.status === 'closed') chipVariant = 'archive';
@@ -71,12 +77,6 @@ export default function DashboardPinnedTickets({ allTickets }: DashboardPinnedTi
                 onClick={() => router.push(`/tickets/${ticket.id}`)}
                 className="flex items-center justify-between p-2.5 rounded-xl border border-border/50 bg-hover/20 hover:bg-hover/50 transition-colors cursor-pointer group"
               >
-                {/* Pin icon on the left (minimal plain icon, click to unpin) */}
-                <Pin
-                  size={12}
-                  className="fill-current text-indigo-500 rotate-45 shrink-0 mr-2.5 cursor-pointer hover:text-danger transition-colors"
-                  onClick={(e) => handleUnpin(ticket.id, e)}
-                />
 
                 <div className="min-w-0 flex-1 pr-2">
                   <div className="flex items-center gap-1.5 mb-1.5">

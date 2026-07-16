@@ -20,9 +20,9 @@ interface ModuleItem {
 }
 
 const MODULES: ModuleItem[] = [
-  { id: 'dashboard', label: 'Dashboard', path: '/', description: 'Overview and status of pricing inquiries' },
-  { id: 'compose', label: 'Compose Inquiry', path: '/compose', description: 'Create a new price inquiry request' },
-  { id: 'tickets', label: 'All Inquiries', path: '/tickets', description: 'View and filter all pricing inquiries' },
+  { id: 'dashboard', label: 'Dashboard', path: '/', description: 'Overview and status of pricing tickets' },
+  { id: 'compose', label: 'Compose Ticket', path: '/compose', description: 'Create a new price ticket request' },
+  { id: 'tickets', label: 'All Tickets', path: '/tickets', description: 'View and filter all pricing tickets' },
   { id: 'reports', label: 'Reports', path: '/reports', description: 'Analytics and pricing trends' },
   { id: 'brands', label: 'Brand Maintenance', path: '/brands', description: 'Manage global brand catalog and focus classification' },
   { id: 'suppliers', label: 'Supplier Settings', path: '/suppliers', description: 'Manage supplier definitions' },
@@ -168,7 +168,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                               </span>
                             </div>
                             <span className="text-xs text-text-info truncate">
-                              Inquiry by {t.requesterName} • {t.businessUnitName} {t.supplierName ? `• ${t.supplierName}` : ''}
+                              Ticket by {t.requesterName} • {t.businessUnitName} {t.supplierName ? `• ${t.supplierName}` : ''}
                             </span>
                           </div>
                         </div>
@@ -183,7 +183,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
               {searchQuery && filteredModules.length === 0 && filteredTickets.length === 0 && (
                 <div className="py-12 text-center text-text-info/60 space-y-1">
                   <p className="text-sm font-medium">No results found for "{searchQuery}"</p>
-                  <p className="text-xs">Try searching for modules, inquiry titles, suppliers, numbers, or sales names.</p>
+                  <p className="text-xs">Try searching for modules, ticket titles, suppliers, numbers, or sales names.</p>
                 </div>
               )}
             </>

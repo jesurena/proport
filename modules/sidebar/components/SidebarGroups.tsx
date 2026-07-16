@@ -1,10 +1,12 @@
+'use client';
+
 import React from 'react';
 import {
   LayoutDashboard,
   Ticket,
   FileBarChart,
-  Mail,
-  Layers,
+  Award,
+  Box,
   Tag,
 } from 'lucide-react';
 
@@ -14,6 +16,7 @@ export interface SidebarItem {
   href?: string;
   badge?: number;
   subItems?: { name: string; href: string }[];
+  isWip?: boolean;
 }
 
 export interface SidebarGroup {
@@ -27,7 +30,8 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
       title: 'Navigation',
       items: [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-        { name: 'All Request', href: '/tickets', icon: Ticket, badge: totalOpen },
+        { name: 'All Tickets', href: '/tickets', icon: Ticket, badge: totalOpen },
+        { name: 'Reports', href: '/reports', icon: FileBarChart, isWip: true },
       ],
     },
     {
@@ -35,22 +39,22 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
       items: [
         {
           name: 'Focus',
-          icon: Mail,
+          icon: Award,
           subItems: [
-            { name: 'Pending Request', href: '/tickets?tab=focus&status=pending' },
-            { name: 'Answered Request', href: '/tickets?tab=focus&status=answered' },
-            { name: 'Closed Request', href: '/tickets?tab=focus&status=closed' },
+            { name: 'Pending Tickets', href: '/tickets?tab=focus&status=pending' },
+            { name: 'Answered Tickets', href: '/tickets?tab=focus&status=answered' },
+            { name: 'Closed Tickets', href: '/tickets?tab=focus&status=closed' },
           ],
         },
         {
           name: 'Non Focus',
-          icon: Layers,
+          icon: Box,
           subItems: [
             { name: 'BU Head Approval', href: '/tickets?tab=bu-approval' },
             { name: 'Declined by BU Head', href: '/tickets?tab=bu-declined' },
-            { name: 'Pending Request', href: '/tickets?tab=non-focus&status=pending' },
-            { name: 'Answered Request', href: '/tickets?tab=non-focus&status=answered' },
-            { name: 'Closed Request', href: '/tickets?tab=non-focus&status=closed' },
+            { name: 'Pending Tickets', href: '/tickets?tab=non-focus&status=pending' },
+            { name: 'Answered Tickets', href: '/tickets?tab=non-focus&status=answered' },
+            { name: 'Closed Tickets', href: '/tickets?tab=non-focus&status=closed' },
           ],
         },
       ],
@@ -61,7 +65,7 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
       items: [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
         { name: 'All Tickets', href: '/tickets', icon: Ticket, badge: totalOpen },
-        { name: 'Reports', href: '/reports', icon: FileBarChart },
+        { name: 'Reports', href: '/reports', icon: FileBarChart, isWip: true },
       ],
     },
     {
@@ -69,26 +73,26 @@ export function getSidebarGroups(role: string, totalOpen: number): SidebarGroup[
       items: [
         {
           name: 'Focus',
-          icon: Mail,
+          icon: Award,
           subItems: [
-            { name: 'Pending Request', href: '/tickets?tab=focus&status=pending' },
-            { name: 'Answered Request', href: '/tickets?tab=focus&status=answered' },
-            { name: 'Closed Request', href: '/tickets?tab=focus&status=closed' },
-            { name: 'Reassigned Request', href: '/tickets?tab=focus&status=reassigned' },
+            { name: 'Pending Tickets', href: '/tickets?tab=focus&status=pending' },
+            { name: 'Answered Tickets', href: '/tickets?tab=focus&status=answered' },
+            { name: 'Closed Tickets', href: '/tickets?tab=focus&status=closed' },
+            { name: 'Reassigned Tickets', href: '/tickets?tab=focus&status=reassigned' },
           ],
         },
         {
           name: 'Non Focus',
-          icon: Layers,
+          icon: Box,
           subItems: [
             { name: 'BU Head Approval', href: '/tickets?tab=bu-approval' },
             { name: 'Declined by BU Head', href: '/tickets?tab=bu-declined' },
             { name: 'Final Approval', href: '/tickets?tab=final-approval' },
             { name: 'Declined by Adel', href: '/tickets?tab=adel-declined' },
-            { name: 'Pending Request', href: '/tickets?tab=non-focus&status=pending' },
-            { name: 'Answered Request', href: '/tickets?tab=non-focus&status=answered' },
-            { name: 'Closed Request', href: '/tickets?tab=non-focus&status=closed' },
-            { name: 'Reassigned Request', href: '/tickets?tab=non-focus&status=reassigned' },
+            { name: 'Pending Tickets', href: '/tickets?tab=non-focus&status=pending' },
+            { name: 'Answered Tickets', href: '/tickets?tab=non-focus&status=answered' },
+            { name: 'Closed Tickets', href: '/tickets?tab=non-focus&status=closed' },
+            { name: 'Reassigned Tickets', href: '/tickets?tab=non-focus&status=reassigned' },
           ],
         },
       ],
