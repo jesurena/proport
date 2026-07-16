@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { AppAvatar, AppDropdown, AppLabel } from '@integrated-computer-system/ui-kit';
 import type { MenuProps } from 'antd';
 import { Settings, LogOut, MoreVertical } from 'lucide-react';
+import { useAuthStore } from '@/modules/auth';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 interface UserProfileProps {
     collapsed: boolean;
@@ -12,10 +13,11 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ collapsed, setSettingsOpen }: UserProfileProps) {
-    const router = useRouter();
+    const { user } = useAuthStore();
+    const { logout } = useAuth();
 
-    const handleLogout = () => {
-        router.push('/login');
+    const handleLogout = async () => {
+        await logout();
     };
 
     const userMenuItems: MenuProps['items'] = [
@@ -41,13 +43,22 @@ export default function UserProfile({ collapsed, setSettingsOpen }: UserProfileP
         },
     ];
 
+    const displayName = user ? `${user.first_name} ${user.last_name}` : 'Guest User';
+    const displayEmail = user ? user.email : 'guest@proport.com';
+    
+    // Generate initials for avatar seed
+    const initials = user 
+        ? `${user.first_name?.charAt(0) || ''}${user.last_name?.charAt(0) || ''}`.toUpperCase() 
+        : 'GU';
+    const displayAvatar = user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${initials}`;
+
     if (collapsed) {
         return (
             <AppDropdown items={userMenuItems} placement="topRight" trigger={['click']}>
                 <div className="cursor-pointer group flex items-center justify-center p-1 select-none">
                     <AppAvatar
-                        src="https://api.dicebear.com/7.x/initials/svg?seed=JD"
-                        name="John Dela Cruz"
+                        src={displayAvatar}
+                        name={displayName}
                         size={36}
                         className="bg-accent-1 text-white font-bold shadow-sm group-hover:scale-105 transition-transform"
                     />
@@ -61,17 +72,17 @@ export default function UserProfile({ collapsed, setSettingsOpen }: UserProfileP
             <div id="tour-user-profile" className="flex items-center justify-between cursor-pointer group select-none">
                 <div className="flex items-center p-2 gap-3 overflow-hidden w-full">
                     <AppAvatar
-                        src="https://api.dicebear.com/7.x/initials/svg?seed=JD"
-                        name="John Dela Cruz"
+                        src={displayAvatar}
+                        name={displayName}
                         size={36}
                         className="bg-accent-1 text-white font-bold shadow-sm group-hover:scale-105 transition-transform shrink-0"
                     />
                     <div className="flex flex-col text-left overflow-hidden">
                         <AppLabel as="span" className="leading-none truncate text-[13px] font-semibold text-foreground">
-                            John Dela Cruz
+                            {displayName}
                         </AppLabel>
                         <AppLabel as="span" variant="description" className="truncate text-[11px]">
-                            admin@proport.com
+                            {displayEmail}
                         </AppLabel>
                     </div>
                 </div>

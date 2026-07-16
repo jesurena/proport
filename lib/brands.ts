@@ -1,10 +1,5 @@
 import { getItem, setItem } from './storage';
-
-export interface Brand {
-  id: string;
-  name: string;
-  type: 'Focus' | 'Non Focus';
-}
+import type { Brand } from '../modules/brand';
 
 const STORAGE_KEY = 'proport_brands';
 
@@ -46,6 +41,23 @@ export function addBrand(name: string, type: 'Focus' | 'Non Focus'): Brand {
   logActivity('System', `Added new brand: ${name} (${type})`);
 
   return newBrand;
+}
+
+export function addBrands(items: { name: string; type: 'Focus' | 'Non Focus' }[]): Brand[] {
+  const brands = getBrands();
+  const newBrands = items.map((item, index) => ({
+    id: String(Date.now() + index),
+    name: item.name.toUpperCase().trim(),
+    type: item.type,
+  }));
+  const updated = [...brands, ...newBrands];
+  setItem(STORAGE_KEY, updated);
+
+  newBrands.forEach(nb => {
+    logActivity('System', `Added new brand: ${nb.name} (${nb.type})`);
+  });
+
+  return newBrands;
 }
 
 export function updateBrand(id: string, name: string, type: 'Focus' | 'Non Focus'): Brand | null {

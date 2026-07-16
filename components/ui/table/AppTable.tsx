@@ -15,6 +15,9 @@ export interface AppTableColumnType<RecordType> {
   width?: string | number;
   align?: 'left' | 'right' | 'center';
   className?: string;
+  sorter?: boolean | ((a: RecordType, b: RecordType) => number);
+  defaultSortOrder?: 'ascend' | 'descend';
+  sortDirections?: ('ascend' | 'descend')[];
 }
 
 export interface AppTableProps<RecordType> extends Omit<TableProps<RecordType>, 'columns'> {

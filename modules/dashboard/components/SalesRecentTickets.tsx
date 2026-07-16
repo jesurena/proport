@@ -9,6 +9,7 @@ import { STATUS_META } from '@/lib/types';
 import type { Ticket as TicketType } from '@/lib/types';
 import { getTickets } from '@/lib/tickets';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
+import { useAuthStore } from '@/modules/auth';
 
 export default function SalesRecentTickets() {
   const router = useRouter();
@@ -16,10 +17,18 @@ export default function SalesRecentTickets() {
   const [page, setPage] = useState(0);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
 
+  const { user } = useAuthStore();
+  const isDeveloper = user?.isDeveloper ?? false;
+  const actualRole = user?.role_name ?? 'buyer';
+
   // Sync role and pins on mount
   useEffect(() => {
     const storedRole = localStorage.getItem('proport_my_role');
-    if (storedRole) setRole(storedRole);
+    if (isDeveloper && storedRole) {
+      setRole(storedRole);
+    } else {
+      setRole(actualRole);
+    }
 
     const storedPins = localStorage.getItem('proport_pinned_tickets');
     if (storedPins) setPinnedIds(JSON.parse(storedPins));

@@ -7,7 +7,7 @@ import { STATUS_META } from '@/lib/types';
 import type { Ticket, TicketStatus } from '@/lib/types';
 import { cn } from '@/components/utils/cn';
 import { TicketTransactionHistoryModal } from '@/components/tickets/TicketTransactionHistoryModal';
-import { notification } from 'antd';
+import { notification } from '@/modules/theme';
 
 interface TicketActionsCardProps {
   ticket: Ticket;

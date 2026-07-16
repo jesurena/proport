@@ -19,6 +19,7 @@ import { StatusCount } from '@/lib/types';
 import SidebarAppDropdown from './SidebarAppDropdown';
 import UserProfile from './UserProfile';
 import { getSidebarGroups, type SidebarGroup, type SidebarItem } from './SidebarGroups';
+import { useAuthStore } from '@/modules/auth';
 
 export default function ProportSidebar() {
   const pathname = usePathname();
@@ -36,6 +37,10 @@ export default function ProportSidebar() {
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['Focus']);
   const [role, setRole] = useState<string>('super_user');
 
+  const { user } = useAuthStore();
+  const isDeveloper = user?.isDeveloper ?? false;
+  const actualRole = user?.role_name ?? 'buyer';
+
   const toggleSubMenu = (name: string) => {
     setExpandedMenus((prev) =>
       prev.includes(name) ? prev.filter((m) => m !== name) : [...prev, name]
@@ -45,10 +50,12 @@ export default function ProportSidebar() {
   useEffect(() => {
     setStatusCounts(getTicketCountByStatus());
     const stored = localStorage.getItem('proport_my_role');
-    if (stored) {
+    if (isDeveloper && stored) {
       setRole(stored);
+    } else {
+      setRole(actualRole);
     }
-  }, [pathname]);
+  }, [pathname, isDeveloper, actualRole]);
 
   useEffect(() => {
     const handleToggle = () => setMobileOpen((prev) => !prev);

@@ -2,7 +2,7 @@ import React from 'react';
 import { Edit, Trash2, MoreVertical, Award, Box } from 'lucide-react';
 import { AppChip } from '@integrated-computer-system/ui-kit';
 import { AppDropdown, AppTable } from '@/components/ui';
-import type { Brand } from '@/lib/brands';
+import type { Brand } from '../types/brand';
 
 interface BrandMaintenanceTableProps {
   filteredBrands: Brand[];
@@ -21,12 +21,15 @@ export default function BrandMaintenanceTable({
       dataIndex: 'name',
       key: 'name',
       align: 'left' as const,
+      sorter: (a: Brand, b: Brand) => a.name.localeCompare(b.name),
+      defaultSortOrder: 'ascend' as const,
     },
     {
       title: 'Brand Type',
       dataIndex: 'type',
       key: 'type',
       align: 'center' as const,
+      sorter: (a: Brand, b: Brand) => a.type.localeCompare(b.type),
       render: (type: string) => (
         <AppChip
           label={type}

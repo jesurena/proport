@@ -1,140 +1,97 @@
-import { useState, useEffect } from 'react';
-import {
-  getTicketCountByStatus,
-  getOpenTicketCount,
-  getTotalTicketCount,
-  getAvgHandlingTimeHours,
-  getTicketCountByBusinessUnit,
-  getMonthlyTrend,
-} from '@/lib/stats';
-import { getTickets } from '@/lib/tickets';
-import type { StatusCount, BusinessUnitCount, MonthlyTrend, Ticket as TicketType } from '@/lib/types';
+import { useQuery } from '@tanstack/react-query';
+import { dashboardService } from '../services/dashboard.service';
+import type { Ticket as TicketType } from '@/lib/types';
 
-export function useDashboard() {
-  const [statusCounts, setStatusCounts] = useState<StatusCount[]>([]);
-  const [buCounts, setBuCounts] = useState<BusinessUnitCount[]>([]);
-  const [monthlyTrend, setMonthlyTrend] = useState<MonthlyTrend[]>([]);
-  const [recentTickets, setRecentTickets] = useState<TicketType[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [openCount, setOpenCount] = useState(0);
-  const [avgHandling, setAvgHandling] = useState(0);
-
-  // Price/Supplier stats
-  const [inquiryTypes, setInquiryTypes] = useState<Record<string, number>>({});
-  const [supplierCounts, setSupplierCounts] = useState<Record<string, number>>({});
-  const [buyerAverages, setBuyerAverages] = useState<{ name: string; avg: number; count: number }[]>([]);
-  const [buyerWeeklyGrid, setBuyerWeeklyGrid] = useState<Record<string, number[]>>({});
-
-  const [allTickets, setAllTickets] = useState<TicketType[]>([]);
-
-  useEffect(() => {
-    setStatusCounts(getTicketCountByStatus());
-    setBuCounts(getTicketCountByBusinessUnit());
-    setMonthlyTrend(getMonthlyTrend());
-    setTotalCount(getTotalTicketCount());
-    setOpenCount(getOpenTicketCount());
-    setAvgHandling(getAvgHandlingTimeHours());
-
-    const tickets = getTickets();
-    setAllTickets(tickets);
-    setRecentTickets(
-      [...tickets].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 6)
-    );
-
-    // ─── 1. Categorize Price Inquiries ───
-    const categories: Record<string, number> = {
-      'Standard Price Query': 0,
-      'Volume Discount': 0,
-      'Custom Quote': 0,
-      'Supplier Match': 0,
-      'General Price Inquiry': 0,
-    };
-    tickets.forEach((t) => {
-      const text = `${t.subject} ${t.description}`.toLowerCase();
-      if (text.includes('discount') || text.includes('volume') || text.includes('seats')) {
-        categories['Volume Discount']++;
-      } else if (text.includes('match') || text.includes('competitor') || text.includes('beat')) {
-        categories['Supplier Match']++;
-      } else if (text.includes('custom') || text.includes('quote') || text.includes('quotation')) {
-        categories['Custom Quote']++;
-      } else if (text.includes('price inquiry') || text.includes('price check') || text.includes('cost') || text.includes('pricing')) {
-        categories['Standard Price Query']++;
-      } else {
-        categories['General Price Inquiry']++;
-      }
-    });
-    setInquiryTypes(categories);
-
-    // ─── 2. Supplier Breakdown ───
-    const supplierTotals: Record<string, number> = {};
-    const trackSupplier = (sup: string) => {
-      supplierTotals[sup] = (supplierTotals[sup] || 0) + 1;
-    };
-    tickets.forEach((t) => {
-      if (t.supplierName) {
-        trackSupplier(t.supplierName);
-      } else {
-        trackSupplier('Other');
-      }
-    });
-    setSupplierCounts(supplierTotals);
-
-    // ─── 3. Avg Handling Time per Buyer ───
-    const closed = tickets.filter((t) => t.closedAt && t.assigneeId);
-    const buyerTimes: Record<string, { totalHours: number; count: number }> = {};
-    closed.forEach((t) => {
-      const hrs = (new Date(t.closedAt!).getTime() - new Date(t.createdAt).getTime()) / (1000 * 60 * 60);
-      if (!buyerTimes[t.assigneeName!]) {
-        buyerTimes[t.assigneeName!] = { totalHours: 0, count: 0 };
-      }
-      buyerTimes[t.assigneeName!].totalHours += hrs;
-      buyerTimes[t.assigneeName!].count++;
-    });
-    const buyerAvg = Object.entries(buyerTimes).map(([name, val]) => ({
-      name,
-      avg: Math.round((val.totalHours / val.count) * 10) / 10,
-      count: val.count,
-    }));
-    // Default mock buyers if no tickets are closed
-    if (buyerAvg.length === 0) {
-      buyerAvg.push({ name: 'Maria Santos', avg: 4.5, count: 2 });
-      buyerAvg.push({ name: 'Rico Mendoza', avg: 12.0, count: 1 });
-    }
-    setBuyerAverages(buyerAvg);
-
-    // ─── 4. Buyer Weekly Matrix ───
-    const weeklyMatrix: Record<string, number[]> = {
-      'Maria Santos': [0, 0, 0, 0, 0, 0, 0],
-      'Rico Mendoza': [0, 0, 0, 0, 0, 0, 0],
-      'Unassigned': [0, 0, 0, 0, 0, 0, 0],
-    };
-    tickets.forEach((t) => {
-      const day = new Date(t.createdAt).getDay();
-      const name = t.assigneeName || 'Unassigned';
-      if (weeklyMatrix[name]) {
-        weeklyMatrix[name][day]++;
-      }
-    });
-    setBuyerWeeklyGrid(weeklyMatrix);
-  }, []);
-
-  const getCount = (status: string) => {
-    return statusCounts.find((s) => s.status === status)?.count || 0;
-  };
+// Helper ticket mapper
+const mapTicket = (t: any): TicketType => {
+  let status: any = 'pending';
+  if (t.status_id === 1) status = 'pending';
+  else if (t.status_id === 2) status = 'answered';
+  else if (t.status_id === 3) status = 'closed';
+  else if (t.status_id === 5) status = 'bu-approval';
+  else if (t.status_id === 6) status = 'bu-declined';
+  else if (t.status_id === 7) status = 'final-approval';
+  else if (t.status_id === 8) status = 'adel-declined';
 
   return {
-    statusCounts,
-    buCounts,
-    monthlyTrend,
-    recentTickets,
-    totalCount,
-    openCount,
-    avgHandling,
-    inquiryTypes,
-    supplierCounts,
-    buyerAverages,
-    buyerWeeklyGrid,
+    id: String(t.ticket_id),
+    ticketNumber: t.ticket_id,
+    subject: t.subject || '',
+    description: t.ticket_content || t.subject || '',
+    status,
+    priority: 'medium',
+    requesterId: String(t.ao_id),
+    requesterName: t.requestor_name || 'Unknown User',
+    assigneeId: t.req_id ? String(t.req_id) : undefined,
+    assigneeName: t.ao_name || undefined,
+    assigneeAvatar: t.GAvatarAO || undefined,
+    brandType: t.transaction_description || undefined,
+    requestType: t.request_type || undefined,
+    businessUnitId: t.AccountGroup || 'Unknown',
+    businessUnitName: t.AccountGroup || 'Unknown',
+    aoId: t.req_id ? String(t.req_id) : undefined,
+    aoName: t.ao_name || undefined,
+    cc: [],
+    createdAt: t.date_created ? new Date(t.date_created).toISOString() : new Date().toISOString(),
+    updatedAt: t.last_updated ? new Date(t.last_updated).toISOString() : new Date().toISOString(),
+    closedAt: t.status_id === 3 && t.last_updated ? new Date(t.last_updated).toISOString() : undefined,
+    replies: [],
+    tags: [],
+    customerName: t.customer_name || undefined,
+    projectName: t.project_name || undefined,
+  };
+};
+
+// ─── API Hooks (Querying database/network) ───
+
+export const useDashboardTickets = () => {
+  return useQuery<TicketType[]>({
+    queryKey: ['dashboard-tickets'],
+    queryFn: async () => {
+      const backendTickets = await dashboardService.getTickets();
+      return backendTickets.map(mapTicket);
+    },
+  });
+};
+
+export const useRecentTickets = () => {
+  return useQuery<TicketType[]>({
+    queryKey: ['recent-tickets'],
+    queryFn: async () => {
+      const backendRecent = await dashboardService.getRecentTickets();
+      return backendRecent.map(mapTicket);
+    },
+  });
+};
+
+export const useFocusBreakdown = () => {
+  return useQuery<{ focus: number; non_focus: number; request_types: any[] }>({
+    queryKey: ['focus-breakdown'],
+    queryFn: async () => {
+      return dashboardService.getFocusBreakdown();
+    },
+  });
+};
+
+export const useBookmarkedTickets = () => {
+  return useQuery<TicketType[]>({
+    queryKey: ['bookmarked-tickets'],
+    queryFn: async () => {
+      const backendBookmarks = await dashboardService.getBookmarkedTickets();
+      return backendBookmarks.map(mapTicket);
+    },
+  });
+};
+
+// ─── Main useDashboard Hook (API ONLY) ───
+
+export function useDashboard() {
+  const { data: allTickets = [], isLoading: isTicketsLoading } = useDashboardTickets();
+  const { data: recentTickets = [], isLoading: isRecentLoading } = useRecentTickets();
+
+  return {
     allTickets,
-    getCount,
+    recentTickets,
+    isLoading: isTicketsLoading || isRecentLoading,
   };
 }

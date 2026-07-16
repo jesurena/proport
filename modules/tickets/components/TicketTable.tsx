@@ -11,6 +11,7 @@ import type { Ticket, TicketStatus } from '@/lib/types';
 import { useTickets } from '../hooks/useTickets';
 import { TicketTabs } from './TicketTabs';
 import { TicketFilters } from './TicketFilters';
+import { useAuthStore } from '@/modules/auth';
 
 function timeAgo(dateStr: string): string {
   const now = new Date().getTime();
@@ -67,12 +68,18 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
   const [role, setRole] = React.useState<string>('super_user');
   const [pageSize, setPageSize] = React.useState<number>(10);
 
+  const { user } = useAuthStore();
+  const isDeveloper = user?.isDeveloper ?? false;
+  const actualRole = user?.role_name ?? 'buyer';
+
   React.useEffect(() => {
     const storedRole = localStorage.getItem('proport_my_role');
-    if (storedRole) {
+    if (isDeveloper && storedRole) {
       setRole(storedRole);
+    } else {
+      setRole(actualRole);
     }
-  }, []);
+  }, [isDeveloper, actualRole]);
 
   const columns = [
     {
@@ -131,7 +138,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
         const participants = Array.from(
           new Set(
             [record.assigneeName, ...record.replies.map((r) => r.authorName)].filter(
-              (name) => Boolean(name) && name !== record.requesterName
+              (name): name is string => Boolean(name) && name !== record.requesterName
             )
           )
         );

@@ -7,4 +7,7 @@ export { default as SalesDashboard } from './components/SalesDashboard';
 export { default as BuyerDashboard } from './components/BuyerDashboard';
 export { default as DashboardTicketCountAo } from './components/DashboardTicketCountAo';
 export { default as DashboardBookmarkedTickets } from './components/DashboardBookmarkedTickets';
-export { useDashboard } from './hooks/useDashboard';
+export * from './hooks/useDashboard';
+export * from './hooks/use-dashboard-stats';
+export * from './hooks/use-inquiry-analytics';
+export * from './hooks/use-buyer-analytics';

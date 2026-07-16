@@ -5,23 +5,28 @@ import { ProportNavbar } from '@/modules/sidebar';
 import {
   SalesDashboard,
   BuyerDashboard,
-  useDashboard
+  useDashboard,
+  useDashboardStats
 } from '@/modules/dashboard';
+import { useAuthStore } from '@/modules/auth';
 
 export default function DashboardPage() {
-  const {
-    totalCount,
-    recentTickets,
-    allTickets,
-    getCount
-  } = useDashboard();
+  const { allTickets, recentTickets, isLoading } = useDashboard();
+  const { totalCount, getCount } = useDashboardStats(allTickets);
 
   const [role, setRole] = useState<string | null>(null);
+  const { user } = useAuthStore();
+  const isDeveloper = user?.isDeveloper ?? false;
+  const actualRole = user?.role_name ?? 'buyer';
 
   useEffect(() => {
     const storedRole = localStorage.getItem('proport_my_role');
-    setRole(storedRole || 'super_user');
-  }, []);
+    if (isDeveloper && storedRole) {
+      setRole(storedRole);
+    } else {
+      setRole(actualRole);
+    }
+  }, [isDeveloper, actualRole]);
 
   return (
     <>

@@ -1,12 +1,37 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { ProportSidebar } from '@/modules/sidebar';
+import { useAuthStore } from '@/modules/auth';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const token = useAuthStore((state) => state.token);
+  const [mounted, setMounted] = useState(false);
+
   const isLoginPage = pathname === '/login';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoginPage && !token) {
+      router.replace('/login');
+    }
+  }, [mounted, isLoginPage, token, router]);
+
+  // Show loading screen during rehydration or redirect check
+  if (!isLoginPage && (!mounted || !token)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col gap-4">
+        <div className="w-10 h-10 border-4 border-[#1e1b18] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-500 font-medium">Verifying session...</p>
+      </div>
+    );
+  }
 
   if (isLoginPage) {
     return <>{children}</>;

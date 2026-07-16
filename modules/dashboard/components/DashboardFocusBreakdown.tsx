@@ -109,7 +109,7 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
       {/* Tickets per Request Type Details */}
       {showMore && (
         <div className="border-t border-border/40 pt-4 mt-1 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
-          <AppLabel as="h5" className="text-[11px] font-bold text-text-info uppercase tracking-wider block mb-1">
+          <AppLabel as="span" className="text-[11px] font-bold text-text-info uppercase tracking-wider block mb-1">
             Tickets per Request Type
           </AppLabel>
           <div className="space-y-3">

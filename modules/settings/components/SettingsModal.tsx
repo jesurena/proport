@@ -6,6 +6,7 @@ import { AppButton, AppModal, AppTabs } from '@/components/ui';
 import type { TabItem } from '@/components/ui/tabs';
 import GeneralTab from './tabs/GeneralTab';
 import RolesTab from './tabs/RolesTab';
+import { useAuthStore } from '@/modules/auth';
 
 interface SettingsModalProps {
     visible: boolean;
@@ -29,6 +30,15 @@ const settingsTabs: TabItem[] = [
 
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
     const [activeTab, setActiveTab] = useState('general');
+    const { user } = useAuthStore();
+    const isDeveloper = user?.isDeveloper ?? false;
+
+    const visibleTabs = settingsTabs.filter(tab => {
+        if (tab.id === 'roles' && !isDeveloper) {
+            return false;
+        }
+        return true;
+    });
 
     return (
         <AppModal
@@ -52,7 +62,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                 </AppButton>
  
                 <AppTabs
-                    tabs={settingsTabs}
+                    tabs={visibleTabs}
                     activeTab={activeTab}
                     onChange={(tab) => setActiveTab(tab as string)}
                     orientation="vertical"

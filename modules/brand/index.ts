@@ -1,3 +1,9 @@
 export { default as BrandMaintenanceTable } from './components/BrandMaintenanceTable';
 export { default as BrandModal } from './components/BrandModal';
-export { useBrandMaintenance } from './hooks/useBrandMaintenance';
+export { default as BrandToolbar } from './components/BrandToolbar';
+export { useBrands, useAddBrands, useUpdateBrand, useDeleteBrand } from './hooks/use-brands';
+export { useBrandFilters } from './hooks/use-brand-filters';
+export { useBrandModal } from './hooks/use-brand-modal';
+export { useBrandActions } from './hooks/use-brand-actions';
+export * from './types/brand';
+export * from './services/brand.service';
