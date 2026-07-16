@@ -170,23 +170,23 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
     return entries.map(([name, count], index) => {
       const percent = count / total;
       const sliceStart = cumulativePercent;
-      const startX = Math.cos(2 * Math.PI * cumulativePercent) * 40 + 50;
-      const startY = Math.sin(2 * Math.PI * cumulativePercent) * 40 + 50;
+      const startX = Math.cos(2 * Math.PI * cumulativePercent) * 46 + 50;
+      const startY = Math.sin(2 * Math.PI * cumulativePercent) * 46 + 50;
       cumulativePercent += percent;
-      const endX = Math.cos(2 * Math.PI * cumulativePercent) * 40 + 50;
-      const endY = Math.sin(2 * Math.PI * cumulativePercent) * 40 + 50;
+      const endX = Math.cos(2 * Math.PI * cumulativePercent) * 46 + 50;
+      const endY = Math.sin(2 * Math.PI * cumulativePercent) * 46 + 50;
       const largeArcFlag = percent > 0.5 ? 1 : 0;
       
       const pathData = percent === 1
-        ? `M 50 10 A 40 40 0 1 1 49.999 10 Z`
-        : `M 50 50 L ${startX} ${startY} A 40 40 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
+        ? `M 50 4 A 46 46 0 1 1 49.999 4 Z`
+        : `M 50 50 L ${startX} ${startY} A 46 46 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
 
       const color = COLORS[index % COLORS.length];
 
-      // Label coordinate (midpoint of slice, scaled inside r=24 to fit well)
+      // Label coordinate (midpoint of slice, scaled inside r=28 to fit well)
       const middlePercent = sliceStart + (percent / 2);
-      const labelX = Math.cos(2 * Math.PI * middlePercent) * 24 + 50;
-      const labelY = Math.sin(2 * Math.PI * middlePercent) * 24 + 50;
+      const labelX = Math.cos(2 * Math.PI * middlePercent) * 28 + 50;
+      const labelY = Math.sin(2 * Math.PI * middlePercent) * 28 + 50;
 
       return {
         name,
@@ -263,8 +263,8 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
           </div>
 
           {/* SVG Pie Chart Widget with Numeric Labels & Highlights */}
-          <div className="relative w-52 h-52 mx-auto">
-            <svg className="w-52 h-52 -rotate-90" viewBox="0 0 100 100">
+          <div className="relative w-64 h-64 mx-auto">
+            <svg className="w-64 h-64 -rotate-90" viewBox="0 0 100 100">
               {buSlices.map((slice) => {
                 const isSelected = selectedBU === slice.name;
                 return (
@@ -278,7 +278,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
                       }`}
                       style={{ transformOrigin: '50px 50px' }}
                     />
-                    {slice.percent > 0.03 && (
+                    {slice.percent > 0.01 && (
                       <text
                         x={slice.labelX}
                         y={slice.labelY}
