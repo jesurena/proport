@@ -78,7 +78,7 @@ export default function TicketDetailPage() {
 
     if (remarks && remarks.trim()) {
       addReply(ticketId, {
-        content: `<strong>Assignment Updated</strong><br/>${remarks}`
+        content: remarks
       });
     }
 

@@ -78,14 +78,16 @@ export default function TicketThread({
       createdAt: ticketCreatedAt,
       isOriginal: true,
     },
-    ...replies.map((r) => ({
-      id: r.id,
-      authorName: r.authorName,
-      authorAvatar: r.authorAvatar,
-      content: r.content,
-      createdAt: r.createdAt,
-      isOriginal: false,
-    })),
+    ...replies
+      .filter((r) => !r.content.includes('Assignment Updated'))
+      .map((r) => ({
+        id: r.id,
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        content: r.content,
+        createdAt: r.createdAt,
+        isOriginal: false,
+      })),
   ];
 
   return (
