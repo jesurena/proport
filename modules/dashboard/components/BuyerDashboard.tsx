@@ -1,15 +1,18 @@
+'use client';
+
 import React from 'react';
 import DashboardWelcomeBanner from './DashboardWelcomeBanner';
 import DashboardMetricCard from './DashboardMetricCard';
-import DashboardTable from './DashboardTable';
+import DashboardTicketCountAo from './DashboardTicketCountAo';
 import DashboardTicketPerBuyer from './DashboardTicketPerBuyer';
 import DashboardFocusBreakdown from './DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from './DashboardBookmarkedTickets';
+import type { Ticket as TicketType } from '@/lib/types';
 
 interface BuyerDashboardProps {
   totalCount: number;
-  recentTickets: any[];
-  allTickets: any[];
+  recentTickets: TicketType[];
+  allTickets: TicketType[];
   getCount: (status: string) => number;
 }
 
@@ -24,8 +27,8 @@ export default function BuyerDashboard({
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="buyer" />
-        <DashboardMetricCard totalCount={totalCount} getCount={getCount} />
-        <DashboardTable recentTickets={recentTickets} />
+        <DashboardMetricCard allTickets={allTickets} />
+        <DashboardTicketCountAo allTickets={allTickets} />
       </div>
 
       {/* ── RIGHT COLUMN ── */}

@@ -76,7 +76,7 @@ export default function SalesRecentTickets() {
   };
 
   return (
-    <AppCard variant="default" padding="md" className="space-y-3">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <AppLabel as="h3" variant="subtitle">Your Recent Tickets</AppLabel>
         <div className="flex items-center gap-2">
@@ -162,6 +162,6 @@ export default function SalesRecentTickets() {
           })}
         </div>
       )}
-    </AppCard>
+    </div>
   );
 }

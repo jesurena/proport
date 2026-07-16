@@ -1,6 +1,6 @@
 import React from 'react';
 import DashboardWelcomeBanner from './DashboardWelcomeBanner';
-import SalesDashboardMetricCard from './SalesDashboardMetricCard';
+import DashboardMetricCard from './DashboardMetricCard';
 import SalesRecentTickets from './SalesRecentTickets';
 import DashboardTicketCountAo from './DashboardTicketCountAo';
 import DashboardFocusBreakdown from './DashboardFocusBreakdown';
@@ -24,7 +24,7 @@ export default function SalesDashboard({
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="sales" />
-        <SalesDashboardMetricCard allTickets={allTickets} />
+        <DashboardMetricCard allTickets={allTickets} />
         <SalesRecentTickets />
         <DashboardTicketCountAo allTickets={allTickets} />
       </div>

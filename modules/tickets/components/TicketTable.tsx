@@ -34,7 +34,13 @@ function formatOrderNumber(ticketNumber: number): string {
   return `#${String(ticketNumber).padStart(4, '0')}`;
 }
 
-export function TicketTable() {
+export interface TicketTableProps {
+  tickets?: Ticket[];
+  hideHeader?: boolean;
+  hideFilters?: boolean;
+}
+
+export function TicketTable({ tickets, hideHeader = false, hideFilters = false }: TicketTableProps = {}) {
   const router = useRouter();
   const {
     searchQuery,
@@ -55,6 +61,8 @@ export function TicketTable() {
     activeFiltersCount,
     handleTabChange,
   } = useTickets();
+
+  const resolvedTickets = tickets ?? filteredTickets;
 
   const [role, setRole] = React.useState<string>('super_user');
   const [pageSize, setPageSize] = React.useState<number>(10);
@@ -203,31 +211,35 @@ export function TicketTable() {
   return (
     <div className="space-y-6">
       {/* Tabs Subcomponent */}
-      <TicketTabs
-        activeTab={activeTab}
-        onChange={handleTabChange}
-        role={role}
-      />
+      {!hideHeader && (
+        <TicketTabs
+          activeTab={activeTab}
+          onChange={handleTabChange}
+          role={role}
+        />
+      )}
 
       {/* Filters, Sort, Search Subcomponent */}
-      <TicketFilters
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        selectedStatuses={selectedStatuses}
-        setSelectedStatuses={setSelectedStatuses}
-        selectedBrandTypes={selectedBrandTypes}
-        setSelectedBrandTypes={setSelectedBrandTypes}
-        sortOpen={sortOpen}
-        setSortOpen={setSortOpen}
-        filterOpen={filterOpen}
-        setFilterOpen={setFilterOpen}
-        activeFiltersCount={activeFiltersCount}
-      />
+      {!hideFilters && (
+        <TicketFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          selectedStatuses={selectedStatuses}
+          setSelectedStatuses={setSelectedStatuses}
+          selectedBrandTypes={selectedBrandTypes}
+          setSelectedBrandTypes={setSelectedBrandTypes}
+          sortOpen={sortOpen}
+          setSortOpen={setSortOpen}
+          filterOpen={filterOpen}
+          setFilterOpen={setFilterOpen}
+          activeFiltersCount={activeFiltersCount}
+        />
+      )}
 
       {/* Ticket Table list */}
-      {filteredTickets.length === 0 ? (
+      {resolvedTickets.length === 0 ? (
         <div className="py-12 flex justify-center border border-border/60 bg-background rounded-2xl shadow-sm">
           <AppEmptyState
             title={emptyState.title}
@@ -239,7 +251,7 @@ export function TicketTable() {
       ) : (
         <AppTable<Ticket>
           columns={columns}
-          dataSource={filteredTickets}
+          dataSource={resolvedTickets}
           rowKey="id"
           scroll={{ x: 'max-content' }}
           pagination={{

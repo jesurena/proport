@@ -103,7 +103,12 @@ export default function ProportSidebar() {
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-center justify-between w-full">
                 <SidebarAppDropdown />
-                <AppSidebar.Toggle className="h-8 w-8 shrink-0" />
+                <AppSidebar.Toggle className="hidden lg:inline-flex h-8 w-8 shrink-0" />
+                <AppSidebar.Toggle
+                  isMobile
+                  onCloseMobile={() => setMobileOpen(false)}
+                  className="lg:hidden h-8 w-8 shrink-0"
+                />
               </div>
               {(role === 'sales' || role === 'super_user') && (
                 <div className="px-1">
