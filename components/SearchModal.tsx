@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppModal, AppInput, AppCard } from '@integrated-computer-system/ui-kit';
-import { Folder, Ticket as TicketIcon, CornerDownLeft, Loader2 } from 'lucide-react';
+import { Ticket as TicketIcon, ArrowRight, Loader2 } from 'lucide-react';
 import { getTickets } from '@/lib/tickets';
 import type { Ticket } from '@/lib/types';
 
@@ -11,23 +11,6 @@ interface SearchModalProps {
   open: boolean;
   onClose: () => void;
 }
-
-interface ModuleItem {
-  id: string;
-  label: string;
-  path: string;
-  description: string;
-}
-
-const MODULES: ModuleItem[] = [
-  { id: 'dashboard', label: 'Dashboard', path: '/', description: 'Overview and status of pricing tickets' },
-  { id: 'compose', label: 'Compose Ticket', path: '/compose', description: 'Create a new price ticket request' },
-  { id: 'tickets', label: 'All Tickets', path: '/tickets', description: 'View and filter all pricing tickets' },
-  { id: 'reports', label: 'Reports', path: '/reports', description: 'Analytics and pricing trends' },
-  { id: 'brands', label: 'Brand Maintenance', path: '/brands', description: 'Manage global brand catalog and focus classification' },
-  { id: 'suppliers', label: 'Supplier Settings', path: '/suppliers', description: 'Manage supplier definitions' },
-  { id: 'logs', label: 'User Logs', path: '/logs', description: 'Audit trails and security logs' },
-];
 
 export default function SearchModal({ open, onClose }: SearchModalProps) {
   const router = useRouter();
@@ -50,32 +33,22 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
     }
   }, [searchQuery]);
 
-  const filteredModules = useMemo(() => {
-    if (!searchQuery) return MODULES;
-    const q = searchQuery.toLowerCase();
-    return MODULES.filter(
-      (m) => m.label.toLowerCase().includes(q) || m.description.toLowerCase().includes(q)
-    );
-  }, [searchQuery]);
-
   const filteredTickets = useMemo(() => {
-    if (!searchQuery) return [];
-    const q = searchQuery.toLowerCase();
     const allTickets = getTickets();
+    if (!searchQuery) {
+      // Show first 5 tickets as quick suggestions when search is empty
+      return allTickets.slice(0, 5);
+    }
+    const q = searchQuery.toLowerCase();
     return allTickets.filter(
       (t) =>
         t.subject.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
+        (t.description && t.description.toLowerCase().includes(q)) ||
         t.requesterName.toLowerCase().includes(q) ||
         (t.supplierName && t.supplierName.toLowerCase().includes(q)) ||
         String(t.ticketNumber).includes(q)
     );
   }, [searchQuery]);
-
-  const handleSelectModule = (path: string) => {
-    router.push(path);
-    onClose();
-  };
 
   const handleSelectTicket = (id: string) => {
     router.push(`/tickets/${id}`);
@@ -85,13 +58,13 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
   return (
     <AppModal open={open} onClose={onClose} width={600} centered>
       <AppModal.Header>
-        <AppModal.Title>Search Portal</AppModal.Title>
+        <AppModal.Title>Search Tickets</AppModal.Title>
       </AppModal.Header>
 
       <AppModal.Body className="space-y-4">
         <AppInput
           preset="search"
-          placeholder="Search modules, inquiries, suppliers, description, number..."
+          placeholder="Search tickets, suppliers, descriptions, numbers..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full"
@@ -106,44 +79,11 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
             </div>
           ) : (
             <>
-              {/* Modules Group */}
-              {filteredModules.length > 0 && (
+              {/* Tickets List */}
+              {filteredTickets.length > 0 && (
                 <div className="space-y-1.5">
                   <span className="text-[11px] font-bold text-text-info uppercase tracking-wider block px-1">
-                    Modules ({filteredModules.length})
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    {filteredModules.map((m) => (
-                      <AppCard
-                        key={m.id}
-                        variant="interactive"
-                        padding="none"
-                        onClick={() => handleSelectModule(m.path)}
-                        className="flex items-center justify-between p-3 cursor-pointer group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-accent-1/10 flex items-center justify-center text-accent-1 shrink-0">
-                            <Folder size={16} />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-text group-hover:text-accent-1 transition-colors">
-                              {m.label}
-                            </span>
-                            <span className="text-xs text-text-info">{m.description}</span>
-                          </div>
-                        </div>
-                        <CornerDownLeft size={14} className="text-text-info opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </AppCard>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tickets Group */}
-              {searchQuery && filteredTickets.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-[11px] font-bold text-text-info uppercase tracking-wider block px-1">
-                    Inquiries ({filteredTickets.length})
+                    {searchQuery ? `Tickets (${filteredTickets.length})` : 'Recent Tickets'}
                   </span>
                   <div className="flex flex-col gap-1">
                     {filteredTickets.map((t) => (
@@ -160,7 +100,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                           </div>
                           <div className="flex flex-col min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-mono text-text-info">
+                              <span className="text-xs font-mono text-text-info shrink-0">
                                 #{String(t.ticketNumber).padStart(4, '0')}
                               </span>
                               <span className="text-sm font-semibold text-text truncate group-hover:text-accent-1 transition-colors">
@@ -172,7 +112,9 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                             </span>
                           </div>
                         </div>
-                        <CornerDownLeft size={14} className="text-text-info opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="w-6 h-6 rounded-full bg-accent-1 text-white flex items-center justify-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <ArrowRight size={12} />
+                        </div>
                       </AppCard>
                     ))}
                   </div>
@@ -180,10 +122,10 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
               )}
 
               {/* Empty state */}
-              {searchQuery && filteredModules.length === 0 && filteredTickets.length === 0 && (
+              {searchQuery && filteredTickets.length === 0 && (
                 <div className="py-12 text-center text-text-info/60 space-y-1">
                   <p className="text-sm font-medium">No results found for "{searchQuery}"</p>
-                  <p className="text-xs">Try searching for modules, ticket titles, suppliers, numbers, or sales names.</p>
+                  <p className="text-xs">Try searching for ticket titles, suppliers, numbers, or requester names.</p>
                 </div>
               )}
             </>

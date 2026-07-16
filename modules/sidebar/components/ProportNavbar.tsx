@@ -4,79 +4,57 @@ import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { AppNavbar } from '@integrated-computer-system/ui-kit';
-import { Bell, Search, Menu, X, Ticket, Clock, CheckCircle2, AlertCircle, MessageSquare } from 'lucide-react';
-
-interface Notification {
-  id: string;
-  type: 'new' | 'update' | 'resolved' | 'urgent' | 'reply';
-  title: string;
-  body: string;
-  time: string;
-  read: boolean;
-}
+import { Bell, Search, Menu, X } from 'lucide-react';
+import { NotificationDropdown, type Notification } from './NotificationDropdown';
 
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '1',
     type: 'urgent',
     title: 'Urgent: Target price match required',
-    body: 'Inquiry #0003 — Lenovo ThinkPad volume request has been escalated.',
+    body: 'Ticket #0003 — Lenovo ThinkPad volume request has been escalated.',
     time: '2m ago',
     read: false,
+    ticketId: 'ticket-3',
   },
   {
     id: '2',
     type: 'reply',
     title: 'New reply from Buyer',
-    body: 'Inquiry #0004 — Rico Mendoza (Buyer) updated Palo Alto pricing details.',
+    body: 'Ticket #0004 — Rico Mendoza (Buyer) updated Palo Alto pricing details.',
     time: '14m ago',
     read: false,
+    ticketId: 'ticket-4',
   },
   {
     id: '3',
     type: 'new',
-    title: 'Inquiry assigned to you',
-    body: 'Inquiry #0001 — O365 Business Premium licenses has been assigned to your queue.',
+    title: 'Ticket assigned to you',
+    body: 'Ticket #0001 — O365 Business Premium licenses has been assigned to your queue.',
     time: '1h ago',
     read: false,
+    ticketId: 'ticket-1',
   },
   {
     id: '4',
     type: 'update',
     title: 'Status updated',
-    body: 'Inquiry #0005 — SLA upgrade pricing is now Pending supplier approval.',
+    body: 'Ticket #0005 — SLA upgrade pricing is now Pending supplier approval.',
     time: '3h ago',
     read: true,
+    ticketId: 'ticket-5',
   },
   {
     id: '5',
     type: 'resolved',
-    title: 'Inquiry closed',
-    body: 'Inquiry #0009 — Dell Latitude quote matched and accepted by sales.',
+    title: 'Ticket closed',
+    body: 'Ticket #0009 — Dell Latitude quote matched and accepted by sales.',
     time: 'Yesterday',
     read: true,
+    ticketId: 'ticket-9',
   },
 ];
 
-const notifIcon = (type: Notification['type']) => {
-  switch (type) {
-    case 'urgent': return <AlertCircle size={14} className="text-red-500" />;
-    case 'reply': return <MessageSquare size={14} className="text-blue-500" />;
-    case 'new': return <Ticket size={14} className="text-indigo-500" />;
-    case 'update': return <Clock size={14} className="text-amber-500" />;
-    case 'resolved': return <CheckCircle2 size={14} className="text-emerald-500" />;
-  }
-};
-
-const notifBg = (type: Notification['type']) => {
-  switch (type) {
-    case 'urgent': return 'bg-red-500/10';
-    case 'reply': return 'bg-blue-500/10';
-    case 'new': return 'bg-indigo-500/10';
-    case 'update': return 'bg-amber-500/10';
-    case 'resolved': return 'bg-emerald-500/10';
-  }
-};
 
 interface ProportNavbarProps {
   title?: string;
@@ -193,69 +171,12 @@ export default function ProportNavbar({ title, children }: ProportNavbarProps) {
             )}
           </button>
 
-          {notifOpen && (
-            <div className="absolute right-0 top-full mt-2 w-[340px] bg-card-bg border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border ">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-text">Notifications</span>
-                  {unreadCount > 0 && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500">
-                      {unreadCount} new
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllRead}
-                      className="text-[11px] font-semibold text-accent-1 hover:underline cursor-pointer"
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setNotifOpen(false)}
-                    className="p-1 rounded-lg hover:bg-hover/60 text-text-info hover:text-text transition-colors cursor-pointer"
-                  >
-                    <X size={13} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Notification list */}
-              <div className="max-h-[360px] overflow-y-auto divide-y divide-border/40">
-                {notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    onClick={() => setNotifications((prev) => prev.map((x) => x.id === n.id ? { ...x, read: true } : x))}
-                    className={`flex gap-3 px-4 py-3 cursor-pointer transition-colors ${n.read ? 'hover:bg-hover/30' : 'bg-accent-1/[0.03] hover:bg-accent-1/[0.06]'}`}
-                  >
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${notifBg(n.type)}`}>
-                      {notifIcon(n.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className={`text-xs font-semibold leading-snug ${n.read ? 'text-text-info' : 'text-text'}`}>
-                          {n.title}
-                        </p>
-                        {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-accent-1 shrink-0 mt-1" />}
-                      </div>
-                      <p className="text-[11px] text-text-info mt-0.5 leading-snug line-clamp-2">{n.body}</p>
-                      <p className="text-[10px] text-text-info/60 mt-1 font-medium">{n.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div className="px-4 py-2.5 border-t border-border text-center">
-                <button className="text-[11px] font-semibold text-accent-1 hover:underline cursor-pointer">
-                  View all notifications
-                </button>
-              </div>
-            </div>
-          )}
+          <NotificationDropdown
+            open={notifOpen}
+            onClose={() => setNotifOpen(false)}
+            notifications={notifications}
+            setNotifications={setNotifications}
+          />
         </div>
       </AppNavbar.Right>
     </AppNavbar>

@@ -1,13 +1,32 @@
-import React from 'react';
-import { MoreHorizontal } from 'lucide-react';
-import { AppLabel, AppCard } from '@/components/ui';
+'use client';
+
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { AppLabel, AppCard, AppButton } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardFocusBreakdownProps {
   allTickets: TicketType[];
 }
 
+const REQUEST_TYPE_LABELS: Record<string, string> = {
+  cost: 'Cost Ticket',
+  demo: 'Demo Unit',
+  service: 'Service Schedule',
+  eta: 'ETA Ticket',
+};
+
+const REQUEST_TYPE_COLORS: Record<string, string> = {
+  cost: 'bg-indigo-600 dark:bg-indigo-500',
+  demo: 'bg-blue-600 dark:bg-blue-500',
+  service: 'bg-emerald-600 dark:bg-emerald-500',
+  eta: 'bg-purple-600 dark:bg-purple-500',
+  unknown: 'bg-neutral-500',
+};
+
 export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBreakdownProps) {
+  const [showMore, setShowMore] = useState(false);
+
   const focusStatuses = ['pending', 'answered', 'closed', 'reassigned'];
   const focusCount = allTickets.filter((t) => focusStatuses.includes(t.status)).length;
   const nonFocusCount = allTickets.length - focusCount;
@@ -16,8 +35,17 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
   const circumference = 2 * Math.PI * 40; // r=40
   const dashOffset = circumference - (focusPct / 100) * circumference;
 
+  // Group by requestType
+  const typeCounts = allTickets.reduce<Record<string, number>>((acc, t) => {
+    const type = t.requestType || 'unknown';
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
+
+  const totalTickets = allTickets.length || 1;
+
   return (
-    <AppCard variant="default" padding="md">
+    <AppCard variant="default" padding="md" className="space-y-3">
       <div className="flex items-center justify-start">
         <div>
           <AppLabel as="h4" variant="title" className="!text-sm !font-bold">Ticket Focus Breakdown</AppLabel>
@@ -55,7 +83,7 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mt-3">
+      <div className="grid grid-cols-2 gap-2 mt-2">
         <div className="rounded-2xl border border-border/50 bg-hover/30 px-3 py-2 text-center">
           <AppLabel as="p" className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Focus</AppLabel>
           <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{focusCount} ({focusPct}%)</AppLabel>
@@ -65,6 +93,49 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
           <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{nonFocusCount} ({nonFocusPct}%)</AppLabel>
         </div>
       </div>
+
+      {/* View More Button */}
+      <div className="pt-2 text-center">
+        <AppButton
+          variant="link"
+          size="sm"
+          onClick={() => setShowMore(!showMore)}
+          className="!text-xs select-none"
+        >
+          {showMore ? 'Show Less' : 'View More'}
+        </AppButton>
+      </div>
+
+      {/* Tickets per Request Type Details */}
+      {showMore && (
+        <div className="border-t border-border/40 pt-4 mt-1 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+          <AppLabel as="h5" className="text-[11px] font-bold text-text-info uppercase tracking-wider block mb-1">
+            Tickets per Request Type
+          </AppLabel>
+          <div className="space-y-3">
+            {Object.entries(REQUEST_TYPE_LABELS).map(([typeKey, typeLabel]) => {
+              const count = typeCounts[typeKey] || 0;
+              const pct = Math.round((count / totalTickets) * 100);
+              const barColor = REQUEST_TYPE_COLORS[typeKey] || REQUEST_TYPE_COLORS.unknown;
+              return (
+                <div key={typeKey} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs font-semibold text-text">
+                    <span className="truncate">{typeLabel}</span>
+                    <span>{count} ({pct}%)</span>
+                  </div>
+                  {/* Progress Bar Container */}
+                  <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </AppCard>
   );
 }

@@ -62,7 +62,7 @@ export default function DashboardBookmarkedTickets({ allTickets }: DashboardBook
           className="py-4 border-none bg-transparent"
         />
       ) : (
-        <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
           {bookmarkedTickets.map((ticket) => {
             let chipVariant: any = 'muted';
             if (ticket.status === 'answered') chipVariant = 'success';
@@ -91,11 +91,11 @@ export default function DashboardBookmarkedTickets({ allTickets }: DashboardBook
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
                   <AppButton
-                    variant="neutral"
+                    variant="primary"
                     size="icon"
                     onClick={() => router.push(`/tickets/${ticket.id}`)}
                     title="View details"
-                    className="!w-6 !h-6 rounded-full"
+                    className="!w-6 !h-6 rounded-full !bg-accent-1 hover:!bg-accent-1/90 !text-white border-none flex items-center justify-center shrink-0"
                   >
                     <ArrowRight size={11} />
                   </AppButton>

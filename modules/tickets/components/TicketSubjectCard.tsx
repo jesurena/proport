@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
 import { AppLabel } from '@integrated-computer-system/ui-kit';
-import { Modal } from 'antd';
+import { modal } from '@/modules/theme';
 import { STATUS_META } from '@/lib/types';
 import type { TicketStatus } from '@/lib/types';
 
@@ -34,7 +34,7 @@ export function TicketSubjectCard({
   }, [ticketId]);
 
   const togglePin = () => {
-    Modal.confirm({
+    modal.confirm({
       title: isPinned ? 'Remove Bookmark?' : 'Bookmark Ticket?',
       content: isPinned
         ? 'Are you sure you want to remove this ticket from your bookmarks?'
