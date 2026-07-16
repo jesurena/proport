@@ -1,6 +1,6 @@
 export { default as DashboardWelcomeBanner } from './components/DashboardWelcomeBanner';
 export { default as DashboardMetricCard } from './components/DashboardMetricCard';
-export { default as DashboardRecentTickets } from './components/DashboardRecentTickets';
+export { default as SalesRecentTickets } from './components/SalesRecentTickets';
 export { default as DashboardTable } from './components/DashboardTable';
 export { default as DashboardFocusBreakdown } from './components/DashboardFocusBreakdown';
 export { default as DashboardTicketPerBuyer } from './components/DashboardTicketPerBuyer';

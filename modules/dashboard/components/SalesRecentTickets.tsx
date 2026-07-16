@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Pin } from 'lucide-react';
-import { AppLabel, AppButton, AppCard } from '@/components/ui';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AppLabel, AppButton, AppCard, AppBookmark, AppChip } from '@/components/ui';
+import { modal } from '@/modules/theme';
+import { STATUS_META } from '@/lib/types';
 import type { Ticket as TicketType } from '@/lib/types';
 import { getTickets } from '@/lib/tickets';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 
-export default function DashboardRecentTickets() {
+export default function SalesRecentTickets() {
   const router = useRouter();
   const [role, setRole] = useState<string>('super_user');
   const [page, setPage] = useState(0);
@@ -27,8 +29,10 @@ export default function DashboardRecentTickets() {
       if (pins) setPinnedIds(JSON.parse(pins));
     };
     window.addEventListener('proport-pins-updated', handlePinSync);
+    window.addEventListener('storage', handlePinSync);
     return () => {
       window.removeEventListener('proport-pins-updated', handlePinSync);
+      window.removeEventListener('storage', handlePinSync);
     };
   }, []);
 
@@ -44,17 +48,31 @@ export default function DashboardRecentTickets() {
   const startIndex = page * itemsPerPage;
   const visibleTickets = displayTickets.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleTogglePin = (ticketId: string, e: React.MouseEvent) => {
+  const handleToggleBookmark = (ticketId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    let updated;
-    if (pinnedIds.includes(ticketId)) {
-      updated = pinnedIds.filter((id) => id !== ticketId);
-    } else {
-      updated = [...pinnedIds, ticketId];
-    }
-    setPinnedIds(updated);
-    localStorage.setItem('proport_pinned_tickets', JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('proport-pins-updated'));
+    const isPinned = pinnedIds.includes(ticketId);
+
+    modal.confirm({
+      title: isPinned ? 'Remove Bookmark?' : 'Bookmark Ticket?',
+      content: isPinned
+        ? 'Are you sure you want to remove this ticket from your bookmarks?'
+        : 'Are you sure you want to bookmark this ticket for quick access?',
+      okText: 'Yes',
+      cancelText: 'No',
+      centered: true,
+      onOk() {
+        let updated;
+        if (isPinned) {
+          updated = pinnedIds.filter((id) => id !== ticketId);
+        } else {
+          updated = [...pinnedIds, ticketId];
+        }
+        setPinnedIds(updated);
+        localStorage.setItem('proport_pinned_tickets', JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('proport-pins-updated'));
+        window.dispatchEvent(new Event('storage'));
+      },
+    });
   };
 
   return (
@@ -93,23 +111,8 @@ export default function DashboardRecentTickets() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {visibleTickets.map((ticket) => {
-            let badgeColor = 'bg-purple-500/10 text-purple-600';
-            let gradient = 'from-purple-600 to-indigo-600';
-            if (ticket.supplierName === 'Ingram Micro') {
-              badgeColor = 'bg-sky-500/10 text-sky-600';
-              gradient = 'from-sky-500 to-blue-600';
-            } else if (ticket.supplierName === 'Synnex') {
-              badgeColor = 'bg-cyan-500/10 text-cyan-600';
-              gradient = 'from-cyan-600 to-blue-500';
-            } else if (ticket.supplierName === 'Tech Data') {
-              badgeColor = 'bg-indigo-500/10 text-indigo-600';
-              gradient = 'from-indigo-500 to-violet-600';
-            } else if (ticket.supplierName === 'Arrow Electronics') {
-              badgeColor = 'bg-emerald-500/10 text-emerald-600';
-              gradient = 'from-emerald-600 to-teal-700';
-            }
-
             const isPinned = pinnedIds.includes(ticket.id);
+            const statusMeta = STATUS_META[ticket.status] || { label: ticket.status, chipVariant: 'muted' };
 
             return (
               <AppCard
@@ -119,7 +122,7 @@ export default function DashboardRecentTickets() {
                 onClick={() => router.push(`/tickets/${ticket.id}`)}
                 className="overflow-hidden shadow-sm cursor-pointer flex flex-col group relative"
               >
-                <div className={`w-full h-36 bg-linear-to-br ${gradient} relative flex items-center justify-center`}>
+                <div className="w-full h-36 bg-gradient-to-br from-indigo-600 to-violet-600 relative flex items-center justify-center">
                   <AppLabel
                     as="span"
                     variant="caption"
@@ -127,43 +130,31 @@ export default function DashboardRecentTickets() {
                   >
                     #{String(ticket.ticketNumber).padStart(4, '0')}
                   </AppLabel>
-                  <AppButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => handleTogglePin(ticket.id, e)}
-                    className={`absolute right-3 top-3 !w-7 !h-7 rounded-full !backdrop-blur-md transition-all !border-none ${isPinned
-                        ? '!bg-indigo-600 !text-white opacity-100'
-                        : '!bg-black/20 hover:!bg-black/40 !text-white opacity-0 group-hover:opacity-100'
-                      }`}
-                  >
-                    <Pin size={12} className={isPinned ? 'fill-current text-amber-400 rotate-45' : ''} />
-                  </AppButton>
                 </div>
                 <div className="p-4 flex-1 flex flex-col gap-2">
-                  <AppLabel
-                    as="h4"
-                    variant="title"
-                    className="!text-sm !font-bold line-clamp-2 leading-snug"
-                  >
-                    {ticket.subject}
-                  </AppLabel>
-                  <div className="flex items-center gap-1.5 mt-auto pt-2">
+                  <div className="flex items-start gap-2 text-left">
+                    <AppBookmark
+                      active={isPinned}
+                      onClick={(e) => handleToggleBookmark(ticket.id, e)}
+                      size={15}
+                      title={isPinned ? 'Remove Bookmark' : 'Bookmark Ticket'}
+                      className="mt-0.5"
+                    />
                     <AppLabel
-                      as="span"
-                      variant="caption"
-                      className={`font-bold uppercase tracking-wider px-2 py-1 rounded-full ${badgeColor}`}
+                      as="h4"
+                      variant="title"
+                      className="!text-sm !font-bold line-clamp-2 leading-snug flex-1"
                     >
-                      {ticket.supplierName || 'General'}
+                      {ticket.subject}
                     </AppLabel>
-                    {ticket.estimatedQuantity !== undefined && (
-                      <AppLabel
-                        as="span"
-                        variant="caption"
-                        className="font-semibold text-text-info bg-neutral px-2 py-1 rounded-full"
-                      >
-                        Qty: {ticket.estimatedQuantity}
-                      </AppLabel>
-                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-auto pt-2 flex-wrap">
+                    <AppChip
+                      label={statusMeta.label}
+                      variant={statusMeta.chipVariant as any}
+                      size="sm"
+                      className="!font-bold font-mono !px-2 !py-0.5"
+                    />
                   </div>
                 </div>
               </AppCard>
