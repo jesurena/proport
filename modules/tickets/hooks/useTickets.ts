@@ -42,6 +42,7 @@ export const useUpdateAssignment = () => {
       ticketsService.updateAssignment(id, assignee_ids),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['ticket', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['ticket-assignees', variables.id] });
     },
   });
 };
@@ -61,6 +62,14 @@ export const useTicketHistory = (id: string, enabled = true) => {
   return useQuery({
     queryKey: ['ticket-history', id],
     queryFn: () => ticketsService.getTicketHistory(id),
+    enabled: !!id && enabled,
+  });
+};
+
+export const useTicketAssignees = (id: string, enabled = true) => {
+  return useQuery({
+    queryKey: ['ticket-assignees', id],
+    queryFn: () => ticketsService.getTicketAssignees(id),
     enabled: !!id && enabled,
   });
 };

@@ -46,4 +46,9 @@ export const ticketsService = {
     const { data } = await api.get(`/tickets/${id}/history`);
     return data;
   },
+
+  async getTicketAssignees(id: string): Promise<{ assigned: any[]; available: any[] }> {
+    const { data } = await api.get(`/tickets/${id}/assignees`);
+    return data;
+  },
 };

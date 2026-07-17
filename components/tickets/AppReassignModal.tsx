@@ -5,7 +5,7 @@ import { MoveLeft, MoveRight } from 'lucide-react';
 import { AppButton, AppLabel, AppModal } from '@integrated-computer-system/ui-kit';
 import { AppSummernoteEditor } from '@/modules/compose/components/AppSummernoteEditor';
 import { AppAvatarCard } from './AppAvatarCard';
-import { getUsers } from '@/lib/tickets';
+import { useTicketAssignees } from '@/modules/tickets/hooks/useTickets';
 import type { Ticket, User } from '@/lib/types';
 import { cn } from '@/components/utils/cn';
 
@@ -28,26 +28,19 @@ export function AppReassignModal({
   const [isDragOverAssigned, setIsDragOverAssigned] = useState(false);
   const [isDragOverAvailable, setIsDragOverAvailable] = useState(false);
 
-  // Initialize lists when modal opens
+  // Fetch real assignees and available buyers from database constant
+  const { data: assigneesRes, isLoading } = useTicketAssignees(String(ticket.id), open);
+
+  // Initialize lists when data is loaded
   useEffect(() => {
-    if (open) {
-      const allUsers = getUsers();
-      const currentIds = ticket.assigneeId
-        ? ticket.assigneeId.split(',').map((id) => id.trim())
-        : [];
-
-      const assigned = allUsers.filter((u) => currentIds.includes(u.id));
-      const available = allUsers.filter(
-        (u) => (u.role === 'buyer' || u.role === 'admin') && !currentIds.includes(u.id)
-      );
-
-      setAssignedList(assigned);
-      setAvailableList(available);
+    if (assigneesRes) {
+      setAssignedList(assigneesRes.assigned);
+      setAvailableList(assigneesRes.available);
       setRemarks('');
       setIsDragOverAssigned(false);
       setIsDragOverAvailable(false);
     }
-  }, [open, ticket]);
+  }, [assigneesRes]);
 
   const handleDragStart = (e: React.DragEvent, userId: string, source: 'available' | 'assigned') => {
     e.dataTransfer.setData('text/plain', userId);
@@ -101,90 +94,97 @@ export function AppReassignModal({
       </AppModal.Header>
 
       <AppModal.Body className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_50px_1fr] gap-4 items-center">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-8 h-8 border-4 border-accent-1 border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-text-info font-medium mt-3">Loading buyers list...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_50px_1fr] gap-4 items-center">
 
-          {/* Assigned Buyers column (Left Side) */}
-          <div className="flex flex-col h-full">
-            <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info mb-2 text-left">
-              Assigned Buyer(s)
-            </AppLabel>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragOverAssigned(true);
-              }}
-              onDragLeave={() => setIsDragOverAssigned(false)}
-              onDrop={handleDropToAssigned}
-              className={cn(
-                "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[220px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
-                isDragOverAssigned && "bg-neutral-200 border-accent-1/40 border-dashed"
-              )}
-            >
-              {assignedList.length > 0 ? (
-                assignedList.map((buyer) => (
-                  <AppAvatarCard
-                    key={buyer.id}
-                    user={buyer}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, buyer.id, 'assigned')}
-                  />
-                ))
-              ) : (
-                <div className="m-auto flex flex-col items-center justify-center text-center p-4 border border-dashed border-border/60 rounded-lg w-full h-full">
-                  <AppLabel as="span" className="text-xs text-text-info/50 italic mb-1">
-                    Drag & Drop
-                  </AppLabel>
-                  <AppLabel as="span" variant="description" className="text-[10px] text-text-info/40">
-                    to assign a buyer to this ticket
-                  </AppLabel>
-                </div>
-              )}
+            {/* Assigned Buyers column (Left Side) */}
+            <div className="flex flex-col h-full">
+              <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info mb-2 text-left">
+                Assigned Buyer(s)
+              </AppLabel>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOverAssigned(true);
+                }}
+                onDragLeave={() => setIsDragOverAssigned(false)}
+                onDrop={handleDropToAssigned}
+                className={cn(
+                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[220px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
+                  isDragOverAssigned && "bg-neutral-200 border-accent-1/40 border-dashed"
+                )}
+              >
+                {assignedList.length > 0 ? (
+                  assignedList.map((buyer) => (
+                    <AppAvatarCard
+                      key={buyer.id}
+                      user={buyer}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, buyer.id, 'assigned')}
+                    />
+                  ))
+                ) : (
+                  <div className="m-auto flex flex-col items-center justify-center text-center p-4 border border-dashed border-border/60 rounded-lg w-full h-full">
+                    <AppLabel as="span" className="text-xs text-text-info/50 italic mb-1">
+                      Drag & Drop
+                    </AppLabel>
+                    <AppLabel as="span" variant="description" className="text-[10px] text-text-info/40">
+                      to assign a buyer to this ticket
+                    </AppLabel>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Indicator icons */}
-          <div className="hidden md:flex flex-col items-center gap-3 mt-6 text-text-info/30 font-bold">
-            <MoveRight size={18} />
-            <MoveLeft size={18} />
-          </div>
-
-          {/* Available Buyers column (Right Side) */}
-          <div className="flex flex-col h-full">
-            <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info mb-2 text-left">
-              Available Buyers
-            </AppLabel>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragOverAvailable(true);
-              }}
-              onDragLeave={() => setIsDragOverAvailable(false)}
-              onDrop={handleDropToAvailable}
-              className={cn(
-                "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[220px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
-                isDragOverAvailable && "bg-neutral-200 border-accent-1/40 border-dashed"
-              )}
-            >
-              {availableList.length > 0 ? (
-                availableList.map((buyer) => (
-                  <AppAvatarCard
-                    key={buyer.id}
-                    user={buyer}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, buyer.id, 'available')}
-                  />
-                ))
-              ) : (
-                <div className="m-auto flex flex-col items-center justify-center text-center opacity-40">
-                  <AppLabel as="span" className="text-xs text-text-info italic">
-                    No buyers available
-                  </AppLabel>
-                </div>
-              )}
+            {/* Indicator icons */}
+            <div className="hidden md:flex flex-col items-center gap-3 mt-6 text-text-info/30 font-bold">
+              <MoveRight size={18} />
+              <MoveLeft size={18} />
             </div>
-          </div>
 
-        </div>
+            {/* Available Buyers column (Right Side) */}
+            <div className="flex flex-col h-full">
+              <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info mb-2 text-left">
+                Available Buyers
+              </AppLabel>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOverAvailable(true);
+                }}
+                onDragLeave={() => setIsDragOverAvailable(false)}
+                onDrop={handleDropToAvailable}
+                className={cn(
+                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[220px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
+                  isDragOverAvailable && "bg-neutral-200 border-accent-1/40 border-dashed"
+                )}
+              >
+                {availableList.length > 0 ? (
+                  availableList.map((buyer) => (
+                    <AppAvatarCard
+                      key={buyer.id}
+                      user={buyer}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, buyer.id, 'available')}
+                    />
+                  ))
+                ) : (
+                  <div className="m-auto flex flex-col items-center justify-center text-center opacity-40">
+                    <AppLabel as="span" className="text-xs text-text-info italic">
+                      No buyers available
+                    </AppLabel>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        )}
 
         {/* Remarks Editor */}
         <div className="flex flex-col">
@@ -210,6 +210,7 @@ export function AppReassignModal({
         <AppButton
           variant="primary"
           onClick={handleUpdate}
+          disabled={isLoading}
         >
           Update Assignment
         </AppButton>

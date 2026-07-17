@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
-  AppLabel,
   AppSidebar,
   cn,
 } from '@integrated-computer-system/ui-kit';
@@ -14,11 +13,9 @@ import {
 import { SettingsModal } from '@/modules/settings';
 import SearchModal from '@/components/SearchModal';
 import { ComposeModal, useComposeStore } from '@/modules/compose';
-import { getTicketCountByStatus } from '@/lib/stats';
-import { StatusCount } from '@/lib/types';
 import SidebarAppDropdown from './SidebarAppDropdown';
 import UserProfile from './UserProfile';
-import { getSidebarGroups, type SidebarGroup, type SidebarItem } from './SidebarGroups';
+import { getSidebarGroups } from './SidebarGroups';
 import { useAuthStore } from '@/modules/auth';
 
 export default function ProportSidebar() {
@@ -30,7 +27,6 @@ export default function ProportSidebar() {
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [statusCounts, setStatusCounts] = useState<StatusCount[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const openCompose = useComposeStore((s) => s.openCompose);
@@ -48,7 +44,6 @@ export default function ProportSidebar() {
   };
 
   useEffect(() => {
-    setStatusCounts(getTicketCountByStatus());
     const stored = localStorage.getItem('proport_my_role');
     if (isDeveloper && stored) {
       setRole(stored);
@@ -73,10 +68,6 @@ export default function ProportSidebar() {
     };
   }, [openCompose]);
 
-  const totalOpen = statusCounts
-    .filter((s) => s.status !== 'closed')
-    .reduce((sum, s) => sum + s.count, 0);
-
   const effectiveUser = React.useMemo(() => {
     if (!user) return null;
     return {
@@ -85,7 +76,7 @@ export default function ProportSidebar() {
     };
   }, [user, role]);
 
-  const menuGroups = getSidebarGroups(effectiveUser, totalOpen);
+  const menuGroups = getSidebarGroups(effectiveUser);
 
   const navigate = (href: string) => {
     router.push(href);

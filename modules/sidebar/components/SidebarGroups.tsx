@@ -26,7 +26,7 @@ export interface SidebarGroup {
 
 import { AuthUser } from '@/modules/auth/types/user';
 
-export function getSidebarGroups(user: AuthUser | null, totalOpen: number): SidebarGroup[] {
+export function getSidebarGroups(user: AuthUser | null): SidebarGroup[] {
   const role = user?.role_name || 'buyer';
   const group = user?.AccountGroup || '';
 
@@ -37,7 +37,7 @@ export function getSidebarGroups(user: AuthUser | null, totalOpen: number): Side
   // 1. Navigation Group
   const navItems: SidebarItem[] = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'All Tickets', href: '/tickets', icon: Ticket, badge: totalOpen },
+    { name: 'All Tickets', href: '/tickets', icon: Ticket },
   ];
 
   // Reports visible if PMD or super_user

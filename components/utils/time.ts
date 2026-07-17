@@ -11,9 +11,13 @@ export function timeAgo(dateStr: string): string {
   if (hours < 24) return `${hours}h ago`;
 
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${days}d ago`;
 
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const d = new Date(dateStr);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${month}/${day}/${year}`;
 }
 
 export function fullDate(dateStr: string): string {
