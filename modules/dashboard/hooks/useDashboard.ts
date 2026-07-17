@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboard.service';
 import type { Ticket as TicketType } from '@/lib/types';
+import { getTickets } from '@/lib/tickets';
 
 // Helper ticket mapper
 const mapTicket = (t: any): TicketType => {
@@ -44,22 +45,11 @@ const mapTicket = (t: any): TicketType => {
 
 // ─── API Hooks (Querying database/network) ───
 
-export const useDashboardTickets = () => {
-  return useQuery<TicketType[]>({
-    queryKey: ['dashboard-tickets'],
+export const useDashboardCounts = () => {
+  return useQuery({
+    queryKey: ['dashboard-counts'],
     queryFn: async () => {
-      const backendTickets = await dashboardService.getTickets();
-      return backendTickets.map(mapTicket);
-    },
-  });
-};
-
-export const useRecentTickets = () => {
-  return useQuery<TicketType[]>({
-    queryKey: ['recent-tickets'],
-    queryFn: async () => {
-      const backendRecent = await dashboardService.getRecentTickets();
-      return backendRecent.map(mapTicket);
+      return dashboardService.getCounts();
     },
   });
 };
@@ -83,15 +73,57 @@ export const useBookmarkedTickets = () => {
   });
 };
 
+export const useTicketCountAo = (enabled: boolean = true) => {
+  return useQuery<any[]>({
+    queryKey: ['ticket-count-ao'],
+    queryFn: async () => {
+      return dashboardService.getTicketCountAo();
+    },
+    enabled,
+  });
+};
+
+export const useChartPerBu = (enabled: boolean = true) => {
+  return useQuery<any[]>({
+    queryKey: ['chart-per-bu'],
+    queryFn: async () => {
+      return dashboardService.getChartPerBu();
+    },
+    enabled,
+  });
+};
+
+export const useBuyerCategoryCounts = (enabled: boolean = true) => {
+  return useQuery<any[]>({
+    queryKey: ['buyer-category-counts'],
+    queryFn: async () => {
+      return dashboardService.getBuyerCategoryCounts();
+    },
+    enabled,
+  });
+};
+
+export const useBuyerDateCounts = (fromDate?: string, toDate?: string, enabled: boolean = true) => {
+  return useQuery<any[]>({
+    queryKey: ['buyer-date-counts', fromDate, toDate],
+    queryFn: async () => {
+      return dashboardService.getBuyerDateCounts(fromDate, toDate);
+    },
+    enabled,
+  });
+};
+
 // ─── Main useDashboard Hook (API ONLY) ───
 
 export function useDashboard() {
-  const { data: allTickets = [], isLoading: isTicketsLoading } = useDashboardTickets();
-  const { data: recentTickets = [], isLoading: isRecentLoading } = useRecentTickets();
+  const { data: counts, isLoading: isCountsLoading } = useDashboardCounts();
+  const allTickets = getTickets();
+  const recentTickets = getTickets().slice(0, 6);
 
   return {
+    counts,
     allTickets,
     recentTickets,
-    isLoading: isTicketsLoading || isRecentLoading,
+    isLoading: isCountsLoading,
   };
 }

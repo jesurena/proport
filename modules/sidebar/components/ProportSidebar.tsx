@@ -208,7 +208,12 @@ export default function ProportSidebar() {
                     );
                   }
 
-                  const isActive = fullCurrentPath === item.href;
+                  let isActive = false;
+                  if (item.href === '/tickets') {
+                    isActive = pathname === '/tickets' && !tabParam;
+                  } else {
+                    isActive = fullCurrentPath === item.href;
+                  }
 
                   return (
                     <AppSidebar.Item

@@ -10,6 +10,7 @@ import DashboardBookmarkedTickets from './DashboardBookmarkedTickets';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface BuyerDashboardProps {
+  counts?: any;
   totalCount: number;
   recentTickets: TicketType[];
   allTickets: TicketType[];
@@ -17,6 +18,7 @@ interface BuyerDashboardProps {
 }
 
 export default function BuyerDashboard({
+  counts,
   totalCount,
   recentTickets,
   allTickets,
@@ -27,7 +29,7 @@ export default function BuyerDashboard({
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="buyer" />
-        <DashboardMetricCard allTickets={allTickets} />
+        <DashboardMetricCard allTickets={allTickets} counts={counts} />
         <DashboardTicketCountAo allTickets={allTickets} />
       </div>
 

@@ -5,10 +5,11 @@ import { AppLabel, AppButton, AppCard } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardMetricCardProps {
-  allTickets: TicketType[];
+  allTickets?: TicketType[];
+  counts?: any;
 }
 
-export default function DashboardMetricCard({ allTickets }: DashboardMetricCardProps) {
+export default function DashboardMetricCard({ allTickets = [], counts }: DashboardMetricCardProps) {
   const router = useRouter();
   const [showAllCards, setShowAllCards] = useState(false);
 
@@ -17,7 +18,7 @@ export default function DashboardMetricCard({ allTickets }: DashboardMetricCardP
   const myTickets = allTickets.filter((t) => t.requesterId === salesUserId);
 
   // 1. New Tickets Today (created in the last 24 hours)
-  const newTicketsTodayCount = allTickets.filter((t) => {
+  const newTicketsTodayCount = counts ? (counts.ticket_today ?? 0) : allTickets.filter((t) => {
     const createdDate = new Date(t.createdAt);
     const oneDayAgo = new Date();
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
@@ -25,19 +26,19 @@ export default function DashboardMetricCard({ allTickets }: DashboardMetricCardP
   }).length;
 
   // 2. My Pending Tickets (unassigned or assigned)
-  const pendingCount = myTickets.filter((t) => t.status === 'unassigned' || t.status === 'assigned').length;
+  const pendingCount = counts ? (counts.ticket_pending ?? 0) : myTickets.filter((t) => t.status === 'unassigned' || t.status === 'assigned').length;
 
   // 3. My Focus Tickets
-  const focusCount = myTickets.filter((t) => t.brandType === 'Focus').length;
+  const focusCount = counts ? (counts.focus_ticket ?? 0) : myTickets.filter((t) => t.brandType === 'Focus').length;
 
   // 4. My Non Focus Tickets
-  const nonFocusCount = myTickets.filter((t) => t.brandType !== 'Focus').length;
+  const nonFocusCount = counts ? (counts.nf_ticket ?? 0) : myTickets.filter((t) => t.brandType !== 'Focus').length;
 
   // 5. My Open Tickets (status !== 'closed')
-  const openCount = myTickets.filter((t) => t.status !== 'closed').length;
+  const openCount = counts ? (counts.ticket_open ?? 0) : myTickets.filter((t) => t.status !== 'closed').length;
 
   // 6. My Closed Tickets (status === 'closed')
-  const closedCount = myTickets.filter((t) => t.status === 'closed').length;
+  const closedCount = counts ? (counts.ticket_closed ?? 0) : myTickets.filter((t) => t.status === 'closed').length;
 
   const initialCards = [
     { label: 'New Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
@@ -72,7 +73,17 @@ export default function DashboardMetricCard({ allTickets }: DashboardMetricCardP
             key={status}
             variant="default"
             padding="none"
-            onClick={() => router.push(`/tickets?status=${status === 'new' ? 'all' : status}`)}
+            onClick={() => {
+              if (status === 'new') {
+                router.push('/tickets');
+              } else if (status === 'focus') {
+                router.push('/tickets?tab=focus');
+              } else if (status === 'non-focus') {
+                router.push('/tickets?tab=non-focus');
+              } else {
+                router.push(`/tickets?status=${status}`);
+              }
+            }}
             className="p-4 flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-3">

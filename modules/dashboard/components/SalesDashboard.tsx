@@ -7,6 +7,7 @@ import DashboardFocusBreakdown from './DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from './DashboardBookmarkedTickets';
 
 interface SalesDashboardProps {
+  counts?: any;
   totalCount: number;
   recentTickets: any[];
   allTickets: any[];
@@ -14,6 +15,7 @@ interface SalesDashboardProps {
 }
 
 export default function SalesDashboard({
+  counts,
   totalCount,
   recentTickets,
   allTickets,
@@ -24,7 +26,7 @@ export default function SalesDashboard({
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="sales" />
-        <DashboardMetricCard allTickets={allTickets} />
+        <DashboardMetricCard allTickets={allTickets} counts={counts} />
         <SalesRecentTickets />
         <DashboardTicketCountAo allTickets={allTickets} />
       </div>

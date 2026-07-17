@@ -78,7 +78,13 @@ export function useTickets() {
 
     // 4. Status filter
     if (selectedStatuses.length > 0) {
-      result = result.filter((t) => selectedStatuses.includes(t.status));
+      if (selectedStatuses.includes('all')) {
+        // Do not filter status if 'all' is selected
+      } else if (selectedStatuses.includes('open')) {
+        result = result.filter((t) => t.status !== 'closed');
+      } else {
+        result = result.filter((t) => selectedStatuses.includes(t.status));
+      }
     }
 
     if (searchQuery.trim()) {

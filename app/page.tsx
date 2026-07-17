@@ -11,7 +11,7 @@ import {
 import { useAuthStore } from '@/modules/auth';
 
 export default function DashboardPage() {
-  const { allTickets, recentTickets, isLoading } = useDashboard();
+  const { counts, allTickets, recentTickets, isLoading } = useDashboard();
   const { totalCount, getCount } = useDashboardStats(allTickets);
 
   const [role, setRole] = useState<string | null>(null);
@@ -39,6 +39,7 @@ export default function DashboardPage() {
           </div>
         ) : role === 'sales' ? (
           <SalesDashboard
+            counts={counts}
             totalCount={totalCount}
             recentTickets={recentTickets}
             allTickets={allTickets}
@@ -46,6 +47,7 @@ export default function DashboardPage() {
           />
         ) : (
           <BuyerDashboard
+            counts={counts}
             totalCount={totalCount}
             recentTickets={recentTickets}
             allTickets={allTickets}

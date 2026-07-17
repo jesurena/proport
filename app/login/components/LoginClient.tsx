@@ -88,7 +88,7 @@ export default function LoginClient() {
 
                     <div className="flex-1 flex flex-col justify-center items-center w-full max-w-[420px] mx-auto text-center">
                         <Image
-                            src="/aria-mascott-login.svg"
+                            src="/login.gif"
                             alt="Proport Mascot"
                             width={280}
                             height={280}
