@@ -26,15 +26,15 @@ export default function SalesDashboard({
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="sales" />
-        <DashboardMetricCard allTickets={allTickets} counts={counts} />
+        <DashboardMetricCard counts={counts} />
         <SalesRecentTickets />
-        <DashboardTicketCountAo allTickets={allTickets} />
+        <DashboardTicketCountAo />
       </div>
 
       {/* ── RIGHT COLUMN ── */}
       <div className="xl:w-[300px] shrink-0 space-y-4">
-        <DashboardFocusBreakdown allTickets={allTickets} />
-        <DashboardBookmarkedTickets allTickets={allTickets} />
+        <DashboardFocusBreakdown />
+        <DashboardBookmarkedTickets />
       </div>
     </div>
   );

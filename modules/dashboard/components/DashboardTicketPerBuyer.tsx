@@ -9,11 +9,7 @@ import type { Ticket as TicketType } from '@/lib/types';
 import { useBuyerPeriodCounts, useBuyerPeriodTickets } from '../hooks/useDashboard';
 import BuyerTicketsModal from './BuyerTicketsModal';
 
-interface DashboardTicketPerBuyerProps {
-  allTickets: TicketType[];
-}
-
-export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketPerBuyerProps) {
+export default function DashboardTicketPerBuyer() {
   const router = useRouter();
   const [buyerPeriod, setBuyerPeriod] = useState<'today' | 'week'>('today');
   const [showAllBuyers, setShowAllBuyers] = useState(false);

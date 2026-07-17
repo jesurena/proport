@@ -5,13 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Bookmark, ArrowRight } from 'lucide-react';
 import { AppLabel, AppCard, AppButton, AppChip } from '@/components/ui';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
-import type { Ticket as TicketType } from '@/lib/types';
+import { useBookmarkedTickets } from '../hooks/useDashboard';
 
-interface DashboardBookmarkedTicketsProps {
-  allTickets: TicketType[];
-}
-
-export default function DashboardBookmarkedTickets({ allTickets }: DashboardBookmarkedTicketsProps) {
+export default function DashboardBookmarkedTickets() {
   const router = useRouter();
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
 
@@ -35,16 +31,8 @@ export default function DashboardBookmarkedTickets({ allTickets }: DashboardBook
     };
   }, []);
 
-  const handleRemoveBookmark = (ticketId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const updated = bookmarkedIds.filter((id) => id !== ticketId);
-    setBookmarkedIds(updated);
-    localStorage.setItem('proport_pinned_tickets', JSON.stringify(updated));
-    window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new CustomEvent('proport-pins-updated'));
-  };
-
-  const bookmarkedTickets = allTickets.filter((t) => bookmarkedIds.includes(t.id));
+  const idsParam = bookmarkedIds.length > 0 ? bookmarkedIds.join(',') : '';
+  const { data: bookmarkedTickets = [], isLoading } = useBookmarkedTickets(idsParam);
 
   return (
     <AppCard variant="default" padding="md" className="space-y-3">
@@ -53,7 +41,12 @@ export default function DashboardBookmarkedTickets({ allTickets }: DashboardBook
         <AppLabel as="p" variant="description" className="text-[10px] mt-0.5">Quick access to bookmarked tickets</AppLabel>
       </div>
 
-      {bookmarkedTickets.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="w-6 h-6 border-2 border-accent-1 border-t-transparent rounded-full animate-spin" />
+          <span className="text-[10px] text-text-info font-medium mt-2">Loading bookmarks...</span>
+        </div>
+      ) : bookmarkedTickets.length === 0 ? (
         <AppEmptyState
           title="No bookmarked tickets"
           description="Bookmark tickets to keep them here."
@@ -77,7 +70,6 @@ export default function DashboardBookmarkedTickets({ allTickets }: DashboardBook
                 onClick={() => router.push(`/tickets/${ticket.id}`)}
                 className="flex items-center justify-between p-2.5 rounded-xl border border-border/50 bg-hover/20 hover:bg-hover/50 transition-colors cursor-pointer group"
               >
-
                 <div className="min-w-0 flex-1 pr-2">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="font-mono text-[9px] font-bold text-text-info">

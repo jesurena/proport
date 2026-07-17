@@ -7,10 +7,6 @@ import { getUsers } from '@/lib/tickets';
 import { STATUS_META } from '@/lib/types';
 import { useTicketCountAo, useChartPerBu, useBuyerCategoryCounts, useBuyerDateCounts } from '../hooks/useDashboard';
 
-interface DashboardTicketCountAoProps {
-  allTickets: TicketType[];
-}
-
 const COLORS = [
   '#3b82f6', // blue
   '#10b981', // green/teal
@@ -28,7 +24,7 @@ const COLORS = [
   '#1abc9c', // turquoise
 ];
 
-export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCountAoProps) {
+export default function DashboardTicketCountAo() {
   const [activeTab, setActiveTab] = useState<'ao' | 'bu' | 'buyer-date' | 'buyer-category'>('ao');
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
 

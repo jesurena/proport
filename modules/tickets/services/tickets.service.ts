@@ -41,4 +41,9 @@ export const ticketsService = {
     const { data } = await api.post(`/tickets/${id}/status`, { status });
     return data;
   },
+
+  async getTicketHistory(id: string): Promise<any> {
+    const { data } = await api.get(`/tickets/${id}/history`);
+    return data;
+  },
 };

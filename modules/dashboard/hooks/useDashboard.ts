@@ -63,13 +63,15 @@ export const useFocusBreakdown = () => {
   });
 };
 
-export const useBookmarkedTickets = () => {
+export const useBookmarkedTickets = (ids?: string) => {
   return useQuery<TicketType[]>({
-    queryKey: ['bookmarked-tickets'],
+    queryKey: ['bookmarked-tickets', ids],
     queryFn: async () => {
-      const backendBookmarks = await dashboardService.getBookmarkedTickets();
+      if (!ids) return [];
+      const backendBookmarks = await dashboardService.getBookmarkedTickets(ids);
       return backendBookmarks.map(mapTicket);
     },
+    enabled: !!ids,
   });
 };
 

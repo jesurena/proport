@@ -56,3 +56,11 @@ export const useUpdateStatus = () => {
     },
   });
 };
+
+export const useTicketHistory = (id: string, enabled = true) => {
+  return useQuery({
+    queryKey: ['ticket-history', id],
+    queryFn: () => ticketsService.getTicketHistory(id),
+    enabled: !!id && enabled,
+  });
+};

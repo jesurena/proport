@@ -29,15 +29,15 @@ export default function BuyerDashboard({
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="buyer" />
-        <DashboardMetricCard allTickets={allTickets} counts={counts} />
-        <DashboardTicketCountAo allTickets={allTickets} />
+        <DashboardMetricCard counts={counts} />
+        <DashboardTicketCountAo />
       </div>
 
       {/* ── RIGHT COLUMN ── */}
       <div className="xl:w-[300px] shrink-0 space-y-4">
-        <DashboardFocusBreakdown allTickets={allTickets} />
-        <DashboardBookmarkedTickets allTickets={allTickets} />
-        <DashboardTicketPerBuyer allTickets={allTickets} />
+        <DashboardFocusBreakdown />
+        <DashboardBookmarkedTickets />
+        <DashboardTicketPerBuyer />
       </div>
     </div>
   );

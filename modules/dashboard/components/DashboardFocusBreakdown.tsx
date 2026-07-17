@@ -1,11 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AppLabel, AppCard, AppButton } from '@/components/ui';
-import type { Ticket as TicketType } from '@/lib/types';
 import { useFocusBreakdown } from '../hooks/useDashboard';
-
-interface DashboardFocusBreakdownProps {
-  allTickets: TicketType[];
-}
 
 const REQUEST_TYPE_LABELS: Record<string, string> = {
   cost: 'Cost Ticket',
@@ -22,30 +19,35 @@ const REQUEST_TYPE_COLORS: Record<string, string> = {
   unknown: 'bg-neutral-500',
 };
 
-export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBreakdownProps) {
+export default function DashboardFocusBreakdown() {
   const [showMore, setShowMore] = useState(false);
   const { data: breakdown, isLoading } = useFocusBreakdown();
 
-  // Fallback to client-side calculations if API isn't loaded
-  const focusStatuses = ['pending', 'answered', 'closed', 'reassigned'];
-  const localFocusCount = allTickets.filter((t) => focusStatuses.includes(t.status)).length;
-  const localNonFocusCount = allTickets.length - localFocusCount;
+  if (isLoading) {
+    return (
+      <AppCard variant="default" padding="md" className="space-y-3">
+        <div className="flex items-center justify-start">
+          <div>
+            <AppLabel as="h4" variant="title" className="!text-sm !font-bold">Ticket Focus Breakdown</AppLabel>
+            <AppLabel as="p" variant="description" className="text-[10px] mt-0.5">Focus vs Non-Focus share in tickets</AppLabel>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="w-6 h-6 border-2 border-accent-1 border-t-transparent rounded-full animate-spin" />
+          <span className="text-[11px] text-text-info font-medium mt-2">Loading breakdown...</span>
+        </div>
+      </AppCard>
+    );
+  }
 
-  const focusCount = breakdown ? breakdown.focus : localFocusCount;
-  const nonFocusCount = breakdown ? breakdown.non_focus : localNonFocusCount;
+  const focusCount = breakdown?.focus ?? 0;
+  const nonFocusCount = breakdown?.non_focus ?? 0;
 
   const totalTickets = focusCount + nonFocusCount || 1;
   const focusPct = Math.round((focusCount / totalTickets) * 100);
   const nonFocusPct = 100 - focusPct;
   const circumference = 2 * Math.PI * 40; // r=40
   const dashOffset = circumference - (focusPct / 100) * circumference;
-
-  // Group by requestType
-  const localTypeCounts = allTickets.reduce<Record<string, number>>((acc, t) => {
-    const type = t.requestType || 'unknown';
-    acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, {});
 
   return (
     <AppCard variant="default" padding="md" className="space-y-3">
@@ -116,52 +118,29 @@ export default function DashboardFocusBreakdown({ allTickets }: DashboardFocusBr
             Tickets per Request Type
           </AppLabel>
           <div className="space-y-3">
-            {breakdown?.request_types ? (
-              breakdown.request_types.map((rt: any) => {
-                const count = Number(rt.count_per_rtype) || 0;
-                const pct = totalTickets > 0 ? Math.round((count / totalTickets) * 100) : 0;
-                const typeKey = Object.keys(REQUEST_TYPE_LABELS).find(
-                  (key) => REQUEST_TYPE_LABELS[key].toLowerCase() === String(rt.request_type).toLowerCase()
-                ) || 'unknown';
-                const barColor = REQUEST_TYPE_COLORS[typeKey] || REQUEST_TYPE_COLORS.unknown;
-                return (
-                  <div key={rt.request_type_id} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-semibold text-text">
-                      <span className="truncate">{rt.request_type}</span>
-                      <span>{count} ({pct}%)</span>
-                    </div>
-                    {/* Progress Bar Container */}
-                    <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+            {breakdown?.request_types && breakdown.request_types.map((rt: any) => {
+              const count = Number(rt.count_per_rtype) || 0;
+              const pct = totalTickets > 0 ? Math.round((count / totalTickets) * 100) : 0;
+              const typeKey = Object.keys(REQUEST_TYPE_LABELS).find(
+                (key) => REQUEST_TYPE_LABELS[key].toLowerCase() === String(rt.request_type).toLowerCase()
+              ) || 'unknown';
+              const barColor = REQUEST_TYPE_COLORS[typeKey] || REQUEST_TYPE_COLORS.unknown;
+              return (
+                <div key={rt.request_type_id} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs font-semibold text-text">
+                    <span className="truncate">{rt.request_type}</span>
+                    <span>{count} ({pct}%)</span>
                   </div>
-                );
-              })
-            ) : (
-              Object.entries(REQUEST_TYPE_LABELS).map(([typeKey, typeLabel]) => {
-                const count = localTypeCounts[typeKey] || 0;
-                const pct = Math.round((count / totalTickets) * 100);
-                const barColor = REQUEST_TYPE_COLORS[typeKey] || REQUEST_TYPE_COLORS.unknown;
-                return (
-                  <div key={typeKey} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-semibold text-text">
-                      <span className="truncate">{typeLabel}</span>
-                      <span>{count} ({pct}%)</span>
-                    </div>
-                    {/* Progress Bar Container */}
-                    <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+                  {/* Progress Bar Container */}
+                  <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                      style={{ width: `${pct}%` }}
+                    />
                   </div>
-                );
-              })
-            )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

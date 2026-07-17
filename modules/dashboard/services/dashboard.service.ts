@@ -18,8 +18,8 @@ export const dashboardService = {
     return data;
   },
 
-  async getBookmarkedTickets(): Promise<any[]> {
-    const { data } = await api.get('/dashboard/bookmarked-tickets');
+  async getBookmarkedTickets(ids?: string): Promise<any[]> {
+    const { data } = await api.get('/dashboard/bookmarked-tickets', { params: { ids } });
     return data || [];
   },
 

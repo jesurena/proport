@@ -5,40 +5,30 @@ import { AppLabel, AppButton, AppCard } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardMetricCardProps {
-  allTickets?: TicketType[];
   counts?: any;
 }
 
-export default function DashboardMetricCard({ allTickets = [], counts }: DashboardMetricCardProps) {
+export default function DashboardMetricCard({ counts }: DashboardMetricCardProps) {
   const router = useRouter();
   const [showAllCards, setShowAllCards] = useState(false);
 
-  // Active Sales User: 'user-7' (Jose Ramos)
-  const salesUserId = 'user-7';
-  const myTickets = allTickets.filter((t) => t.requesterId === salesUserId);
-
   // 1. New Tickets Today (created in the last 24 hours)
-  const newTicketsTodayCount = counts ? (counts.ticket_today ?? 0) : allTickets.filter((t) => {
-    const createdDate = new Date(t.createdAt);
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-    return createdDate >= oneDayAgo;
-  }).length;
+  const newTicketsTodayCount = counts?.ticket_today ?? 0;
 
   // 2. My Pending Tickets (unassigned or assigned)
-  const pendingCount = counts ? (counts.ticket_pending ?? 0) : myTickets.filter((t) => t.status === 'unassigned' || t.status === 'assigned').length;
+  const pendingCount = counts?.ticket_pending ?? 0;
 
   // 3. My Focus Tickets
-  const focusCount = counts ? (counts.focus_ticket ?? 0) : myTickets.filter((t) => t.brandType === 'Focus').length;
+  const focusCount = counts?.focus_ticket ?? 0;
 
   // 4. My Non Focus Tickets
-  const nonFocusCount = counts ? (counts.nf_ticket ?? 0) : myTickets.filter((t) => t.brandType !== 'Focus').length;
+  const nonFocusCount = counts?.nf_ticket ?? 0;
 
   // 5. My Open Tickets (status !== 'closed')
-  const openCount = counts ? (counts.ticket_open ?? 0) : myTickets.filter((t) => t.status !== 'closed').length;
+  const openCount = counts?.ticket_open ?? 0;
 
   // 6. My Closed Tickets (status === 'closed')
-  const closedCount = counts ? (counts.ticket_closed ?? 0) : myTickets.filter((t) => t.status === 'closed').length;
+  const closedCount = counts?.ticket_closed ?? 0;
 
   const initialCards = [
     { label: 'New Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },

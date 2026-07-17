@@ -111,7 +111,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       title: '# ID',
       dataIndex: 'ticketNumber',
       key: 'ticketNumber',
-      width: '80px',
+      width: '8px',
       align: 'center' as const,
       sorter: (a: any, b: any) => (a.ticketNumber || 0) - (b.ticketNumber || 0),
       render: (num: number) => (
@@ -123,7 +123,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     {
       title: 'Brand',
       key: 'brand',
-      width: '130px',
+      width: '80px',
       sorter: (a: any, b: any) => String(a.brandName || '').localeCompare(String(b.brandName || '')),
       render: (_: any, record: Ticket) => (
         <BrandTicketChip
@@ -135,7 +135,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     {
       title: 'Subject',
       key: 'subject',
-      width: '380px',
+      width: '300px',
       sorter: (a: any, b: any) => String(a.subject || '').localeCompare(String(b.subject || '')),
       render: (_: any, record: Ticket) => (
         <div className="flex items-center gap-3 w-full">
@@ -235,7 +235,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       dataIndex: 'status',
       key: 'status',
       align: 'center' as const,
-      width: '110px',
+      width: '80px',
       sorter: (a: any, b: any) => String(a.status || '').localeCompare(String(b.status || '')),
       render: (status: string) => {
         const meta = STATUS_META[status as TicketStatus] || {
@@ -269,6 +269,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: '100px',
+      defaultSortOrder: 'descend' as const,
       sorter: (a: any, b: any) => new Date(a.updatedAt || 0).getTime() - new Date(b.updatedAt || 0).getTime(),
       render: (date: string) => (
         <AppLabel as="span" variant="info" className="text-xs text-text-info font-medium">
@@ -280,7 +281,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       title: 'Last Transaction',
       dataIndex: 'last_transaction',
       key: 'last_transaction',
-      width: '180px',
+      width: '100px',
       sorter: (a: any, b: any) => new Date(a.last_transaction || 0).getTime() - new Date(b.last_transaction || 0).getTime(),
       render: (date: string) => (
         <AppLabel as="span" variant="info" className="text-xs text-text-info font-medium">
