@@ -21,8 +21,8 @@ function formatPanelDate(dateStr: string): string {
 }
 
 export default function TicketInfoPanel({ ticket }: TicketInfoPanelProps) {
-  const priorityMeta = PRIORITY_META[ticket.priority];
-  const statusMeta = STATUS_META[ticket.status];
+  const priorityMeta = PRIORITY_META[ticket.priority] || { label: ticket.priority, color: '#6b7280' };
+  const statusMeta = STATUS_META[ticket.status] || { label: ticket.status, color: '#6b7280', chipVariant: 'default' };
 
   return (
     <div className="rounded-2xl bg-card-bg border border-border/60 p-5 space-y-4 shadow-sm">

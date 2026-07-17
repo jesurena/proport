@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, FileText, Download } from 'lucide-react';
-import { formatFileSize } from '../attachments/AppAttachmentCard';
+import { formatFileSize } from './AppAttachmentCard';
 
 export interface AppFilePreviewProps {
   open: boolean;
@@ -54,9 +54,9 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
       const extension = file.split('.').pop()?.toLowerCase() || '';
       const isImg = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(extension);
       if (isImg) {
-        setBlobUrl(`https://picsum.photos/seed/${file}/800/600`);
+        setBlobUrl(`http://localhost:3001/viewFile/${file}`);
       } else if (extension === 'pdf') {
-        setBlobUrl('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
+        setBlobUrl(`http://localhost:3001/viewFile/${file}`);
       }
     }
   }, [open, file]);
@@ -86,7 +86,7 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } else {
-      alert(`Downloading: ${fileName}`);
+      window.open(`http://localhost:3001/viewFile/${fileName}`, '_blank');
     }
   };
 

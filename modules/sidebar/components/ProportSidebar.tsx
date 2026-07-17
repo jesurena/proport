@@ -77,7 +77,15 @@ export default function ProportSidebar() {
     .filter((s) => s.status !== 'closed')
     .reduce((sum, s) => sum + s.count, 0);
 
-  const menuGroups = getSidebarGroups(role, totalOpen);
+  const effectiveUser = React.useMemo(() => {
+    if (!user) return null;
+    return {
+      ...user,
+      role_name: role,
+    };
+  }, [user, role]);
+
+  const menuGroups = getSidebarGroups(effectiveUser, totalOpen);
 
   const navigate = (href: string) => {
     router.push(href);

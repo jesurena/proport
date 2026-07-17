@@ -11,6 +11,10 @@ interface TicketFilesCardProps {
   setPreviewFile: (file: string) => void;
 }
 
+function displayFileName(name: string): string {
+  return name.replace(/^\d+_/, '');
+}
+
 export function TicketFilesCard({ ticket, setPreviewFile }: TicketFilesCardProps) {
   const [expanded, setExpanded] = useState(true);
 
@@ -35,15 +39,16 @@ export function TicketFilesCard({ ticket, setPreviewFile }: TicketFilesCardProps
       {expanded && (
         <div className="divide-y divide-border/40 border-t border-border/40">
           <div className="p-4 space-y-3 flex flex-col items-center">
-            {ticket.tags && ticket.tags.length > 0 ? (
-              ticket.tags.map((tag, idx) => (
+            {ticket.attachments && ticket.attachments.length > 0 ? (
+              ticket.attachments.map((file, idx) => (
                 <AppAttachmentCard
                   key={idx}
-                  name={tag}
+                  name={displayFileName(file.name)}
+                  size={file.size}
                   variant="shared"
-                  onClick={() => setPreviewFile(tag)}
+                  onClick={() => setPreviewFile(file.name)}
                   onDownload={() => {
-                    alert(`Downloading: ${tag}`);
+                    window.open(`http://localhost:3001/viewFile/${file.name}`, '_blank');
                   }}
                 />
               ))

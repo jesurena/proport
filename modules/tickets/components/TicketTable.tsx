@@ -13,24 +13,7 @@ import { useTicketFilters } from '../hooks/useTicketFilters';
 import { TicketTabs } from './TicketTabs';
 import { TicketFilters } from './TicketFilters';
 import { useAuthStore } from '@/modules/auth';
-
-function timeAgo(dateStr: string): string {
-  const now = new Date().getTime();
-  const date = new Date(dateStr).getTime();
-  const diff = now - date;
-
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
+import { timeAgo } from '@/components/utils/time';
 
 function formatOrderNumber(ticketNumber: number): string {
   return `#${String(ticketNumber).padStart(4, '0')}`;
@@ -102,6 +85,8 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       status: t.status ?? (t.status_description ? String(t.status_description).toLowerCase() : 'pending'),
       updatedAt: t.updatedAt ?? t.last_updated ?? t.date_created,
       createdAt: t.createdAt ?? t.date_created,
+      reply_ctr: t.reply_ctr ?? 0,
+      last_transaction: t.last_transaction ?? '',
     }));
   }, [tickets, filteredTickets]);
 
@@ -150,24 +135,25 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     {
       title: 'Subject',
       key: 'subject',
+      width: '380px',
       sorter: (a: any, b: any) => String(a.subject || '').localeCompare(String(b.subject || '')),
       render: (_: any, record: Ticket) => (
-        <div className="flex items-center gap-3 max-w-[400px]">
+        <div className="flex items-center gap-3 w-full">
           {/* Creator avatar */}
           <AppAvatar
             name={record.requesterName}
             src={`https://api.dicebear.com/7.x/initials/svg?seed=${record.requesterName}`}
-            size={28}
+            size={36}
             className="shrink-0"
           />
 
           {/* Subject + description */}
-          <div className="flex flex-col gap-0.5 min-w-0">
-            <AppLabel as="span" variant="label" className="text-sm font-bold text-text truncate leading-snug">
+          <div className="flex flex-col gap-0.5 min-w-0 break-words whitespace-normal">
+            <AppLabel as="span" variant="label" className="text-sm font-bold text-text leading-snug whitespace-normal break-words">
               {record.subject}
             </AppLabel>
-            <AppLabel as="span" variant="description" className="text-xs text-text-info truncate leading-snug font-medium">
-              {record.description}
+            <AppLabel as="span" variant="description" className="text-xs text-text-info leading-snug font-medium whitespace-normal break-words">
+              {(record.AccountGroup ?? (record as any).businessUnitName) ? `${record.AccountGroup ?? (record as any).businessUnitName} • ` : ''}{record.requesterName}
             </AppLabel>
           </div>
         </div>
@@ -252,15 +238,31 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       width: '110px',
       sorter: (a: any, b: any) => String(a.status || '').localeCompare(String(b.status || '')),
       render: (status: string) => {
-        const meta = STATUS_META[status as TicketStatus];
+        const meta = STATUS_META[status as TicketStatus] || {
+          label: typeof status === 'string' ? status : 'Unknown',
+          chipVariant: 'default'
+        };
         return (
           <AppChip
-            label={meta?.label || status}
-            variant={status as any}
+            label={meta.label}
+            variant={meta.chipVariant as any}
             size="sm"
           />
         );
       },
+    },
+    {
+      title: 'Replies',
+      dataIndex: 'reply_ctr',
+      key: 'reply_ctr',
+      width: '80px',
+      align: 'center' as const,
+      sorter: (a: any, b: any) => (Number(a.reply_ctr) || 0) - (Number(b.reply_ctr) || 0),
+      render: (ctr: any) => (
+        <AppLabel as="span" variant="body" className="text-xs font-semibold text-text">
+          {ctr}
+        </AppLabel>
+      ),
     },
     {
       title: 'Last Updated',
@@ -271,6 +273,18 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       render: (date: string) => (
         <AppLabel as="span" variant="info" className="text-xs text-text-info font-medium">
           {timeAgo(date)}
+        </AppLabel>
+      ),
+    },
+    {
+      title: 'Last Transaction',
+      dataIndex: 'last_transaction',
+      key: 'last_transaction',
+      width: '180px',
+      sorter: (a: any, b: any) => new Date(a.last_transaction || 0).getTime() - new Date(b.last_transaction || 0).getTime(),
+      render: (date: string) => (
+        <AppLabel as="span" variant="info" className="text-xs text-text-info font-medium">
+          {date ? timeAgo(date) : '-'}
         </AppLabel>
       ),
     },
@@ -326,22 +340,22 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
           pagination={
             !tickets
               ? {
-                  current: page,
-                  pageSize: pageSize,
-                  total: total,
-                  showSizeChanger: true,
-                  pageSizeOptions: ['10', '20', '50', '100'],
-                  onChange: (p, ps) => {
-                    setPage(p);
-                    if (ps) setPageSize(ps);
-                  },
-                }
+                current: page,
+                pageSize: pageSize,
+                total: total,
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                onChange: (p, ps) => {
+                  setPage(p);
+                  if (ps) setPageSize(ps);
+                },
+              }
               : {
-                  pageSize: localPageSize,
-                  showSizeChanger: true,
-                  pageSizeOptions: ['10', '20', '50', '100'],
-                  onShowSizeChange: (_, size) => setLocalPageSize(size),
-                }
+                pageSize: localPageSize,
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                onShowSizeChange: (_, size) => setLocalPageSize(size),
+              }
           }
           onRow={(record) => ({
             onClick: () => router.push(`/tickets/${record.id}`),

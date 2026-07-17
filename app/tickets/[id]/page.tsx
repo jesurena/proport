@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { AppButton } from '@integrated-computer-system/ui-kit';
 import { ArrowLeft, XCircle } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
-import { AppFilePreview } from '@/components/ui';
 import type { TicketStatus, User } from '@/lib/types';
 import { useTicketDetail, useAddReply, useUpdateAssignment, useUpdateStatus } from '@/modules/tickets/hooks/useTickets';
 
@@ -31,6 +30,8 @@ export default function TicketDetailPage() {
     if (!ticketData?.ticket) return null;
     return {
       ...ticketData.ticket,
+      businessUnitName: ticketData.ticket.businessUnitName ?? ticketData.ticket.brandName ?? 'N/A',
+      cc: (ticketData.ticket.ccUsers || []).map((u: any) => u.email),
       replies: (ticketData.ticket.replies || []).map((r: any) => ({
         id: r.id ?? r.reply_id,
         authorName: r.authorName,
@@ -145,6 +146,7 @@ export default function TicketDetailPage() {
             setSelectedCcUsers={setSelectedCcUsers}
             onSendReply={handleSendReply}
             onDiscard={handleDiscard}
+            previewFile={previewFile}
             setPreviewFile={setPreviewFile}
           />
 
@@ -169,12 +171,6 @@ export default function TicketDetailPage() {
         onClose={() => setAssignModalOpen(false)}
         ticket={ticket}
         onUpdateAssignment={handleUpdateAssignment}
-      />
-
-      <AppFilePreview
-        open={!!previewFile}
-        onClose={() => setPreviewFile(null)}
-        file={previewFile}
       />
     </>
   );

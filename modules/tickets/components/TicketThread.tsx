@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, Paperclip } from 'lucide-react';
 import { AppAvatar, AppLabel } from '@integrated-computer-system/ui-kit';
-import { Reply } from '@/lib/types';
-import { cn } from '@/components/utils/cn';
+import { AppAttachmentCard } from '@/components/ui';
+import { timeAgo, fullDate } from '@/components/utils/time';
+import { getPreviewText, displayFileName, localizeHtmlImages } from '@/components/utils/ticket';
+import type { Reply, Attachment } from '@/lib/types';
 
 interface TicketThreadProps {
   replies: Reply[];
@@ -11,44 +14,8 @@ interface TicketThreadProps {
   ticketCreatedAt: string;
   requesterName: string;
   requesterAvatar?: string;
-}
-
-/** Returns relative time like "25 mins ago", "2 hours ago", "3 days ago" */
-function timeAgo(dateStr: string): string {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
-
-  const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return 'just now';
-
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} min${minutes === 1 ? '' : 's'} ago`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
-
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
-
-  const years = Math.floor(months / 12);
-  return `${years} year${years === 1 ? '' : 's'} ago`;
-}
-
-function fullDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
+  attachments?: Attachment[];
+  onAttachmentClick?: (fileName: string) => void;
 }
 
 export default function TicketThread({
@@ -57,48 +24,62 @@ export default function TicketThread({
   ticketCreatedAt,
   requesterName,
   requesterAvatar,
+  attachments = [],
+  onAttachmentClick,
 }: TicketThreadProps) {
-  // All messages retracted (collapsed) by default
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
   const toggleExpand = (id: string) => {
-    setExpandedIds((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Build a unified messages list: original + all replies
-  const messages = [
-    {
-      id: 'original',
-      authorName: requesterName,
-      authorAvatar: requesterAvatar,
-      content: ticketDescription,
-      createdAt: ticketCreatedAt,
-      isOriginal: true,
-    },
-    ...replies
-      .filter((r) => !r.content.includes('Assignment Updated'))
-      .map((r) => ({
-        id: r.id,
-        authorName: r.authorName,
-        authorAvatar: r.authorAvatar,
-        content: r.content,
-        createdAt: r.createdAt,
-        isOriginal: false,
-      })),
-  ];
+  const messages = replies
+    .filter((r) => !r.content.includes('Assignment Updated'))
+    .map((r) => ({
+      id: r.id,
+      replyId: String(r.id),
+      authorName: r.authorName,
+      authorAvatar: r.authorAvatar,
+      content: r.content,
+      createdAt: r.createdAt,
+      isOriginal: false,
+    }))
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return (
     <div className="divide-y divide-border/30">
       {messages.map((msg) => {
-        const isExpanded = !!expandedIds[msg.id];
         const avatarSrc = msg.authorAvatar || `https://api.dicebear.com/7.x/initials/svg?seed=${msg.authorName}`;
+        const isExpanded = !!expandedIds[msg.id];
+        const preview = getPreviewText(msg.content);
+
+        // Find attachments linked to this reply
+        const msgAttachments = msg.replyId
+          ? attachments.filter((a) => String(a.reply_id) === msg.replyId)
+          : [];
+
+        // Find first image attachment
+        const firstImgAttachment = msgAttachments.find(a =>
+          ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(a.file_type?.toLowerCase() || '') ||
+          ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(a.name.split('.').pop()?.toLowerCase() || '')
+        );
+
+        // Parse first embedded image in HTML content
+        const imgRegex = /<img[^>]+src="([^">]+)"/i;
+        const match = msg.content.match(imgRegex);
+        let firstEmbeddedImg = match ? match[1] : null;
+
+        if (firstEmbeddedImg && firstEmbeddedImg.includes('proport.ics.com.ph/public/img/summernote_img/')) {
+          firstEmbeddedImg = firstEmbeddedImg.replace('http://proport.ics.com.ph', 'http://localhost:3001');
+        }
+
+        const imageToShow = firstImgAttachment 
+          ? `http://localhost:3001/viewFile/${firstImgAttachment.name}` 
+          : firstEmbeddedImg;
 
         return (
           <div key={msg.id} className="py-4 first:pt-0 last:pb-2">
-            {/* Header row */}
+            {/* Header row — clickable to expand/collapse */}
             <div
               onClick={() => toggleExpand(msg.id)}
               className="flex items-start justify-between gap-3 cursor-pointer select-none group"
@@ -110,9 +91,14 @@ export default function TicketThread({
                   size={36}
                 />
                 <div className="min-w-0">
-                  <AppLabel as="span" className="text-sm font-semibold text-text block">
-                    {msg.authorName}
-                  </AppLabel>
+                  <div className="flex items-center gap-2">
+                    <AppLabel as="span" className="text-sm font-semibold text-text block">
+                      {msg.authorName}
+                    </AppLabel>
+                    {msgAttachments.length > 0 && !firstImgAttachment && (
+                      <Paperclip size={12} className="text-text-info/50" />
+                    )}
+                  </div>
                   <AppLabel as="span" variant="description" className="text-[11px] text-text-info block mt-0.5">
                     {fullDate(msg.createdAt)}
                   </AppLabel>
@@ -122,24 +108,60 @@ export default function TicketThread({
                 <AppLabel as="span" variant="info" className="text-[11px] text-text-info font-medium">
                   {timeAgo(msg.createdAt)}
                 </AppLabel>
+                {isExpanded ? (
+                  <ChevronUp size={14} className="text-text-info/50" />
+                ) : (
+                  <ChevronDown size={14} className="text-text-info/50" />
+                )}
               </div>
             </div>
 
-            {/* Message body - Toggle expand on click */}
-            <div
-              onClick={() => toggleExpand(msg.id)}
-              className={cn(
-                "pl-12 mt-2 text-sm text-text leading-[1.75] cursor-pointer hover:opacity-95 transition-opacity",
-                isExpanded ? "whitespace-pre-wrap" : "line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap"
-              )}
-            >
-              {/* If HTML template content, render raw text snippet if retracted */}
+            {/* Body — collapsed: single line preview with "…", expanded: full HTML */}
+            <div className="pl-12 mt-2 text-sm text-text leading-[1.75]">
               {isExpanded ? (
-                <div dangerouslySetInnerHTML={{ __html: msg.content }} />
+                <>
+                  <div dangerouslySetInnerHTML={{ __html: localizeHtmlImages(msg.content) }} />
+
+                  {/* Attachments section */}
+                  {msgAttachments.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-border/30">
+                      <AppLabel as="span" variant="info" className="text-[11px] font-bold text-text-info/70 uppercase tracking-wide block mb-2">
+                        Attachments:
+                      </AppLabel>
+                      <div className="flex flex-wrap gap-2">
+                        {msgAttachments.map((file, idx) => (
+                          <AppAttachmentCard
+                            key={idx}
+                            name={displayFileName(file.name)}
+                            size={file.size}
+                            variant="shared"
+                            onClick={() => onAttachmentClick?.(file.name)}
+                            onDownload={() => {
+                              window.open(`http://localhost:3001/viewFile/${file.name}`, '_blank');
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
-                <AppLabel as="span" className="text-sm text-text">
-                  {msg.content.replace(/<[^>]*>/g, '') || '—'}
-                </AppLabel>
+                <div
+                  onClick={() => toggleExpand(msg.id)}
+                  className="flex items-center gap-4 cursor-pointer hover:bg-neutral/10 p-1 rounded-lg transition-colors"
+                >
+                  <span className="flex-1 line-clamp-1 text-text-info text-sm">
+                    {preview || '—'}
+                    {preview.length > 80 && ' …'}
+                  </span>
+                  {imageToShow && (
+                    <img
+                      src={imageToShow}
+                      alt="preview thumbnail"
+                      className="w-10 h-10 object-cover rounded-lg border border-border/40 shrink-0"
+                    />
+                  )}
+                </div>
               )}
             </div>
           </div>

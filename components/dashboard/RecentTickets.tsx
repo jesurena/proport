@@ -48,7 +48,7 @@ export default function RecentTickets({ tickets }: RecentTicketsProps) {
           <p className="text-sm text-text-info py-8 text-center">No inquiries yet</p>
         )}
         {tickets.map((ticket) => {
-          const statusMeta = STATUS_META[ticket.status];
+          const statusMeta = STATUS_META[ticket.status] || { label: ticket.status, color: '#6b7280', chipVariant: 'default' };
           return (
             <button
               key={ticket.id}

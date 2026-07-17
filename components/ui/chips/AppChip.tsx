@@ -40,7 +40,13 @@ export type AppChipVariant =
     | 'focus'
     | 'non-focus'
     | 'for approval of bu head'
-    | 'for-approval-of-bu-head';
+    | 'for-approval-of-bu-head'
+    | 'declined by bu head'
+    | 'declined-by-bu-head'
+    | 'for final approval'
+    | 'for-final-approval'
+    | 'declined by final approver'
+    | 'declined-by-final-approver';
 
 export interface AppChipProps {
     label: string;
@@ -80,6 +86,12 @@ const VARIANT_CLASSES: Record<AppChipVariant, string> = {
     'non-focus': 'bg-blue-600 text-white',
     'for approval of bu head': 'bg-pink-600 text-white',
     'for-approval-of-bu-head': 'bg-pink-600 text-white',
+    'declined by bu head': 'bg-red-600 text-white',
+    'declined-by-bu-head': 'bg-red-600 text-white',
+    'for final approval': 'bg-emerald-600 text-white',
+    'for-final-approval': 'bg-emerald-600 text-white',
+    'declined by final approver': 'bg-red-600 text-white',
+    'declined-by-final-approver': 'bg-red-600 text-white',
 };
 
 const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>> = {
@@ -104,6 +116,12 @@ const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>>
     'non-focus': <Box />,
     'for approval of bu head': <Clock />,
     'for-approval-of-bu-head': <Clock />,
+    'declined by bu head': <XCircle />,
+    'declined-by-bu-head': <XCircle />,
+    'for final approval': <CheckCircle2 />,
+    'for-final-approval': <CheckCircle2 />,
+    'declined by final approver': <XCircle />,
+    'declined-by-final-approver': <XCircle />,
 };
 
 export const AppChip: React.FC<AppChipProps> = ({

@@ -19,7 +19,6 @@ export * from './tabs';
 export * from './toggle';
 export * from './table';
 export * from './attachments';
-export * from './preview';
 export * from './popover';
 export * from './bookmark';
 

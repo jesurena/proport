@@ -38,7 +38,7 @@ export default function TicketStatusGrid({ counts, onStatusClick }: TicketStatus
       <h3 className="text-sm font-semibold text-text mb-4">Inquiries by Status</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {counts.map((item) => {
-          const meta = STATUS_META[item.status];
+          const meta = STATUS_META[item.status] || { label: item.status, color: '#6b7280', chipVariant: 'default' };
           return (
             <button
               key={item.status}
