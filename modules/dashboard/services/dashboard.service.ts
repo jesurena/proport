@@ -23,9 +23,14 @@ export const dashboardService = {
     return data || [];
   },
 
-  async getTicketCountAo(): Promise<any[]> {
-    const { data } = await api.get('/dashboard/ticket-count-ao');
-    return data.data || [];
+  async getTicketCountAo(params?: {
+    page?: number;
+    per_page?: number;
+    sort_field?: string;
+    sort_order?: 'asc' | 'desc';
+  }): Promise<{ data: any[]; total: number }> {
+    const { data } = await api.get('/dashboard/ticket-count-ao', { params });
+    return data;
   },
 
   async getChartPerBu(): Promise<any[]> {
@@ -33,14 +38,36 @@ export const dashboardService = {
     return data.data || [];
   },
 
-  async getBuyerCategoryCounts(): Promise<any[]> {
-    const { data } = await api.get('/dashboard/buyer-category-counts');
-    return data.data || [];
+  async getBuyerCategoryCounts(params?: {
+    page?: number;
+    per_page?: number;
+    sort_field?: string;
+    sort_order?: 'asc' | 'desc';
+  }): Promise<{ data: any[]; total: number }> {
+    const { data } = await api.get('/dashboard/buyer-category-counts', { params });
+    return data;
   },
 
-  async getBuyerDateCounts(fromDate?: string, toDate?: string): Promise<any[]> {
-    const { data } = await api.get('/dashboard/buyer-date-counts', {
-      params: { from_date: fromDate, to_date: toDate },
+  async getBuyerDateCounts(params?: {
+    from_date?: string;
+    to_date?: string;
+    page?: number;
+    per_page?: number;
+    sort_field?: string;
+    sort_order?: 'asc' | 'desc';
+  }): Promise<{ data: any[]; total: number }> {
+    const { data } = await api.get('/dashboard/buyer-date-counts', { params });
+    return data;
+  },
+
+  async getBuyerPeriodCounts(): Promise<{ today: any[]; week: any[] }> {
+    const { data } = await api.get('/dashboard/buyer-period-counts');
+    return data.data;
+  },
+
+  async getBuyerPeriodTickets(buyer: string, period: 'today' | 'week'): Promise<any[]> {
+    const { data } = await api.get('/dashboard/buyer-period-tickets', {
+      params: { buyer, period },
     });
     return data.data || [];
   },

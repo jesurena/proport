@@ -140,14 +140,17 @@ export default function LoginClient() {
                 </div>
 
                 {/* Right Panel */}
-                <div className="hidden md:flex w-1/2 lg:w-[55%] bg-[#efeae6] relative overflow-hidden flex-col justify-between pt-16 pb-0 px-12 lg:px-24">
+                <div 
+                    className="hidden md:flex w-1/2 lg:w-[55%] text-white relative overflow-hidden flex-col justify-between pt-16 pb-0 px-12 lg:px-24"
+                    style={{ background: 'linear-gradient(135deg, #f8a5c2, #ea82a5, #c44b82)' }}
+                >
                     <div />
 
                     <div className="relative z-10 w-full max-w-xl select-none">
-                        <AppLabel as="h2" variant="title" className="mb-6 leading-[1.2] tracking-tight !text-[#1e1b18] !text-[42px] lg:!text-[48px] font-black">
+                        <AppLabel as="h2" variant="title" className="mb-6 leading-[1.2] tracking-tight !text-white !text-[42px] lg:!text-[48px] font-black">
                             Your sales inquiries, managed seamlessly.
                         </AppLabel>
-                        <AppLabel as="p" className="!text-[#1e1b18]/70 leading-relaxed mb-12 !text-[18px] lg:!text-[20px] font-semibold">
+                        <AppLabel as="p" className="!text-white/80 leading-relaxed mb-12 !text-[18px] lg:!text-[20px] font-semibold">
                             Log in to track tickets, collaborate with buyers, and secure the best pricing checkups. We&apos;re excited to help you streamline your sales workflow!
                         </AppLabel>
                     </div>

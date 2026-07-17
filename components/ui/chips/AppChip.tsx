@@ -38,7 +38,9 @@ export type AppChipVariant =
     | 'final-approval'
     | 'adel-declined'
     | 'focus'
-    | 'non-focus';
+    | 'non-focus'
+    | 'for approval of bu head'
+    | 'for-approval-of-bu-head';
 
 export interface AppChipProps {
     label: string;
@@ -76,6 +78,8 @@ const VARIANT_CLASSES: Record<AppChipVariant, string> = {
     'adel-declined': 'bg-red-600 text-white',
     focus: 'bg-purple-600 text-white',
     'non-focus': 'bg-blue-600 text-white',
+    'for approval of bu head': 'bg-pink-600 text-white',
+    'for-approval-of-bu-head': 'bg-pink-600 text-white',
 };
 
 const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>> = {
@@ -98,6 +102,8 @@ const VARIANT_DEFAULT_ICONS: Partial<Record<AppChipVariant, React.ReactElement>>
     'adel-declined': <XCircle />,
     focus: <Award />,
     'non-focus': <Box />,
+    'for approval of bu head': <Clock />,
+    'for-approval-of-bu-head': <Clock />,
 };
 
 export const AppChip: React.FC<AppChipProps> = ({

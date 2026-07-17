@@ -73,11 +73,16 @@ export const useBookmarkedTickets = () => {
   });
 };
 
-export const useTicketCountAo = (enabled: boolean = true) => {
-  return useQuery<any[]>({
-    queryKey: ['ticket-count-ao'],
+export const useTicketCountAo = (params?: {
+  page?: number;
+  per_page?: number;
+  sort_field?: string;
+  sort_order?: 'asc' | 'desc';
+}, enabled: boolean = true) => {
+  return useQuery<{ data: any[]; total: number }>({
+    queryKey: ['ticket-count-ao', params],
     queryFn: async () => {
-      return dashboardService.getTicketCountAo();
+      return dashboardService.getTicketCountAo(params);
     },
     enabled,
   });
@@ -93,23 +98,55 @@ export const useChartPerBu = (enabled: boolean = true) => {
   });
 };
 
-export const useBuyerCategoryCounts = (enabled: boolean = true) => {
-  return useQuery<any[]>({
-    queryKey: ['buyer-category-counts'],
+export const useBuyerCategoryCounts = (params?: {
+  page?: number;
+  per_page?: number;
+  sort_field?: string;
+  sort_order?: 'asc' | 'desc';
+}, enabled: boolean = true) => {
+  return useQuery<{ data: any[]; total: number }>({
+    queryKey: ['buyer-category-counts', params],
     queryFn: async () => {
-      return dashboardService.getBuyerCategoryCounts();
+      return dashboardService.getBuyerCategoryCounts(params);
     },
     enabled,
   });
 };
 
-export const useBuyerDateCounts = (fromDate?: string, toDate?: string, enabled: boolean = true) => {
-  return useQuery<any[]>({
-    queryKey: ['buyer-date-counts', fromDate, toDate],
+export const useBuyerDateCounts = (params?: {
+  from_date?: string;
+  to_date?: string;
+  page?: number;
+  per_page?: number;
+  sort_field?: string;
+  sort_order?: 'asc' | 'desc';
+}, enabled: boolean = true) => {
+  return useQuery<{ data: any[]; total: number }>({
+    queryKey: ['buyer-date-counts', params],
     queryFn: async () => {
-      return dashboardService.getBuyerDateCounts(fromDate, toDate);
+      return dashboardService.getBuyerDateCounts(params);
     },
     enabled,
+  });
+};
+
+export const useBuyerPeriodCounts = () => {
+  return useQuery<{ today: any[]; week: any[] }>({
+    queryKey: ['buyer-period-counts'],
+    queryFn: async () => {
+      return dashboardService.getBuyerPeriodCounts();
+    },
+  });
+};
+
+export const useBuyerPeriodTickets = (buyer: string | null, period: 'today' | 'week') => {
+  return useQuery<any[]>({
+    queryKey: ['buyer-period-tickets', buyer, period],
+    queryFn: async () => {
+      if (!buyer) return [];
+      return dashboardService.getBuyerPeriodTickets(buyer, period);
+    },
+    enabled: !!buyer,
   });
 };
 

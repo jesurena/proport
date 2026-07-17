@@ -73,7 +73,7 @@ export function TicketSubjectCard({
           title={isPinned ? 'Remove Bookmark' : 'Bookmark Ticket'}
         />
         <h1 className="text-xl font-bold text-text leading-snug">
-          {businessUnitName} - {subject}
+          {businessUnitName} {subject}
         </h1>
       </div>
 

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 import { AppLabel } from '@integrated-computer-system/ui-kit';
-import { AppToggle, AppChip } from '@/components/ui';
+import { AppToggle, AppChip, AppAvatar } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
-import BuyerTicketsTableModal from './BuyerTicketsTableModal';
+import { useBuyerPeriodCounts, useBuyerPeriodTickets } from '../hooks/useDashboard';
+import BuyerTicketsModal from './BuyerTicketsModal';
 
 interface DashboardTicketPerBuyerProps {
   allTickets: TicketType[];
@@ -18,47 +19,16 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
   const [showAllBuyers, setShowAllBuyers] = useState(false);
   const [selectedBuyerForModal, setSelectedBuyerForModal] = useState<string | null>(null);
 
-  const buyersList = [
-    'Maria Santos',
-    'Rico Mendoza',
-    'John Dela Cruz',
-    'Angela Reyes',
-    'Carlos Garcia',
-    'Patricia Lim',
-    'Jose Ramos',
-    'Unassigned'
-  ];
+  const { data: periodCounts, isLoading } = useBuyerPeriodCounts();
+  const { data: modalTickets } = useBuyerPeriodTickets(selectedBuyerForModal, buyerPeriod);
 
-  const filteredPeriodTickets = allTickets.filter((t) => {
-    if (buyerPeriod === 'today') {
-      const todayStr = new Date().toISOString().split('T')[0];
-      return t.createdAt.startsWith(todayStr);
-    } else {
-      const oneWeekAgo = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-      return new Date(t.createdAt) >= oneWeekAgo;
-    }
-  });
-
-  const buyerCounts = buyersList.map((name) => {
-    let count = 0;
-    if (name === 'Unassigned') {
-      count = filteredPeriodTickets.filter(t => !t.assigneeId).length;
-    } else {
-      count = filteredPeriodTickets.filter(t => t.assigneeName === name).length;
-    }
-    return { name, count };
-  }).sort((a, b) => b.count - a.count);
+  const buyerCounts = useMemo(() => {
+    if (!periodCounts) return [];
+    const list = buyerPeriod === 'today' ? periodCounts.today : periodCounts.week;
+    return [...list].sort((a, b) => b.count - a.count);
+  }, [periodCounts, buyerPeriod]);
 
   const displayedBuyers = showAllBuyers ? buyerCounts : buyerCounts.slice(0, 5);
-
-  const modalTickets = selectedBuyerForModal
-    ? filteredPeriodTickets.filter((t) => {
-        if (selectedBuyerForModal === 'Unassigned') {
-          return !t.assigneeId;
-        }
-        return t.assigneeName === selectedBuyerForModal;
-      })
-    : [];
 
   return (
     <>
@@ -82,12 +52,10 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
           />
         </div>
         <div className="space-y-3">
-          {displayedBuyers.map((buyer, index) => (
+          {displayedBuyers.map((buyer) => (
             <div key={buyer.name} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 ${index === 0 ? 'bg-linear-to-br from-indigo-400 to-purple-500' : index === 1 ? 'bg-linear-to-br from-sky-400 to-blue-500' : 'bg-linear-to-br from-emerald-400 to-teal-500'}`}>
-                  {buyer.name.substring(0, 2).toUpperCase()}
-                </div>
+                <AppAvatar src={buyer.avatar} name={buyer.name} size={36} />
                 <div>
                   <AppLabel as="p" className="text-xs font-bold text-text leading-none mb-0.5">{buyer.name}</AppLabel>
                   <AppLabel as="p" variant="description" className="text-[10px]">
@@ -117,12 +85,12 @@ export default function DashboardTicketPerBuyer({ allTickets }: DashboardTicketP
       </div>
 
       {/* Embedded TicketTable Modal */}
-      <BuyerTicketsTableModal
+      <BuyerTicketsModal
         open={!!selectedBuyerForModal}
         onClose={() => setSelectedBuyerForModal(null)}
         buyer={selectedBuyerForModal || ''}
         buyerPeriod={buyerPeriod}
-        tickets={modalTickets}
+        tickets={modalTickets || []}
       />
     </>
   );

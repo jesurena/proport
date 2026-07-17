@@ -9,6 +9,7 @@ import { BrandTicketChip } from '@/components/tickets/BrandTicketChip';
 import { STATUS_META } from '@/lib/types';
 import type { Ticket, TicketStatus } from '@/lib/types';
 import { useTickets } from '../hooks/useTickets';
+import { useTicketFilters } from '../hooks/useTicketFilters';
 import { TicketTabs } from './TicketTabs';
 import { TicketFilters } from './TicketFilters';
 import { useAuthStore } from '@/modules/auth';
@@ -57,16 +58,55 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     setSortOpen,
     filterOpen,
     setFilterOpen,
-    filteredTickets,
     emptyState,
     activeFiltersCount,
     handleTabChange,
-  } = useTickets();
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+  } = useTicketFilters();
 
-  const resolvedTickets = tickets ?? filteredTickets;
+  const queryParams = React.useMemo(() => {
+    const statusVal = selectedStatuses.length > 0 ? selectedStatuses.join(',') : undefined;
+    const brandTypeVal = selectedBrandTypes.length > 0 ? selectedBrandTypes.join(',') : undefined;
+
+    return {
+      page,
+      per_page: pageSize,
+      tab: activeTab,
+      search: searchQuery.trim() || undefined,
+      sort_by: sortBy,
+      status: statusVal,
+      brand_type: brandTypeVal,
+    };
+  }, [page, pageSize, activeTab, searchQuery, sortBy, selectedStatuses, selectedBrandTypes]);
+
+  const { data, isLoading } = useTickets(queryParams);
+
+  const filteredTickets = React.useMemo(() => {
+    return data?.data || [];
+  }, [data]);
+
+  const total = data?.total || 0;
+
+  const resolvedTickets = React.useMemo(() => {
+    const rawList = tickets ?? filteredTickets;
+    return rawList.map((t: any) => ({
+      ...t,
+      id: t.id ?? t.ticket_id,
+      ticketNumber: t.ticketNumber ?? t.ticket_id,
+      requesterName: t.requesterName ?? t.requestor_name ?? t.requestor_nickname ?? 'Unknown',
+      requesterAvatar: t.requesterAvatar ?? t.GAvatarReq ?? undefined,
+      description: t.description ?? t.project_name ?? t.ticket_content ?? '',
+      status: t.status ?? (t.status_description ? String(t.status_description).toLowerCase() : 'pending'),
+      updatedAt: t.updatedAt ?? t.last_updated ?? t.date_created,
+      createdAt: t.createdAt ?? t.date_created,
+    }));
+  }, [tickets, filteredTickets]);
 
   const [role, setRole] = React.useState<string>('super_user');
-  const [pageSize, setPageSize] = React.useState<number>(10);
+  const [localPageSize, setLocalPageSize] = React.useState<number>(10);
 
   const { user } = useAuthStore();
   const isDeveloper = user?.isDeveloper ?? false;
@@ -88,6 +128,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       key: 'ticketNumber',
       width: '80px',
       align: 'center' as const,
+      sorter: (a: any, b: any) => (a.ticketNumber || 0) - (b.ticketNumber || 0),
       render: (num: number) => (
         <AppLabel as="span" variant="label" className="font-mono text-xs font-semibold text-text-info">
           {formatOrderNumber(num)}
@@ -98,6 +139,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       title: 'Brand',
       key: 'brand',
       width: '130px',
+      sorter: (a: any, b: any) => String(a.brandName || '').localeCompare(String(b.brandName || '')),
       render: (_: any, record: Ticket) => (
         <BrandTicketChip
           brandName={record.brandName}
@@ -108,6 +150,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     {
       title: 'Subject',
       key: 'subject',
+      sorter: (a: any, b: any) => String(a.subject || '').localeCompare(String(b.subject || '')),
       render: (_: any, record: Ticket) => (
         <div className="flex items-center gap-3 max-w-[400px]">
           {/* Creator avatar */}
@@ -134,14 +177,30 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       title: 'Assignee',
       key: 'assignee',
       width: '100px',
-      render: (_: any, record: Ticket) => {
-        const participants = Array.from(
-          new Set(
-            [record.assigneeName, ...record.replies.map((r) => r.authorName)].filter(
-              (name): name is string => Boolean(name) && name !== record.requesterName
+      render: (_: any, record: any) => {
+        let participants: string[] = [];
+        let participantAvatars: string[] = [];
+
+        if (record.OwnerName) {
+          const parts = record.OwnerName.split(';');
+          parts.forEach((p: string) => {
+            const fields = p.split(',');
+            if (fields[0]) {
+              participants.push(fields[0]);
+              participantAvatars.push(fields[1] || `https://api.dicebear.com/7.x/initials/svg?seed=${fields[0]}`);
+            }
+          });
+        } else {
+          const rawParticipants = Array.from(
+            new Set(
+              [record.assigneeName, ...(record.replies || []).map((r) => r.authorName)].filter(
+                (name): name is string => Boolean(name) && name !== record.requesterName
+              )
             )
-          )
-        );
+          );
+          participants = rawParticipants as string[];
+          participantAvatars = participants.map(name => `https://api.dicebear.com/7.x/initials/svg?seed=${name}`);
+        }
 
         if (participants.length === 0) {
           return (
@@ -165,7 +224,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
                 <TicketAvatar
                   key={name}
                   name={name}
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${name}`}
+                  src={participantAvatars[i]}
                   size={24}
                   status={avatarStatus}
                   className="ring-2 ring-background rounded-full shrink-0 relative"
@@ -191,6 +250,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       key: 'status',
       align: 'center' as const,
       width: '110px',
+      sorter: (a: any, b: any) => String(a.status || '').localeCompare(String(b.status || '')),
       render: (status: string) => {
         const meta = STATUS_META[status as TicketStatus];
         return (
@@ -207,6 +267,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: '100px',
+      sorter: (a: any, b: any) => new Date(a.updatedAt || 0).getTime() - new Date(b.updatedAt || 0).getTime(),
       render: (date: string) => (
         <AppLabel as="span" variant="info" className="text-xs text-text-info font-medium">
           {timeAgo(date)}
@@ -246,12 +307,12 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       )}
 
       {/* Ticket Table list */}
-      {resolvedTickets.length === 0 ? (
+      {resolvedTickets.length === 0 && !isLoading ? (
         <div className="py-12 flex justify-center border border-border/60 bg-background rounded-2xl shadow-sm">
           <AppEmptyState
             title={emptyState.title}
             description={emptyState.description}
-            imageSrc={emptyState.imageSrc}
+            imageSrc="/aria-mascott-happy.svg"
             imageSize={110}
           />
         </div>
@@ -261,12 +322,27 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
           dataSource={resolvedTickets}
           rowKey="id"
           scroll={{ x: 'max-content' }}
-          pagination={{
-            pageSize: pageSize,
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            onShowSizeChange: (_, size) => setPageSize(size),
-          }}
+          loading={isLoading}
+          pagination={
+            !tickets
+              ? {
+                  current: page,
+                  pageSize: pageSize,
+                  total: total,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
+                  onChange: (p, ps) => {
+                    setPage(p);
+                    if (ps) setPageSize(ps);
+                  },
+                }
+              : {
+                  pageSize: localPageSize,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
+                  onShowSizeChange: (_, size) => setLocalPageSize(size),
+                }
+          }
           onRow={(record) => ({
             onClick: () => router.push(`/tickets/${record.id}`),
             className: 'cursor-pointer hover:bg-neutral/5 transition-colors group',

@@ -10,7 +10,9 @@ export type TicketStatus =
   | 'bu-approval'
   | 'bu-declined'
   | 'final-approval'
-  | 'adel-declined';
+  | 'adel-declined'
+  | 'for approval of bu head'
+  | 'for-approval-of-bu-head';
 
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 
@@ -107,6 +109,8 @@ export const STATUS_META: Record<TicketStatus, { label: string; color: string; c
   'bu-declined': { label: 'BU Declined', color: '#ef4444', chipVariant: 'bu-declined' },
   'final-approval': { label: 'Final Approval', color: '#10b981', chipVariant: 'final-approval' },
   'adel-declined': { label: 'Declined by Adel', color: '#ef4444', chipVariant: 'adel-declined' },
+  'for approval of bu head': { label: 'For Approval of BU Head', color: '#ec4899', chipVariant: 'for-approval-of-bu-head' },
+  'for-approval-of-bu-head': { label: 'For Approval of BU Head', color: '#ec4899', chipVariant: 'for-approval-of-bu-head' },
 };
 
 export const PRIORITY_META: Record<TicketPriority, { label: string; color: string }> = {

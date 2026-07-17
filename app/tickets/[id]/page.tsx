@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { AppButton, AppAvatar } from '@integrated-computer-system/ui-kit';
+import { AppButton } from '@integrated-computer-system/ui-kit';
 import { ArrowLeft, XCircle } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
-import TicketThread from '@/modules/tickets/components/TicketThread';
 import { AppFilePreview } from '@/components/ui';
-import { getTicketById, addReply, updateTicketStatus, updateTicketAssignee, getUsers, addTicketTags, updateTicketCc } from '@/lib/tickets';
-import type { Ticket, TicketStatus, User } from '@/lib/types';
+import type { TicketStatus, User } from '@/lib/types';
+import { useTicketDetail, useAddReply, useUpdateAssignment, useUpdateStatus } from '@/modules/tickets/hooks/useTickets';
 
 import { TicketMainCard } from '@/modules/tickets/components/TicketMainCard';
 import { TicketActionsCard } from '@/modules/tickets/components/TicketActionsCard';
@@ -21,46 +20,49 @@ export default function TicketDetailPage() {
   const router = useRouter();
   const ticketId = params.id as string;
 
-  const [ticket, setTicket] = useState<Ticket | null>(null);
   const [sending, setSending] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [previewFile, setPreviewFile] = useState<any>(null);
   const [selectedCcUsers, setSelectedCcUsers] = useState<User[]>([]);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
-  useEffect(() => {
-    const t = getTicketById(ticketId);
-    if (t) {
-      setTicket(t);
-    }
-  }, [ticketId]);
 
-  const refresh = () => {
-    const t = getTicketById(ticketId);
-    if (t) setTicket(t);
-  };
+  const { data: ticketData, isLoading } = useTicketDetail(ticketId);
+  const ticket = React.useMemo(() => {
+    if (!ticketData?.ticket) return null;
+    return {
+      ...ticketData.ticket,
+      replies: (ticketData.ticket.replies || []).map((r: any) => ({
+        id: r.id ?? r.reply_id,
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        content: r.content ?? r.replyContent ?? r.reply ?? '',
+        createdAt: r.createdAt ?? r.dateCreated ?? r.date_replied,
+      })),
+    };
+  }, [ticketData]);
+
+  const addReplyMutation = useAddReply();
+  const updateAssignmentMutation = useUpdateAssignment();
+  const updateStatusMutation = useUpdateStatus();
 
   const handleSendReply = async (contentText: string, statusAction?: TicketStatus) => {
     setSending(true);
-    await new Promise((r) => setTimeout(r, 300));
-    addReply(ticketId, { content: contentText });
-
-    if (statusAction) {
-      updateTicketStatus(ticketId, statusAction);
+    try {
+      await addReplyMutation.mutateAsync({
+        id: ticketId,
+        payload: {
+          content: contentText,
+          cc_ids: selectedCcUsers.map((u) => String(u.id)),
+          status_action: statusAction,
+        },
+      });
+      setAttachments([]);
+      setSelectedCcUsers([]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSending(false);
     }
-
-    if (selectedCcUsers.length > 0) {
-      const ccEmails = selectedCcUsers.map((u) => u.email);
-      updateTicketCc(ticketId, ccEmails);
-    }
-
-    if (attachments.length > 0) {
-      addTicketTags(ticketId, attachments.map(f => f.name));
-    }
-
-    setAttachments([]);
-    setSelectedCcUsers([]);
-    setSending(false);
-    refresh();
   };
 
   const handleDiscard = () => {
@@ -68,22 +70,37 @@ export default function TicketDetailPage() {
     setSelectedCcUsers([]);
   };
 
-  const handleStatusChange = (status: TicketStatus) => {
-    updateTicketStatus(ticketId, status);
-    refresh();
-  };
-
-  const handleUpdateAssignment = (newAssigneeIds: string, newAssigneeNames: string, remarks: string) => {
-    updateTicketAssignee(ticketId, newAssigneeIds);
-
-    if (remarks && remarks.trim()) {
-      addReply(ticketId, {
-        content: remarks
-      });
+  const handleStatusChange = async (status: TicketStatus) => {
+    try {
+      await updateStatusMutation.mutateAsync({ id: ticketId, status });
+    } catch (err) {
+      console.error(err);
     }
-
-    refresh();
   };
+
+  const handleUpdateAssignment = async (newAssigneeIds: string, newAssigneeNames: string, remarks: string) => {
+    try {
+      await updateAssignmentMutation.mutateAsync({ id: ticketId, assignee_ids: newAssigneeIds });
+      if (remarks && remarks.trim()) {
+        await addReplyMutation.mutateAsync({
+          id: ticketId,
+          payload: {
+            content: remarks,
+          },
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[100vh] text-text-info bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!ticket) {
     return (

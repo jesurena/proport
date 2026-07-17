@@ -31,14 +31,19 @@ const COLORS = [
 export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCountAoProps) {
   const [activeTab, setActiveTab] = useState<'ao' | 'bu' | 'buyer-date' | 'buyer-category'>('ao');
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
-  const { data: ticketCountAoData, isLoading } = useTicketCountAo(activeTab === 'ao');
+
+  const [aoParams, setAoParams] = useState({ page: 1, per_page: 10, sort_field: 'AccountName', sort_order: 'asc' as 'asc' | 'desc' });
+  const [buyerCategoryParams, setBuyerCategoryParams] = useState({ page: 1, per_page: 10, sort_field: 'AccountName', sort_order: 'asc' as 'asc' | 'desc' });
+  const [buyerDateParams, setBuyerDateParams] = useState({ page: 1, per_page: 10, sort_field: 'date_created', sort_order: 'desc' as 'asc' | 'desc' });
+
+  const { data: ticketCountAoData, isLoading } = useTicketCountAo(aoParams, activeTab === 'ao');
   const { data: chartPerBuData } = useChartPerBu(activeTab === 'bu');
-  const { data: buyerCategoryCountsData, isLoading: isBuyerCategoryLoading } = useBuyerCategoryCounts(activeTab === 'buyer-category');
-  const { data: buyerDateCountsData, isLoading: isBuyerDateLoading } = useBuyerDateCounts(undefined, undefined, activeTab === 'buyer-date');
+  const { data: buyerCategoryCountsData, isLoading: isBuyerCategoryLoading } = useBuyerCategoryCounts(buyerCategoryParams, activeTab === 'buyer-category');
+  const { data: buyerDateCountsData, isLoading: isBuyerDateLoading } = useBuyerDateCounts(buyerDateParams, activeTab === 'buyer-date');
 
   const tableData = useMemo(() => {
-    if (!ticketCountAoData) return [];
-    return ticketCountAoData.map((item: any, index: number) => ({
+    const list = ticketCountAoData?.data || [];
+    return list.map((item: any, index: number) => ({
       id: String(index),
       ao: item.AccountName,
       bu: item.AccountGroup,
@@ -57,7 +62,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       title: 'AO',
       dataIndex: 'ao',
       key: 'ao',
-      sorter: (a: any, b: any) => a.ao.localeCompare(b.ao),
+      sorter: true,
       render: (text: string, record: any) => (
         <div className="flex items-center gap-2">
           <AppAvatar src={record.avatar} name={text} size={24} />
@@ -69,7 +74,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       title: 'BU',
       dataIndex: 'bu',
       key: 'bu',
-      sorter: (a: any, b: any) => a.bu.localeCompare(b.bu),
+      sorter: true,
       render: (text: string) => <AppLabel variant="info">{text}</AppLabel>,
     },
     {
@@ -77,7 +82,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'focusPending',
       key: 'focusPending',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.focusPending - b.focusPending,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -85,7 +90,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'focusAnswered',
       key: 'focusAnswered',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.focusAnswered - b.focusAnswered,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -93,7 +98,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'focusClosed',
       key: 'focusClosed',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.focusClosed - b.focusClosed,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -101,7 +106,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'nonFocusPending',
       key: 'nonFocusPending',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.nonFocusPending - b.nonFocusPending,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -109,7 +114,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'nonFocusAnswered',
       key: 'nonFocusAnswered',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.nonFocusAnswered - b.nonFocusAnswered,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -117,7 +122,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'nonFocusClosed',
       key: 'nonFocusClosed',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.nonFocusClosed - b.nonFocusClosed,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
   ];
@@ -127,7 +132,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       title: 'Buyer',
       dataIndex: 'buyer',
       key: 'buyer',
-      sorter: (a: any, b: any) => a.buyer.localeCompare(b.buyer),
+      sorter: true,
       render: (text: string, record: any) => (
         <div className="flex items-center gap-2">
           <AppAvatar src={record.avatar} name={text} size={24} />
@@ -140,7 +145,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'focusPending',
       key: 'focusPending',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.focusPending - b.focusPending,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -148,7 +153,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'focusAnswered',
       key: 'focusAnswered',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.focusAnswered - b.focusAnswered,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -156,7 +161,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'focusClosed',
       key: 'focusClosed',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.focusClosed - b.focusClosed,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -164,7 +169,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'nonFocusPending',
       key: 'nonFocusPending',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.nonFocusPending - b.nonFocusPending,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -172,7 +177,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'nonFocusAnswered',
       key: 'nonFocusAnswered',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.nonFocusAnswered - b.nonFocusAnswered,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
     {
@@ -180,14 +185,14 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       dataIndex: 'nonFocusClosed',
       key: 'nonFocusClosed',
       align: 'center' as const,
-      sorter: (a: any, b: any) => a.nonFocusClosed - b.nonFocusClosed,
+      sorter: true,
       render: (val: number) => <AppLabel variant="body">{val}</AppLabel>,
     },
   ];
 
   const buyerCategoryTableData = useMemo(() => {
-    if (!buyerCategoryCountsData) return [];
-    return buyerCategoryCountsData.map((item: any, index: number) => ({
+    const list = buyerCategoryCountsData?.data || [];
+    return list.map((item: any, index: number) => ({
       id: String(index),
       buyer: item.AccountName,
       avatar: item.GAvatar,
@@ -201,8 +206,9 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
   }, [buyerCategoryCountsData]);
 
   const buyerDateColumns = useMemo(() => {
-    if (!buyerDateCountsData || buyerDateCountsData.length === 0) return [];
-    const firstRowKeys = Object.keys(buyerDateCountsData[0]).filter(k => k !== 'GAvatar');
+    const list = buyerDateCountsData?.data || [];
+    if (list.length === 0) return [];
+    const firstRowKeys = Object.keys(list[0]).filter(k => k !== 'GAvatar');
     return firstRowKeys.map((key) => {
       const isName = key.toLowerCase() === 'accountname' || key.toLowerCase() === 'name' || key.toLowerCase() === 'buyer';
       return {
@@ -210,9 +216,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
         dataIndex: key,
         key: key,
         align: isName ? ('left' as const) : ('center' as const),
-        sorter: isName 
-          ? (a: any, b: any) => String(a[key] || '').localeCompare(String(b[key] || ''))
-          : (a: any, b: any) => Number(a[key] || 0) - Number(b[key] || 0),
+        sorter: true,
         render: (val: any, record: any) => {
           if (isName) {
             return (
@@ -229,8 +233,8 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
   }, [buyerDateCountsData]);
 
   const buyerDateTableData = useMemo(() => {
-    if (!buyerDateCountsData) return [];
-    return buyerDateCountsData.map((item: any, index: number) => ({
+    const list = buyerDateCountsData?.data || [];
+    return list.map((item: any, index: number) => ({
       id: String(index),
       ...item,
     }));
@@ -256,7 +260,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       const endX = Math.cos(2 * Math.PI * cumulativePercent) * 46 + 50;
       const endY = Math.sin(2 * Math.PI * cumulativePercent) * 46 + 50;
       const largeArcFlag = percent > 0.5 ? 1 : 0;
-      
+
       const pathData = percent === 1
         ? `M 50 4 A 46 46 0 1 1 49.999 4 Z`
         : `M 50 50 L ${startX} ${startY} A 46 46 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
@@ -290,41 +294,37 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       <div className="flex border-b border-border/40 select-none">
         <button
           onClick={() => setActiveTab('ao')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${
-            activeTab === 'ao'
+          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'ao'
               ? 'border-accent-1 text-accent-1'
               : 'border-transparent text-text-info'
-          }`}
+            }`}
         >
           Ticket Count per AO & Category
         </button>
         <button
           onClick={() => setActiveTab('bu')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${
-            activeTab === 'bu'
+          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'bu'
               ? 'border-accent-1 text-accent-1'
               : 'border-transparent text-text-info'
-          }`}
+            }`}
         >
           Tickets per BU
         </button>
         <button
           onClick={() => setActiveTab('buyer-date')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${
-            activeTab === 'buyer-date'
+          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'buyer-date'
               ? 'border-accent-1 text-accent-1'
               : 'border-transparent text-text-info'
-          }`}
+            }`}
         >
           Ticket Count per Buyer & Date
         </button>
         <button
           onClick={() => setActiveTab('buyer-category')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${
-            activeTab === 'buyer-category'
+          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'buyer-category'
               ? 'border-accent-1 text-accent-1'
               : 'border-transparent text-text-info'
-          }`}
+            }`}
         >
           Ticket Count per Buyer & Category
         </button>
@@ -336,7 +336,31 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
             columns={columns}
             dataSource={tableData}
             rowKey="id"
-            pagination={{ pageSize: 5 }}
+            pagination={{
+              current: aoParams.page,
+              pageSize: aoParams.per_page,
+              total: ticketCountAoData?.total || 0,
+            }}
+            onChange={(pagination, filters, sorter: any) => {
+              let sortField = 'AccountName';
+              if (sorter.field) {
+                if (sorter.field === 'ao') sortField = 'AccountName';
+                else if (sorter.field === 'bu') sortField = 'AccountGroup';
+                else if (sorter.field === 'focusPending') sortField = 'focus_pending_count';
+                else if (sorter.field === 'focusAnswered') sortField = 'focus_answered_count';
+                else if (sorter.field === 'focusClosed') sortField = 'focus_closed_count';
+                else if (sorter.field === 'nonFocusPending') sortField = 'nf_pending_count';
+                else if (sorter.field === 'nonFocusAnswered') sortField = 'nf_answered_count';
+                else if (sorter.field === 'nonFocusClosed') sortField = 'nf_closed_count';
+              }
+              const sortOrder = sorter.order === 'descend' ? 'desc' : 'asc';
+              setAoParams({
+                page: pagination.current || 1,
+                per_page: pagination.pageSize || 10,
+                sort_field: sortField,
+                sort_order: sortOrder,
+              });
+            }}
             loading={isLoading}
             scroll={{ x: 'max-content' }}
           />
@@ -349,7 +373,30 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
             columns={buyerCategoryColumns}
             dataSource={buyerCategoryTableData}
             rowKey="id"
-            pagination={{ pageSize: 5 }}
+            pagination={{
+              current: buyerCategoryParams.page,
+              pageSize: buyerCategoryParams.per_page,
+              total: buyerCategoryCountsData?.total || 0,
+            }}
+            onChange={(pagination, filters, sorter: any) => {
+              let sortField = 'AccountName';
+              if (sorter.field) {
+                if (sorter.field === 'buyer') sortField = 'AccountName';
+                else if (sorter.field === 'focusPending') sortField = 'focus_pending_count';
+                else if (sorter.field === 'focusAnswered') sortField = 'focus_answered_count';
+                else if (sorter.field === 'focusClosed') sortField = 'focus_closed_count';
+                else if (sorter.field === 'nonFocusPending') sortField = 'nf_pending_count';
+                else if (sorter.field === 'nonFocusAnswered') sortField = 'nf_answered_count';
+                else if (sorter.field === 'nonFocusClosed') sortField = 'nf_closed_count';
+              }
+              const sortOrder = sorter.order === 'descend' ? 'desc' : 'asc';
+              setBuyerCategoryParams({
+                page: pagination.current || 1,
+                per_page: pagination.pageSize || 10,
+                sort_field: sortField,
+                sort_order: sortOrder,
+              });
+            }}
             loading={isBuyerCategoryLoading}
             scroll={{ x: 'max-content' }}
           />
@@ -362,7 +409,22 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
             columns={buyerDateColumns}
             dataSource={buyerDateTableData}
             rowKey="id"
-            pagination={{ pageSize: 5 }}
+            pagination={{
+              current: buyerDateParams.page,
+              pageSize: buyerDateParams.per_page,
+              total: buyerDateCountsData?.total || 0,
+            }}
+            onChange={(pagination, filters, sorter: any) => {
+              const sortField = sorter.field || 'date_created';
+              const sortOrder = sorter.order === 'descend' ? 'desc' : 'asc';
+              setBuyerDateParams(prev => ({
+                ...prev,
+                page: pagination.current || 1,
+                per_page: pagination.pageSize || 10,
+                sort_field: sortField,
+                sort_order: sortOrder,
+              }));
+            }}
             loading={isBuyerDateLoading}
             scroll={{ x: 'max-content' }}
           />
@@ -372,7 +434,7 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
       {activeTab === 'bu' && (
         <AppCard variant="default" padding="lg" className="py-6 space-y-5 animate-in fade-in duration-200">
           <AppLabel as="h4" className="text-sm font-bold text-text mb-2 text-center">Tickets per BU</AppLabel>
-          
+
           <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 px-4">
             {/* SVG Pie Chart Widget */}
             <div className="relative w-80 h-80 shrink-0">
@@ -385,9 +447,8 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
                         d={slice.pathData}
                         fill={slice.color}
                         onClick={() => handleSelectBU(slice.name)}
-                        className={`transition-all duration-300 cursor-pointer ${
-                          selectedBU && !isSelected ? 'opacity-20 scale-95' : 'opacity-100 hover:opacity-85'
-                        }`}
+                        className={`transition-all duration-300 cursor-pointer ${selectedBU && !isSelected ? 'opacity-20 scale-95' : 'opacity-100 hover:opacity-85'
+                          }`}
                         style={{ transformOrigin: '50px 50px' }}
                       />
                       {slice.percent > 0.01 && (
@@ -400,9 +461,8 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
                           textAnchor="middle"
                           dominantBaseline="central"
                           transform={`rotate(90, ${slice.labelX}, ${slice.labelY})`}
-                          className={`pointer-events-none select-none font-sans transition-all duration-300 ${
-                            selectedBU && !isSelected ? 'opacity-20' : 'opacity-100'
-                          }`}
+                          className={`pointer-events-none select-none font-sans transition-all duration-300 ${selectedBU && !isSelected ? 'opacity-20' : 'opacity-100'
+                            }`}
                         >
                           {slice.count}
                         </text>
@@ -426,11 +486,10 @@ export default function DashboardTicketCountAo({ allTickets }: DashboardTicketCo
                     <div
                       key={slice.name}
                       onClick={() => handleSelectBU(slice.name)}
-                      className={`flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition-all duration-200 border ${
-                        isSelected 
-                          ? 'bg-accent-1/10 border-accent-1/25 shadow-xs' 
+                      className={`flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition-all duration-200 border ${isSelected
+                          ? 'bg-accent-1/10 border-accent-1/25 shadow-xs'
                           : 'bg-transparent border-transparent hover:bg-hover hover:border-border/30'
-                      } ${selectedBU && !isSelected ? 'opacity-40' : 'opacity-100'}`}
+                        } ${selectedBU && !isSelected ? 'opacity-40' : 'opacity-100'}`}
                     >
                       <div className="flex items-center gap-2.5">
                         <span className="w-3 h-3 rounded-xs shrink-0" style={{ backgroundColor: slice.color }} />
