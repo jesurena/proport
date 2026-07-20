@@ -51,4 +51,9 @@ export const ticketsService = {
     const { data } = await api.get(`/tickets/${id}/assignees`);
     return data;
   },
+
+  async getCcUsers(): Promise<any[]> {
+    const { data } = await api.get('/cc-users');
+    return data;
+  },
 };

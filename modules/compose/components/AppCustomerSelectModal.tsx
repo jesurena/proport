@@ -7,10 +7,34 @@ import {
   AppInput,
   AppTable,
   AppSelect,
-  AppFilterPopover
+  AppFilterPopover,
+  AppChip,
+  type AppChipVariant
 } from '@/components/ui';
-import { Search, Building2, Filter } from 'lucide-react';
-import { getCustomers, type Customer } from '@/lib/customers';
+import { Search, Building2, Filter, ArrowRight } from 'lucide-react';
+import { type Customer } from '@/lib/customers';
+import { useCustomer } from '../hooks/useCustomer';
+
+const CHIP_VARIANTS: AppChipVariant[] = [
+  'info',
+  'non-focus',
+  'focus',
+  'answered',
+  'reassigned',
+  'assigned',
+  'warning',
+  'default',
+];
+
+function getSalesAreaChipVariant(area: string): AppChipVariant {
+  if (!area) return 'muted';
+  let hash = 0;
+  for (let i = 0; i < area.length; i++) {
+    hash = area.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % CHIP_VARIANTS.length;
+  return CHIP_VARIANTS[index];
+}
 
 interface AppCustomerSelectModalProps {
   open: boolean;
@@ -31,7 +55,8 @@ export function AppCustomerSelectModal({
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const activeFiltersCount = salesAreaFilter !== 'All' ? 1 : 0;
 
-  const customers = useMemo(() => getCustomers(), []);
+  // Use custom customer hook for live search
+  const { customers: baseCustomers, isLoading, hasSearched } = useCustomer(search, open);
 
   // Sync state when modal opens
   React.useEffect(() => {
@@ -43,31 +68,37 @@ export function AppCustomerSelectModal({
     }
   }, [open, initialSearch]);
 
-  const salesAreas = useMemo(() => {
-    const areas = new Set(customers.map((c) => c.salesArea).filter(Boolean));
-    return ['All', ...Array.from(areas).sort()];
-  }, [customers]);
+  // Reset salesAreaFilter when user types a new search query
+  React.useEffect(() => {
+    setSalesAreaFilter('All');
+    setTempSalesAreaFilter('All');
+  }, [search]);
 
-  const hasSearched = search.trim().length >= 2;
+  const salesAreas = useMemo(() => {
+    const areas = new Set(baseCustomers.map((c) => c.salesArea?.trim()).filter(Boolean));
+    return ['All', ...Array.from(areas).sort()];
+  }, [baseCustomers]);
 
   const filtered = useMemo(() => {
     if (!hasSearched) return [];
     const q = search.toLowerCase().trim();
-    return customers.filter((c) => {
+    return baseCustomers.filter((c) => {
       const matchesSearch =
         c.name.toLowerCase().includes(q) ||
         c.id.toLowerCase().includes(q);
-      const matchesSalesArea = salesAreaFilter === 'All' || c.salesArea === salesAreaFilter;
+      const matchesSalesArea =
+        salesAreaFilter === 'All' ||
+        c.salesArea.trim().toLowerCase() === salesAreaFilter.trim().toLowerCase();
       return matchesSearch && matchesSalesArea;
     });
-  }, [customers, search, salesAreaFilter, hasSearched]);
+  }, [baseCustomers, search, salesAreaFilter, hasSearched]);
 
-  // Sync temporary filter state when popover opens
-  React.useEffect(() => {
-    if (filterPopoverOpen) {
+  const handlePopoverOpenChange = (nextOpen: boolean) => {
+    setFilterPopoverOpen(nextOpen);
+    if (nextOpen) {
       setTempSalesAreaFilter(salesAreaFilter);
     }
-  }, [filterPopoverOpen, salesAreaFilter]);
+  };
 
   const handleSelect = (customerName: string) => {
     onSelect(customerName);
@@ -86,14 +117,12 @@ export function AppCustomerSelectModal({
       title: 'Customer Name',
       dataIndex: 'name',
       key: 'name',
+      width: '280px',
       render: (name: string) => (
-        <div className="flex items-start gap-2.5 py-0.5">
-          <div className="p-1.5 rounded-lg bg-neutral border border-border text-text-info shrink-0 mt-0.5">
-            <Building2 size={13} />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-bold text-text text-sm break-words whitespace-pre-wrap">{name}</span>
-          </div>
+        <div className="py-1 max-w-[280px]">
+          <span className="font-bold text-text text-sm group-hover:text-accent-1 transition-colors duration-200 break-words whitespace-pre-wrap leading-snug">
+            {name}
+          </span>
         </div>
       ),
     },
@@ -101,11 +130,14 @@ export function AppCustomerSelectModal({
       title: 'Sales Area',
       dataIndex: 'salesArea',
       key: 'salesArea',
-      width: '150px',
+      width: '160px',
       render: (area: string) => (
-        <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-neutral border border-border/50 text-text-info">
-          {area}
-        </span>
+        <AppChip
+          label={area || '—'}
+          variant={getSalesAreaChipVariant(area)}
+          size="sm"
+          icon={null}
+        />
       ),
     },
     {
@@ -113,27 +145,27 @@ export function AppCustomerSelectModal({
       dataIndex: 'buAo',
       key: 'buAo',
       width: '180px',
-      render: (buAo: string) => <span className="text-xs text-text-info">{buAo}</span>,
+      render: (buAo: string) => <span className="text-xs text-text-info">{buAo || '—'}</span>,
     },
     {
-      title: 'Action',
-      key: 'action',
-      width: '100px',
+      title: '',
+      key: 'arrow',
+      width: '50px',
       align: 'right' as const,
-      render: (_: any, record: Customer) => (
+      render: () => (
         <AppButton
-          variant="primary"
-          size="sm"
-          onClick={() => handleSelect(record.name.split('\n')[0])}
+          variant="neutral"
+          size="icon"
+          className="!w-7 !h-7 rounded-full group-hover:!bg-accent-1 group-hover:!text-white group-hover:!border-accent-1 transition-colors duration-200"
         >
-          Select
+          <ArrowRight size={13} className="group-hover:transition-transform" />
         </AppButton>
       ),
     },
   ];
 
   return (
-    <AppModal open={open} onClose={onClose} width={700} centered>
+    <AppModal open={open} onClose={onClose} width={820} centered>
       <AppModal.Body className="space-y-4">
         {/* Header */}
         <div>
@@ -159,7 +191,7 @@ export function AppCustomerSelectModal({
           {/* Filter Popover Component */}
           <AppFilterPopover
             open={filterPopoverOpen}
-            onOpenChange={setFilterPopoverOpen}
+            onOpenChange={handlePopoverOpenChange}
             title="Filters"
             onResetAll={() => {
               setSalesAreaFilter('All');
@@ -204,6 +236,11 @@ export function AppCustomerSelectModal({
               <p className="text-sm font-semibold">Enter a customer name or ID to start searching</p>
               <p className="text-xs mt-1">Type at least 2 characters to fetch matching database entries.</p>
             </div>
+          ) : isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
+              <div className="w-7 h-7 border-2 border-accent-1 border-t-transparent rounded-full animate-spin mb-2.5" />
+              <p className="text-sm font-semibold">Searching live customers...</p>
+            </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
               <Building2 size={32} className="opacity-30 mb-2.5" />
@@ -214,15 +251,13 @@ export function AppCustomerSelectModal({
             <AppTable<Customer>
               columns={columns}
               dataSource={filtered}
-              rowKey="id"
+              rowKey={(record, index) => `${record.id}_${record.name}_${index}`}
               pagination={false}
               size="small"
+              scroll={{ x: 750 }}
               onRow={(record) => ({
-                onClick: (event) => {
-                  const target = event.target as HTMLElement;
-                  if (target.closest('button')) return;
-                  handleSelect(record.name.split('\n')[0]);
-                },
+                onClick: () => handleSelect(record.name.split('\n')[0]),
+                className: 'group cursor-pointer hover:bg-neutral/40 transition-colors',
               })}
               className="cursor-pointer"
             />

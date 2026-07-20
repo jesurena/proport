@@ -10,13 +10,14 @@ import {
   AppSelect,
   AppFilterPopover
 } from '@/components/ui';
+import { useCcUsers } from '@/modules/tickets/hooks/useTickets';
 import { Filter } from 'lucide-react';
 import type { User } from '@/lib/types';
 
 interface AppUserSelectModalProps {
   open: boolean;
   onClose: () => void;
-  users: User[];
+  users?: User[];
   selectedUsers: User[];
   onSelect: (users: User[]) => void;
 }
@@ -24,24 +25,40 @@ interface AppUserSelectModalProps {
 export function AppUserSelectModal({
   open,
   onClose,
-  users,
+  users = [],
   selectedUsers,
   onSelect,
 }: AppUserSelectModalProps) {
   const [search, setSearch] = useState('');
-  const [deptFilter, setDeptFilter] = useState('All');
-  const [tempDeptFilter, setTempDeptFilter] = useState('All');
+  const [groupFilter, setGroupFilter] = useState('All');
+  const [tempGroupFilter, setTempGroupFilter] = useState('All');
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const [tempSelected, setTempSelected] = useState<User[]>([]);
-  const activeFiltersCount = deptFilter !== 'All' ? 1 : 0;
+  const activeFiltersCount = groupFilter !== 'All' ? 1 : 0;
+
+  // Fetch real CC users from backend API
+  const { data: fetchedCcUsers, isLoading } = useCcUsers(open);
+
+  const activeUsersList = useMemo(() => {
+    if (fetchedCcUsers && Array.isArray(fetchedCcUsers) && fetchedCcUsers.length > 0) {
+      return fetchedCcUsers.map((u: any) => ({
+        id: String(u.id),
+        name: u.name,
+        email: u.email,
+        avatar: u.avatar || undefined,
+        account_group: u.account_group || '',
+      }));
+    }
+    return users;
+  }, [fetchedCcUsers, users]);
 
   // Sync selected users when modal opens
   React.useEffect(() => {
     if (open) {
       setTempSelected(selectedUsers);
       setSearch('');
-      setDeptFilter('All');
-      setTempDeptFilter('All');
+      setGroupFilter('All');
+      setTempGroupFilter('All');
       setFilterPopoverOpen(false);
     }
   }, [open, selectedUsers]);
@@ -49,27 +66,27 @@ export function AppUserSelectModal({
   // Sync temporary filter state when popover opens
   React.useEffect(() => {
     if (filterPopoverOpen) {
-      setTempDeptFilter(deptFilter);
+      setTempGroupFilter(groupFilter);
     }
-  }, [filterPopoverOpen, deptFilter]);
+  }, [filterPopoverOpen, groupFilter]);
 
-  const availableDepts = useMemo(() => {
-    const depts = new Set(users.map((u) => u.department || '').filter(Boolean));
-    return ['All', ...Array.from(depts).sort()];
-  }, [users]);
+  const availableGroups = useMemo(() => {
+    const groups = new Set(activeUsersList.map((u) => u.account_group || '').filter(Boolean));
+    return ['All', ...Array.from(groups).sort()];
+  }, [activeUsersList]);
 
   const filtered = useMemo(() => {
-    return users.filter((u) => {
+    return activeUsersList.filter((u) => {
       const q = search.toLowerCase().trim();
       const matchesSearch = !q || (
         u.name.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
-        (u.department || '').toLowerCase().includes(q)
+        (u.account_group || '').toLowerCase().includes(q)
       );
-      const matchesDept = deptFilter === 'All' || u.department === deptFilter;
-      return matchesSearch && matchesDept;
+      const matchesGroup = groupFilter === 'All' || u.account_group === groupFilter;
+      return matchesSearch && matchesGroup;
     });
-  }, [users, search, deptFilter]);
+  }, [activeUsersList, search, groupFilter]);
 
   const handleApply = () => {
     onSelect(tempSelected);
@@ -102,15 +119,17 @@ export function AppUserSelectModal({
       render: (email: string) => <span className="text-xs text-text-info">{email}</span>,
     },
     {
-      title: 'Department',
-      dataIndex: 'department',
-      key: 'department',
-      render: (dept: string) => <span className="text-xs text-text-info">{dept || '—'}</span>,
+      title: 'Account Group',
+      dataIndex: 'account_group',
+      key: 'account_group',
+      render: (group: string) => (
+        <span className="text-xs text-text-info">{group || '—'}</span>
+      ),
     },
   ];
 
   return (
-    <AppModal open={open} onClose={onClose} width={700} centered>
+    <AppModal open={open} onClose={onClose} width={820} centered>
       <AppModal.Body className="space-y-4">
         {/* Header */}
         <div>
@@ -128,7 +147,7 @@ export function AppUserSelectModal({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search users by name, email, department..."
+              placeholder="Search users by name, email, account group..."
               className="w-full"
             />
           </div>
@@ -139,12 +158,12 @@ export function AppUserSelectModal({
             onOpenChange={setFilterPopoverOpen}
             title="Filters"
             onResetAll={() => {
-              setDeptFilter('All');
-              setTempDeptFilter('All');
+              setGroupFilter('All');
+              setTempGroupFilter('All');
               setFilterPopoverOpen(false);
             }}
             onApply={() => {
-              setDeptFilter(tempDeptFilter);
+              setGroupFilter(tempGroupFilter);
               setFilterPopoverOpen(false);
             }}
             onClose={() => setFilterPopoverOpen(false)}
@@ -158,15 +177,15 @@ export function AppUserSelectModal({
             }
           >
             <AppFilterPopover.Group
-              title="Department"
-              showReset={tempDeptFilter !== 'All'}
-              onReset={() => setTempDeptFilter('All')}
+              title="Account Group"
+              showReset={tempGroupFilter !== 'All'}
+              onReset={() => setTempGroupFilter('All')}
             >
               <AppSelect
-                options={availableDepts.map((d) => ({ value: d, label: d }))}
-                value={tempDeptFilter}
-                onChange={(val) => setTempDeptFilter(val)}
-                placeholder="Select department"
+                options={availableGroups.map((g) => ({ value: g, label: g }))}
+                value={tempGroupFilter}
+                onChange={(val) => setTempGroupFilter(val)}
+                placeholder="Select account group"
                 variant="borderless"
               />
             </AppFilterPopover.Group>
@@ -178,6 +197,7 @@ export function AppUserSelectModal({
           <AppTable<User>
             columns={columns}
             dataSource={filtered}
+            loading={isLoading}
             rowKey="id"
             pagination={false}
             size="small"

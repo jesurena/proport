@@ -129,7 +129,7 @@ export default function SalesRecentTickets() {
                 variant="default"
                 padding="none"
                 onClick={() => router.push(`/tickets/${ticket.id}`)}
-                className="overflow-hidden shadow-sm cursor-pointer flex flex-col group relative"
+                className="overflow-hidden shadow-sm cursor-pointer flex flex-col group relative border hover:border-accent-1/40 hover:shadow-md transition-all duration-200"
               >
                 <div className="w-full h-36 bg-gradient-to-br from-indigo-600 to-violet-600 relative flex items-center justify-center">
                   <AppLabel
@@ -152,7 +152,7 @@ export default function SalesRecentTickets() {
                     <AppLabel
                       as="h4"
                       variant="title"
-                      className="!text-sm !font-bold line-clamp-2 leading-snug flex-1"
+                      className="!text-sm !font-bold line-clamp-2 leading-snug flex-1 group-hover:text-accent-1 transition-colors duration-200"
                     >
                       {ticket.subject}
                     </AppLabel>

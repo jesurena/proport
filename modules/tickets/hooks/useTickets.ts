@@ -13,6 +13,7 @@ export const useTickets = (params?: {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsService.getTickets(params),
+    refetchInterval: 10000,
   });
 };
 
@@ -21,6 +22,7 @@ export const useTicketDetail = (id: string) => {
     queryKey: ['ticket', id],
     queryFn: () => ticketsService.getTicketById(id),
     enabled: !!id,
+    refetchInterval: 10000,
   });
 };
 
@@ -71,5 +73,13 @@ export const useTicketAssignees = (id: string, enabled = true) => {
     queryKey: ['ticket-assignees', id],
     queryFn: () => ticketsService.getTicketAssignees(id),
     enabled: !!id && enabled,
+  });
+};
+
+export const useCcUsers = (enabled = true) => {
+  return useQuery({
+    queryKey: ['cc-users'],
+    queryFn: () => ticketsService.getCcUsers(),
+    enabled,
   });
 };

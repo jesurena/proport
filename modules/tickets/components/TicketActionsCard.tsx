@@ -114,8 +114,8 @@ export function TicketActionsCard({
               {details.icon}
               {statusMeta.label}
             </span>
-            <span className="text-[10px] font-semibold text-text-info/50 uppercase tracking-widest shrink-0 select-none">
-              Live status
+            <span className="text-[11px] font-mono font-bold text-text-info/70 tracking-wider shrink-0 select-none">
+              #{ticket.ticketNumber ? String(ticket.ticketNumber).padStart(4, '0') : ticket.id}
             </span>
           </div>
 

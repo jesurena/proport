@@ -64,7 +64,7 @@ export function AppTable<RecordType extends object>({
         },
       }}
     >
-      <div className={cn("app-table-wrapper border border-border/60 rounded-2xl overflow-hidden bg-card-bg shadow-sm", className)}>
+      <div className={cn("app-table-wrapper border border-border/60 rounded-2xl overflow-x-auto max-w-full bg-card-bg shadow-sm", className)}>
         <Table
           dataSource={dataSource}
           columns={resolvedColumns as any}

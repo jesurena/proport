@@ -29,8 +29,8 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
-  role: 'admin' | 'buyer' | 'sales' | 'super_user';
-  department?: string;
+  role?: 'admin' | 'buyer' | 'sales' | 'super_user';
+  account_group?: string;
 }
 
 export interface BusinessUnit {

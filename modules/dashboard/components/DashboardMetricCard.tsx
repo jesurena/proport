@@ -77,14 +77,14 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
             className="p-4 flex items-center justify-between cursor-pointer group transition-all duration-200 hover:border-accent-1/40 hover:shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-full ${iconBg} flex items-center justify-center ${iconColor} shrink-0 group-hover:scale-105 transition-transform duration-200`}>
+              <div className={`w-11 h-11 rounded-full ${iconBg} flex items-center justify-center ${iconColor} shrink-0`}>
                 {icon}
               </div>
               <div>
                 <AppLabel as="p" variant="info" className="text-[11px] font-semibold uppercase tracking-wider leading-none mb-1">
                   {count} {count === 1 ? 'ticket' : 'tickets'}
                 </AppLabel>
-                <AppLabel as="p" variant="subtitle" className="font-bold text-sm">
+                <AppLabel as="p" variant="subtitle" className="font-bold text-sm group-hover:text-accent-1 transition-colors duration-200">
                   {label}
                 </AppLabel>
               </div>
@@ -94,7 +94,7 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
               size="icon"
               className="!w-8 !h-8 rounded-full group-hover:!bg-accent-1 group-hover:!text-white group-hover:!border-accent-1 transition-colors duration-200"
             >
-              <ArrowRight size={13} className="group-hover:transition-transform duration-200" />
+              <ArrowRight size={13} />
             </AppButton>
           </AppCard>
         ))}

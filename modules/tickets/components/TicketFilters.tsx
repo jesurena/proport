@@ -56,9 +56,6 @@ export function TicketFilters({
               {[
                 { value: 'recent', label: 'Most Recent' },
                 { value: 'oldest', label: 'Oldest' },
-                { value: 'price-desc', label: 'Cost (High to Low)' },
-                { value: 'price-asc', label: 'Cost (Low to High)' },
-                { value: 'qty-desc', label: 'Quantity (High to Low)' },
               ].map((opt) => (
                 <button
                   key={opt.value}
