@@ -14,8 +14,20 @@ interface SettingsModalProps {
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
     const [activeTab, setActiveTab] = useState('general');
     const { user } = useAuthStore();
+    const [mockRole, setMockRole] = useState<string | null>(null);
 
-    const visibleTabs = useMemo(() => getSettingsTabs(user), [user]);
+    React.useEffect(() => {
+        const storedRole = typeof window !== 'undefined' ? localStorage.getItem('proport_my_role') : null;
+        if (user?.isDeveloper && storedRole) {
+            setMockRole(storedRole);
+        } else {
+            setMockRole(user?.role_name || 'requestor');
+        }
+    }, [user]);
+
+    const activeRole = mockRole || user?.role_name || 'requestor';
+
+    const visibleTabs = useMemo(() => getSettingsTabs(user, activeRole), [user, activeRole]);
 
     const activeTabConfig = visibleTabs.find(tab => tab.id === activeTab) || visibleTabs[0];
     const ActiveComponent = activeTabConfig?.component;

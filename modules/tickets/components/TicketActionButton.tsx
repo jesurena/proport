@@ -174,14 +174,27 @@ export function TicketActionButton({
   return (
     <>
       <div className={`flex gap-2 relative mt-1 items-center w-full ${className}`}>
-        {primaryBtn && <div className="flex-1">{primaryBtn}</div>}
-
-        <button
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="w-9 h-9 border border-border/60 bg-neutral/5 hover:bg-hover text-text-info hover:text-text rounded-md transition-colors cursor-pointer flex items-center justify-center shrink-0"
-        >
-          <MoreHorizontal size={14} />
-        </button>
+        {primaryBtn ? (
+          <>
+            <div className="flex-1">{primaryBtn}</div>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-9 h-9 border border-border/60 bg-neutral/5 hover:bg-hover text-text-info hover:text-text rounded-md transition-colors cursor-pointer flex items-center justify-center shrink-0"
+            >
+              <MoreHorizontal size={14} />
+            </button>
+          </>
+        ) : (
+          <AppButton
+            variant="neutral"
+            size="sm"
+            leftIcon={<History size={14} />}
+            onClick={() => setHistoryOpen(true)}
+            className="w-full text-xs py-2 bg-neutral/5 hover:bg-hover text-text font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer border border-border/60"
+          >
+            Transaction History
+          </AppButton>
+        )}
 
         {dropdownOpen && (
           <div className="absolute right-0 top-11 w-48 bg-card-bg border border-border shadow-lg rounded-lg py-1.5 z-50">

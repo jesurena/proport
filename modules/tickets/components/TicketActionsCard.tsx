@@ -12,7 +12,7 @@ import {
   UserPlus,
   UserCheck,
 } from 'lucide-react';
-import { AppAvatar, AppButton } from '@integrated-computer-system/ui-kit';
+import { AppAvatar, AppButton, AppLabel } from '@integrated-computer-system/ui-kit';
 import { STATUS_META, normalizeStatusKey } from '@/lib/types';
 import type { Ticket, TicketStatus } from '@/lib/types';
 import { useAuthStore } from '@/modules/auth';
@@ -146,29 +146,33 @@ export function TicketActionsCard({
         }}
       >
         <div className="flex items-center justify-between">
-          <span
-            className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center justify-center w-fit border"
+          <AppLabel
+            as="span"
+            variant="label"
+            className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1 w-fit select-none"
             style={{
-              backgroundColor: `${details.color}1c`,
               color: details.color,
-              borderColor: `${details.color}30`,
             }}
           >
             {details.icon}
             {statusMeta.label}
-          </span>
-          <span className="text-[11px] font-mono font-bold text-text-info/70 tracking-wider shrink-0 select-none">
+          </AppLabel>
+          <AppLabel
+            as="span"
+            variant="caption"
+            className="text-[11px] font-mono font-bold text-text-info/70 tracking-wider shrink-0 select-none"
+          >
             #{ticket.ticketNumber ? String(ticket.ticketNumber).padStart(4, '0') : ticket.id}
-          </span>
+          </AppLabel>
         </div>
 
         <div className="space-y-1">
-          <h4 className="text-xs font-bold text-text transition-colors">
+          <AppLabel as="h4" variant="title" className="!text-xs !font-bold text-text transition-colors">
             {details.heading}
-          </h4>
-          <p className="text-[11px] text-text-info leading-relaxed font-medium">
+          </AppLabel>
+          <AppLabel as="p" variant="description" className="!text-[11px] text-text-info leading-relaxed font-medium">
             {details.description}
-          </p>
+          </AppLabel>
         </div>
       </div>
 

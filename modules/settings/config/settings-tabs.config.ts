@@ -1,8 +1,9 @@
 import React from 'react';
-import { Settings, Shield } from 'lucide-react';
+import { Settings, Shield, UserCheck } from 'lucide-react';
 import { AuthUser } from '@/modules/auth/types/user';
 import GeneralTab from '../components/tabs/GeneralTab';
 import RolesTab from '../components/tabs/RolesTab';
+import AssignmentTab from '../components/tabs/AssignmentTab';
 
 export interface SettingsTabItem {
   id: string;
@@ -10,7 +11,7 @@ export interface SettingsTabItem {
   icon: React.ComponentType<any>;
   group: string;
   component: React.ComponentType<any>;
-  checkVisibility?: (user: AuthUser | null) => boolean;
+  checkVisibility?: (user: AuthUser | null, role: string) => boolean;
 }
 
 export const SETTINGS_TABS_CONFIG: SettingsTabItem[] = [
@@ -22,6 +23,14 @@ export const SETTINGS_TABS_CONFIG: SettingsTabItem[] = [
     component: GeneralTab,
   },
   {
+    id: 'assignment',
+    label: 'Assignment',
+    icon: UserCheck,
+    group: 'Preferences',
+    component: AssignmentTab,
+    checkVisibility: (user, role) => role === 'buyer',
+  },
+  {
     id: 'roles',
     label: 'Roles',
     icon: Shield,
@@ -31,8 +40,8 @@ export const SETTINGS_TABS_CONFIG: SettingsTabItem[] = [
   },
 ];
 
-export function getSettingsTabs(user: AuthUser | null): SettingsTabItem[] {
+export function getSettingsTabs(user: AuthUser | null, role: string): SettingsTabItem[] {
   return SETTINGS_TABS_CONFIG.filter(
-    (tab) => !tab.checkVisibility || tab.checkVisibility(user)
+    (tab) => !tab.checkVisibility || tab.checkVisibility(user, role)
   );
 }

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Slider } from 'antd';
 import { ShoppingBag } from 'lucide-react';
-import { AppLabel, AppDivider, cn } from '@integrated-computer-system/ui-kit';
+import { AppLabel, cn } from '@integrated-computer-system/ui-kit';
 import { ThemeCard } from '../ThemeCard';
 import { COLOR_THEMES } from '../../constants/themes';
 import { useTheme } from '@/components/Providers/theme-provider';
@@ -104,15 +104,6 @@ export default function GeneralTab() {
 
                 <AppLabel as="p" variant="description" className="mt-4 text-xs text-foreground/50">
                     Adjust the size of the text in the app to make it easier to read.
-                </AppLabel>
-            </div>
-
-            <AppDivider className="my-0" />
-
-            <div>
-                <AppLabel as="h3" variant="title">Language</AppLabel>
-                <AppLabel as="p" variant="description" className="mt-1">
-                    Interface language is currently set to English.
                 </AppLabel>
             </div>
         </div>

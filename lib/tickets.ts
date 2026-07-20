@@ -5,13 +5,13 @@ import { SEED_TICKETS, SEED_USERS, SEED_BUSINESS_UNITS, INITIAL_NEXT_TICKET_NUMB
 // ─── Seeding ────────────────────────────────────────────────────────────────
 
 export function ensureSeeded(): void {
-  const seeded = getItem<boolean>(STORAGE_KEYS.SEEDED, false);
+  const seeded = getItem<boolean>('proport_seeded_v3', false);
   if (!seeded) {
-    setItem(STORAGE_KEYS.TICKETS, SEED_TICKETS);
-    setItem(STORAGE_KEYS.USERS, SEED_USERS);
-    setItem(STORAGE_KEYS.BUSINESS_UNITS, SEED_BUSINESS_UNITS);
-    setItem(STORAGE_KEYS.NEXT_TICKET_NUMBER, INITIAL_NEXT_TICKET_NUMBER);
-    setItem(STORAGE_KEYS.SEEDED, true);
+    setItem(STORAGE_KEYS.TICKETS, []);
+    setItem(STORAGE_KEYS.USERS, []);
+    setItem(STORAGE_KEYS.BUSINESS_UNITS, []);
+    setItem(STORAGE_KEYS.NEXT_TICKET_NUMBER, 1000000);
+    setItem('proport_seeded_v3', true);
   }
 }
 
