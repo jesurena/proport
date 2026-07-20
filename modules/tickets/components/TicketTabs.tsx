@@ -2,32 +2,20 @@
 
 import React from 'react';
 import { AppTabs } from '@/components/ui';
-
-const STATUS_TABS = [
-  { id: 'all', label: 'All' },
-  { id: 'focus', label: 'Focus' },
-  { id: 'non-focus', label: 'Non Focus' },
-  { id: 'bu-approval', label: 'BU Head Approval' },
-  { id: 'bu-declined', label: 'BU Head Declined' },
-  { id: 'final-approval', label: 'Final Approval' },
-  { id: 'adel-declined', label: 'Declined by Adel' },
-];
+import { AuthUser } from '@/modules/auth/types/user';
+import { getTicketTabs } from '../config/ticket-tabs.config';
 
 interface TicketTabsProps {
   activeTab: string;
   onChange: (tabId: string) => void;
+  user: AuthUser | null;
   role: string;
 }
 
-export function TicketTabs({ activeTab, onChange, role }: TicketTabsProps) {
+export function TicketTabs({ activeTab, onChange, user, role }: TicketTabsProps) {
   const displayedTabs = React.useMemo(() => {
-    if (role === 'sales') {
-      return STATUS_TABS.filter(
-        (tab) => tab.id !== 'final-approval' && tab.id !== 'adel-declined'
-      );
-    }
-    return STATUS_TABS;
-  }, [role]);
+    return getTicketTabs(user, role);
+  }, [user, role]);
 
   return (
     <AppTabs

@@ -15,7 +15,7 @@ import SearchModal from '@/components/SearchModal';
 import { ComposeModal, useComposeStore } from '@/modules/compose';
 import SidebarAppDropdown from './SidebarAppDropdown';
 import UserProfile from './UserProfile';
-import { getSidebarGroups } from './SidebarGroups';
+import { getSidebarGroups } from '../config/sidebar.config';
 import { useAuthStore } from '@/modules/auth';
 
 export default function ProportSidebar() {

@@ -20,6 +20,7 @@ export function useTicketFilters() {
   const [sortBy, setSortBy] = useState<'recent' | 'oldest' | 'price-desc' | 'price-asc' | 'qty-desc'>('recent');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedBrandTypes, setSelectedBrandTypes] = useState<string[]>([]);
+  const [myTicketsOnly, setMyTicketsOnly] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -91,7 +92,7 @@ export function useTicketFilters() {
     };
   }, [activeTab, statusParam, searchQuery]);
 
-  const activeFiltersCount = selectedStatuses.length + selectedBrandTypes.length;
+  const activeFiltersCount = selectedStatuses.length + selectedBrandTypes.length + (myTicketsOnly ? 1 : 0);
 
   return {
     searchQuery,
@@ -104,6 +105,8 @@ export function useTicketFilters() {
     setSelectedStatuses,
     selectedBrandTypes,
     setSelectedBrandTypes,
+    myTicketsOnly,
+    setMyTicketsOnly,
     sortOpen,
     setSortOpen,
     filterOpen,

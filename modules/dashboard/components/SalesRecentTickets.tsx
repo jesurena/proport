@@ -7,7 +7,7 @@ import { AppLabel, AppButton, AppCard, AppBookmark, AppChip } from '@/components
 import { modal } from '@/modules/theme';
 import { STATUS_META } from '@/lib/types';
 import type { Ticket as TicketType } from '@/lib/types';
-import { getTickets } from '@/lib/tickets';
+import { useRecentTickets } from '../hooks/useDashboard';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 import { useAuthStore } from '@/modules/auth';
 
@@ -45,17 +45,25 @@ export default function SalesRecentTickets() {
     };
   }, []);
 
-  const allTickets = getTickets();
-  const activeUserId = role === 'sales' ? 'user-7' : 'user-1';
+  const { data: recentTickets = [], isLoading } = useRecentTickets();
 
-  // Filter to show last 6 tickets of the active user
-  const userTickets = allTickets.filter((t) => t.requesterId === activeUserId);
-  const sortedTickets = [...userTickets].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  const displayTickets = sortedTickets.slice(0, 6);
+  // Filter to show last 6 tickets (already sorted descending by date_created from backend)
+  const displayTickets = recentTickets.slice(0, 6);
 
   const itemsPerPage = 3;
   const startIndex = page * itemsPerPage;
   const visibleTickets = displayTickets.slice(startIndex, startIndex + itemsPerPage);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <AppLabel as="h3" variant="subtitle">Your Recent Tickets</AppLabel>
+        <div className="py-12 text-center text-text-info text-xs font-semibold">
+          Loading recent tickets...
+        </div>
+      </div>
+    );
+  }
 
   const handleToggleBookmark = (ticketId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,12 +119,14 @@ export default function SalesRecentTickets() {
       </div>
 
       {visibleTickets.length === 0 ? (
-        <AppEmptyState
-          title="No recent tickets"
-          description="Create your first ticket to start comparing options."
-          imageSrc="/aria-mascott-sad.svg"
-          imageSize={70}
-        />
+        <AppCard variant="default">
+          <AppEmptyState
+            title="No recent tickets"
+            description="Create your first ticket to start comparing options."
+            imageSrc="/aria-mascott-sad.svg"
+            imageSize={70}
+          />
+        </AppCard>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {visibleTickets.map((ticket) => {

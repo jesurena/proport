@@ -11,4 +11,5 @@ export interface AuthUser {
     DomainAccount: string | null;
     avatar: string | null;
     isDeveloper: boolean;
+    is_head?: boolean;
 }

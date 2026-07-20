@@ -71,4 +71,9 @@ export const dashboardService = {
     });
     return data.data || [];
   },
+
+  async getRecentTickets(): Promise<any[]> {
+    const { data } = await api.get('/dashboard/recent-tickets');
+    return data.data || [];
+  },
 };

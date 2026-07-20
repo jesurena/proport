@@ -1,44 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Settings, Shield, X } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { X } from 'lucide-react';
 import { AppButton, AppModal, AppTabs } from '@/components/ui';
-import type { TabItem } from '@/components/ui/tabs';
-import GeneralTab from './tabs/GeneralTab';
-import RolesTab from './tabs/RolesTab';
 import { useAuthStore } from '@/modules/auth';
+import { getSettingsTabs } from '../config/settings-tabs.config';
 
 interface SettingsModalProps {
     visible: boolean;
     onClose: () => void;
 }
 
-const settingsTabs: TabItem[] = [
-    {
-        id: 'general',
-        label: 'General',
-        icon: Settings,
-        group: 'Preferences',
-    },
-    {
-        id: 'roles',
-        label: 'Roles',
-        icon: Shield,
-        group: 'Preferences',
-    },
-];
-
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
     const [activeTab, setActiveTab] = useState('general');
     const { user } = useAuthStore();
-    const isDeveloper = user?.isDeveloper ?? false;
 
-    const visibleTabs = settingsTabs.filter(tab => {
-        if (tab.id === 'roles' && !isDeveloper) {
-            return false;
-        }
-        return true;
-    });
+    const visibleTabs = useMemo(() => getSettingsTabs(user), [user]);
+
+    const activeTabConfig = visibleTabs.find(tab => tab.id === activeTab) || visibleTabs[0];
+    const ActiveComponent = activeTabConfig?.component;
 
     return (
         <AppModal
@@ -70,8 +50,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
                 />
 
                 <div className="flex-1 overflow-y-auto p-5 md:p-8">
-                    {activeTab === 'general' && <GeneralTab />}
-                    {activeTab === 'roles' && <RolesTab />}
+                    {ActiveComponent && <ActiveComponent />}
                 </div>
             </AppModal.Body>
         </AppModal>

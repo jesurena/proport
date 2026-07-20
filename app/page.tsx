@@ -3,16 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { ProportNavbar } from '@/modules/sidebar';
 import {
-  SalesDashboard,
-  BuyerDashboard,
-  useDashboard,
-  useDashboardStats
+  Dashboard,
+  useDashboard
 } from '@/modules/dashboard';
 import { useAuthStore } from '@/modules/auth';
 
 export default function DashboardPage() {
-  const { counts, allTickets, recentTickets, isLoading } = useDashboard();
-  const { totalCount, getCount } = useDashboardStats(allTickets);
+  const { counts } = useDashboard();
 
   const [role, setRole] = useState<string | null>(null);
   const { user } = useAuthStore();
@@ -37,22 +34,8 @@ export default function DashboardPage() {
           <div className="p-12 text-center text-text-info text-sm">
             Loading dashboard...
           </div>
-        ) : role === 'sales' ? (
-          <SalesDashboard
-            counts={counts}
-            totalCount={totalCount}
-            recentTickets={recentTickets}
-            allTickets={allTickets}
-            getCount={getCount}
-          />
         ) : (
-          <BuyerDashboard
-            counts={counts}
-            totalCount={totalCount}
-            recentTickets={recentTickets}
-            allTickets={allTickets}
-            getCount={getCount}
-          />
+          <Dashboard role={role} counts={counts} />
         )}
       </div>
     </>

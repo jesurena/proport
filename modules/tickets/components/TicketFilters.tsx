@@ -15,6 +15,8 @@ interface TicketFiltersProps {
   setSelectedStatuses: React.Dispatch<React.SetStateAction<string[]>>;
   selectedBrandTypes: string[];
   setSelectedBrandTypes: React.Dispatch<React.SetStateAction<string[]>>;
+  myTicketsOnly: boolean;
+  setMyTicketsOnly: (val: boolean) => void;
   sortOpen: boolean;
   setSortOpen: (open: boolean) => void;
   filterOpen: boolean;
@@ -31,12 +33,26 @@ export function TicketFilters({
   setSelectedStatuses,
   selectedBrandTypes,
   setSelectedBrandTypes,
+  myTicketsOnly,
+  setMyTicketsOnly,
   sortOpen,
   setSortOpen,
   filterOpen,
   setFilterOpen,
   activeFiltersCount,
 }: TicketFiltersProps) {
+  const [tempStatuses, setTempStatuses] = React.useState<string[]>(selectedStatuses);
+  const [tempBrandTypes, setTempBrandTypes] = React.useState<string[]>(selectedBrandTypes);
+  const [tempMyTicketsOnly, setTempMyTicketsOnly] = React.useState<boolean>(myTicketsOnly);
+
+  React.useEffect(() => {
+    if (filterOpen) {
+      setTempStatuses(selectedStatuses);
+      setTempBrandTypes(selectedBrandTypes);
+      setTempMyTicketsOnly(myTicketsOnly);
+    }
+  }, [filterOpen, selectedStatuses, selectedBrandTypes, myTicketsOnly]);
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center w-full">
       <div className="flex-1 min-w-0">
@@ -98,16 +114,40 @@ export function TicketFilters({
           onOpenChange={setFilterOpen}
           title="Filter Tickets"
           onResetAll={() => {
+            setTempStatuses([]);
+            setTempBrandTypes([]);
+            setTempMyTicketsOnly(false);
             setSelectedStatuses([]);
             setSelectedBrandTypes([]);
+            setMyTicketsOnly(false);
+            setFilterOpen(false);
           }}
-          onApply={() => setFilterOpen(false)}
+          onApply={() => {
+            setSelectedStatuses(tempStatuses);
+            setSelectedBrandTypes(tempBrandTypes);
+            setMyTicketsOnly(tempMyTicketsOnly);
+            setFilterOpen(false);
+          }}
           onClose={() => setFilterOpen(false)}
         >
+          <AppFilterPopover.Group title="Scope">
+            <div className="flex flex-col gap-1 p-1">
+              <label className="flex items-center gap-2 px-2 py-1.5 hover:bg-hover rounded-lg cursor-pointer text-xs text-text font-semibold">
+                <input
+                  type="checkbox"
+                  checked={tempMyTicketsOnly}
+                  onChange={(e) => setTempMyTicketsOnly(e.target.checked)}
+                  className="rounded border-border text-accent-1 focus:ring-accent-1"
+                />
+                My Tickets Only
+              </label>
+            </div>
+          </AppFilterPopover.Group>
+
           <AppFilterPopover.Group title="Brand Type">
             <div className="flex flex-col gap-1 p-1">
               {['Focus', 'Non Focus'].map((brandType) => {
-                const isChecked = selectedBrandTypes.includes(brandType);
+                const isChecked = tempBrandTypes.includes(brandType);
                 return (
                   <label
                     key={brandType}
@@ -117,7 +157,7 @@ export function TicketFilters({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => {
-                        setSelectedBrandTypes((prev) =>
+                        setTempBrandTypes((prev) =>
                           isChecked ? prev.filter((b) => b !== brandType) : [...prev, brandType]
                         );
                       }}
@@ -137,7 +177,7 @@ export function TicketFilters({
                   ['unassigned', 'bu-declined', 'pending', 'answered', 'closed', 'reassigned'].includes(statusKey)
                 )
                 .map(([statusKey, meta]) => {
-                  const isChecked = selectedStatuses.includes(statusKey);
+                  const isChecked = tempStatuses.includes(statusKey);
                   return (
                     <label
                       key={statusKey}
@@ -147,7 +187,7 @@ export function TicketFilters({
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => {
-                          setSelectedStatuses((prev) =>
+                          setTempStatuses((prev) =>
                             isChecked ? prev.filter((s) => s !== statusKey) : [...prev, statusKey]
                           );
                         }}

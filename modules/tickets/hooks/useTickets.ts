@@ -9,11 +9,13 @@ export const useTickets = (params?: {
   sort_by?: string;
   status?: string;
   brand_type?: string;
+  my_tickets?: string;
 }) => {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsService.getTickets(params),
     refetchInterval: 10000,
+    refetchIntervalInBackground: false,
   });
 };
 
@@ -23,6 +25,7 @@ export const useTicketDetail = (id: string) => {
     queryFn: () => ticketsService.getTicketById(id),
     enabled: !!id,
     refetchInterval: 10000,
+    refetchIntervalInBackground: false,
   });
 };
 

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AppLabel, AppTable, AppButton, AppCard, AppAvatar } from '@/components/ui';
 import type { Ticket as TicketType } from '@/lib/types';
 import { getUsers } from '@/lib/tickets';
 import { STATUS_META } from '@/lib/types';
+import { useAuthStore } from '@/modules/auth';
+import { getDashboardTabs } from '../config/dashboard-tabs.config';
 import { useTicketCountAo, useChartPerBu, useBuyerCategoryCounts, useBuyerDateCounts } from '../hooks/useDashboard';
 
 const COLORS = [
@@ -27,6 +29,29 @@ const COLORS = [
 export default function DashboardTicketCountAo() {
   const [activeTab, setActiveTab] = useState<'ao' | 'bu' | 'buyer-date' | 'buyer-category'>('ao');
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
+
+  const { user } = useAuthStore();
+  const [role, setRole] = useState<string>('super_user');
+
+  useEffect(() => {
+    const storedRole = typeof window !== 'undefined' ? localStorage.getItem('proport_my_role') : null;
+    const isDeveloper = user?.isDeveloper ?? false;
+    const actualRole = user?.role_name ?? 'buyer';
+
+    if (isDeveloper && storedRole) {
+      setRole(storedRole);
+    } else {
+      setRole(actualRole);
+    }
+  }, [user]);
+
+  const tabs = useMemo(() => getDashboardTabs(user, role), [user, role]);
+
+  useEffect(() => {
+    if (tabs.length > 0 && !tabs.some(t => t.id === activeTab)) {
+      setActiveTab(tabs[0].id);
+    }
+  }, [tabs, activeTab]);
 
   const [aoParams, setAoParams] = useState({ page: 1, per_page: 10, sort_field: 'AccountName', sort_order: 'asc' as 'asc' | 'desc' });
   const [buyerCategoryParams, setBuyerCategoryParams] = useState({ page: 1, per_page: 10, sort_field: 'AccountName', sort_order: 'asc' as 'asc' | 'desc' });
@@ -288,42 +313,19 @@ export default function DashboardTicketCountAo() {
     <div className="space-y-4">
       {/* Dynamic Tab Navigation Header */}
       <div className="flex border-b border-border/40 select-none">
-        <button
-          onClick={() => setActiveTab('ao')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'ao'
-              ? 'border-accent-1 text-accent-1'
-              : 'border-transparent text-text-info'
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${
+              activeTab === tab.id
+                ? 'border-accent-1 text-accent-1'
+                : 'border-transparent text-text-info'
             }`}
-        >
-          Ticket Count per AO & Category
-        </button>
-        <button
-          onClick={() => setActiveTab('bu')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'bu'
-              ? 'border-accent-1 text-accent-1'
-              : 'border-transparent text-text-info'
-            }`}
-        >
-          Tickets per BU
-        </button>
-        <button
-          onClick={() => setActiveTab('buyer-date')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'buyer-date'
-              ? 'border-accent-1 text-accent-1'
-              : 'border-transparent text-text-info'
-            }`}
-        >
-          Ticket Count per Buyer & Date
-        </button>
-        <button
-          onClick={() => setActiveTab('buyer-category')}
-          className={`px-4 py-2.5 text-xs font-bold transition-all border-b-2 hover:text-accent-1 cursor-pointer ${activeTab === 'buyer-category'
-              ? 'border-accent-1 text-accent-1'
-              : 'border-transparent text-text-info'
-            }`}
-        >
-          Ticket Count per Buyer & Category
-        </button>
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {activeTab === 'ao' && (

@@ -3,8 +3,7 @@ export { default as DashboardMetricCard } from './components/DashboardMetricCard
 export { default as SalesRecentTickets } from './components/SalesRecentTickets';
 export { default as DashboardFocusBreakdown } from './components/DashboardFocusBreakdown';
 export { default as DashboardTicketPerBuyer } from './components/DashboardTicketPerBuyer';
-export { default as SalesDashboard } from './components/SalesDashboard';
-export { default as BuyerDashboard } from './components/BuyerDashboard';
+export { default as Dashboard } from './components/Dashboard';
 export { default as DashboardTicketCountAo } from './components/DashboardTicketCountAo';
 export { default as DashboardBookmarkedTickets } from './components/DashboardBookmarkedTickets';
 export * from './hooks/useDashboard';

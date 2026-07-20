@@ -37,6 +37,8 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     setSelectedStatuses,
     selectedBrandTypes,
     setSelectedBrandTypes,
+    myTicketsOnly,
+    setMyTicketsOnly,
     sortOpen,
     setSortOpen,
     filterOpen,
@@ -62,8 +64,9 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
       sort_by: sortBy,
       status: statusVal,
       brand_type: brandTypeVal,
+      my_tickets: myTicketsOnly ? 'true' : undefined,
     };
-  }, [page, pageSize, activeTab, searchQuery, sortBy, selectedStatuses, selectedBrandTypes]);
+  }, [page, pageSize, activeTab, searchQuery, sortBy, selectedStatuses, selectedBrandTypes, myTicketsOnly]);
 
   const { data, isLoading } = useTickets(queryParams);
 
@@ -142,7 +145,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
           {/* Creator avatar */}
           <AppAvatar
             name={record.requesterName}
-            src={`https://api.dicebear.com/7.x/initials/svg?seed=${record.requesterName}`}
+            src={record.GAvatarReq || `https://api.dicebear.com/7.x/initials/svg?seed=${record.requesterName}`}
             size={36}
             className="shrink-0"
           />
@@ -298,6 +301,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
         <TicketTabs
           activeTab={activeTab}
           onChange={handleTabChange}
+          user={user}
           role={role}
         />
       )}
@@ -313,6 +317,8 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
           setSelectedStatuses={setSelectedStatuses}
           selectedBrandTypes={selectedBrandTypes}
           setSelectedBrandTypes={setSelectedBrandTypes}
+          myTicketsOnly={myTicketsOnly}
+          setMyTicketsOnly={setMyTicketsOnly}
           sortOpen={sortOpen}
           setSortOpen={setSortOpen}
           filterOpen={filterOpen}

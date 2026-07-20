@@ -9,6 +9,7 @@ export const ticketsService = {
     sort_by?: string;
     status?: string;
     brand_type?: string;
+    my_tickets?: string;
   }): Promise<{
     data: any[];
     total: number;

@@ -91,6 +91,7 @@ export interface Ticket {
   customerName?: string;
   projectName?: string;
   brandName?: string;
+  GAvatarReq?: string;
 }
 
 // ─── Stat Types ─────────────────────────────────────────────────────────────
@@ -135,9 +136,43 @@ export const STATUS_META: Record<TicketStatus, { label: string; color: string; c
   'declined-by-final-approver': { label: 'Declined by Final Approver', color: '#ef4444', chipVariant: 'adel-declined' },
 };
 
+export function normalizeStatusKey(status: string | undefined | null, status_id?: number): TicketStatus {
+  if (status_id === 5) return 'bu-approval';
+  if (status_id === 6) return 'bu-declined';
+  if (status_id === 7) return 'final-approval';
+  if (status_id === 8) return 'adel-declined';
+  if (status_id === 1) return 'pending';
+  if (status_id === 2) return 'answered';
+  if (status_id === 3) return 'closed';
+
+  const s = String(status || '').toLowerCase().trim();
+  if (s === 'bu-approval' || s === 'for approval of bu head' || s === 'for-approval-of-bu-head') {
+    return 'bu-approval';
+  }
+  if (s === 'final-approval' || s === 'for final approval' || s === 'for-final-approval') {
+    return 'final-approval';
+  }
+  if (s === 'bu-declined' || s === 'declined by bu head' || s === 'declined-by-bu-head') {
+    return 'bu-declined';
+  }
+  if (s === 'adel-declined' || s === 'declined by final approver' || s === 'declined-by-final-approver') {
+    return 'adel-declined';
+  }
+  if (s === 'answered') return 'answered';
+  if (s === 'closed') return 'closed';
+  if (s === 'assigned') return 'assigned';
+  if (s === 'reassigned') return 'reassigned';
+  if (s === 'unassigned') return 'unassigned';
+  if (s === 'pending') return 'pending';
+  if (s === 'escalated') return 'escalated';
+
+  return (s as TicketStatus) || 'pending';
+}
+
 export const PRIORITY_META: Record<TicketPriority, { label: string; color: string }> = {
   low:      { label: 'Low',      color: '#6b7280' },
   medium:   { label: 'Medium',   color: '#f59e0b' },
   high:     { label: 'High',     color: '#ef4444' },
   critical: { label: 'Critical', color: '#dc2626' },
 };
+

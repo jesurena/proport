@@ -40,6 +40,7 @@ const mapTicket = (t: any): TicketType => {
     tags: [],
     customerName: t.customer_name || undefined,
     projectName: t.project_name || undefined,
+    GAvatarReq: t.GAvatarReq || undefined,
   };
 };
 
@@ -149,6 +150,16 @@ export const useBuyerPeriodTickets = (buyer: string | null, period: 'today' | 'w
       return dashboardService.getBuyerPeriodTickets(buyer, period);
     },
     enabled: !!buyer,
+  });
+};
+
+export const useRecentTickets = () => {
+  return useQuery<TicketType[]>({
+    queryKey: ['recent-tickets'],
+    queryFn: async () => {
+      const data = await dashboardService.getRecentTickets();
+      return data.map(mapTicket);
+    },
   });
 };
 
