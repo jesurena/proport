@@ -86,3 +86,15 @@ export const useCcUsers = (enabled = true) => {
     enabled,
   });
 };
+
+export const useSearchTickets = (search: string, enabled = true) => {
+  return useQuery({
+    queryKey: ['tickets-search', search],
+    queryFn: () => ticketsService.searchTickets(search),
+    enabled: enabled && search.length >= 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: 30000, // Cache search results for 30s
+  });
+};

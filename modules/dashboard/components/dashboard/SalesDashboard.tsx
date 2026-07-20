@@ -8,11 +8,11 @@ import DashboardTicketCountAo from '../DashboardTicketCountAo';
 import DashboardFocusBreakdown from '../DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from '../DashboardBookmarkedTickets';
 
-interface SalesDashboardProps {
-  counts: any;
-}
+import { useDashboard } from '../../hooks/useDashboard';
 
-export default function SalesDashboard({ counts }: SalesDashboardProps) {
+export default function SalesDashboard() {
+  const { counts } = useDashboard();
+
   return (
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}

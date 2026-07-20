@@ -3,23 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { ProportNavbar } from '@/modules/sidebar';
 import {
-  Dashboard,
-  useDashboard,
-  useAdelCounts,
-  useBuHeadCounts
+  Dashboard
 } from '@/modules/dashboard';
 import { useAuthStore } from '@/modules/auth';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const isAdel = user?.is_adel ?? false;
-  const isHead = user?.is_head ?? false;
-
-  const { counts: standardCounts } = useDashboard();
-  const { data: adelCounts } = useAdelCounts();
-  const { data: buHeadCounts } = useBuHeadCounts();
-
-  const counts = isAdel ? adelCounts : (isHead ? buHeadCounts : standardCounts);
 
   const [role, setRole] = useState<string | null>(null);
   const isDeveloper = user?.isDeveloper ?? false;
@@ -44,7 +33,7 @@ export default function DashboardPage() {
             Loading dashboard...
           </div>
         ) : (
-          <Dashboard role={role} counts={counts} />
+          <Dashboard role={role} />
         )}
       </div>
     </>

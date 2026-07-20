@@ -57,4 +57,9 @@ export const ticketsService = {
     const { data } = await api.get('/cc-users');
     return data;
   },
+
+  async searchTickets(search: string): Promise<any[]> {
+    const { data } = await api.get('/tickets/search', { params: { search } });
+    return data;
+  },
 };

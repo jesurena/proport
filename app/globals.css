@@ -311,13 +311,11 @@ body {
   font-weight: 600 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-  padding: 10px 24px !important;
   border-bottom: 1px solid var(--border) !important;
   color: var(--text-info) !important;
 }
 
 .app-table-wrapper .ant-table-tbody>tr>td {
-  padding: 10px 24px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
   color: var(--text) !important;

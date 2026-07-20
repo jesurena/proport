@@ -7,23 +7,21 @@ import DashboardTicketCountAo from '../DashboardTicketCountAo';
 import DashboardFocusBreakdown from '../DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from '../DashboardBookmarkedTickets';
 
-interface AdelDashboardProps {
-  counts: any;
-}
+import { useAdelCounts } from '../../hooks/useAdel';
 
-export default function AdelDashboard({ counts }: AdelDashboardProps) {
+export default function AdelDashboard() {
+  const { data: counts } = useAdelCounts();
+
   return (
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="adel" counts={counts} />
         <DashboardMetricCard counts={counts} />
-        <DashboardTicketCountAo />
       </div>
 
       {/* ── RIGHT COLUMN ── */}
       <div className="xl:w-[300px] shrink-0 space-y-4">
-        <DashboardFocusBreakdown />
         <DashboardBookmarkedTickets />
       </div>
     </div>

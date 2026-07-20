@@ -7,25 +7,24 @@ import BUHeadDashboard from './BUHeadDashboard';
 
 interface DashboardProps {
   role: string;
-  counts: any;
 }
 
-export default function Dashboard({ role, counts }: DashboardProps) {
+export default function Dashboard({ role }: DashboardProps) {
   const { is_adel, is_head } = useAuthStore();
 
   if (role === 'buyer' || role === 'admin' || role === 'super_user') {
-    return <BuyerDashboard role={role} counts={counts} />;
+    return <BuyerDashboard role={role} />;
   }
   if (is_adel) {
-    return <AdelDashboard counts={counts} />;
+    return <AdelDashboard />;
   }
   if (is_head) {
-    return <BUHeadDashboard counts={counts} />;
+    return <BUHeadDashboard />;
   }
   if (role === 'sales' || role === 'requestor') {
-    return <SalesDashboard counts={counts} />;
+    return <SalesDashboard />;
   }
 
   // Fallback
-  return <SalesDashboard counts={counts} />;
+  return <SalesDashboard />;
 }

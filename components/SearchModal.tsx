@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppModal, AppInput, AppCard } from '@integrated-computer-system/ui-kit';
 import { Ticket as TicketIcon, ArrowRight, Loader2 } from 'lucide-react';
-import { getTickets } from '@/lib/tickets';
+import { useSearchTickets } from '@/modules/tickets/hooks/useTickets';
 import type { Ticket } from '@/lib/types';
 
 interface SearchModalProps {
@@ -15,40 +15,41 @@ interface SearchModalProps {
 export default function SearchModal({ open, onClose }: SearchModalProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
   useEffect(() => {
     if (!open) {
       setSearchQuery('');
+      setDebouncedQuery('');
     }
   }, [open]);
 
   useEffect(() => {
-    if (searchQuery) {
-      setLoading(true);
-      const t = setTimeout(() => setLoading(false), 200);
-      return () => clearTimeout(t);
-    } else {
-      setLoading(false);
+    if (!searchQuery) {
+      setDebouncedQuery('');
+      return;
     }
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(handler);
   }, [searchQuery]);
 
+  const { data, isLoading } = useSearchTickets(debouncedQuery, open);
+
+  const loading = isLoading || searchQuery !== debouncedQuery;
+
   const filteredTickets = useMemo(() => {
-    const allTickets = getTickets();
-    if (!searchQuery) {
-      // Show first 5 tickets as quick suggestions when search is empty
-      return allTickets.slice(0, 5);
-    }
-    const q = searchQuery.toLowerCase();
-    return allTickets.filter(
-      (t) =>
-        t.subject.toLowerCase().includes(q) ||
-        (t.description && t.description.toLowerCase().includes(q)) ||
-        t.requesterName.toLowerCase().includes(q) ||
-        (t.supplierName && t.supplierName.toLowerCase().includes(q)) ||
-        String(t.ticketNumber).includes(q)
-    );
-  }, [searchQuery]);
+    const list = Array.isArray(data) ? data : [];
+    return list.map((t: any) => ({
+      id: String(t.ticket_id),
+      ticketNumber: t.ticket_id,
+      subject: t.subject,
+      requesterName: t.requestor_name || t.ao_name || 'System',
+      businessUnitName: t.ao_group || t.AccountGroup || 'N/A',
+      supplierName: t.customer_name || '',
+    }));
+  }, [data]);
 
   const handleSelectTicket = (id: string) => {
     router.push(`/tickets/${id}`);

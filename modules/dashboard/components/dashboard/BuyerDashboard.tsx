@@ -8,12 +8,15 @@ import DashboardFocusBreakdown from '../DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from '../DashboardBookmarkedTickets';
 import DashboardTicketPerBuyer from '../DashboardTicketPerBuyer';
 
+import { useDashboard } from '../../hooks/useDashboard';
+
 interface BuyerDashboardProps {
   role: string;
-  counts: any;
 }
 
-export default function BuyerDashboard({ role, counts }: BuyerDashboardProps) {
+export default function BuyerDashboard({ role }: BuyerDashboardProps) {
+  const { counts } = useDashboard();
+
   return (
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}
