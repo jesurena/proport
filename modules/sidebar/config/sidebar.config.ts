@@ -56,7 +56,6 @@ const SIDEBAR_STRUCTURE: SidebarGroupConfig[] = [
         href: '/reports',
         icon: FileBarChart,
         isWip: true,
-        checkVisibility: (user, role) => role === 'super_user' || user?.AccountGroup === 'PMD',
       },
     ],
   },
@@ -84,10 +83,16 @@ const SIDEBAR_STRUCTURE: SidebarGroupConfig[] = [
           {
             name: 'BU Head Approval',
             href: '/tickets?tab=bu-approval',
+            checkVisibility: (user, role) => {
+              return !!user?.is_head || ['admin', 'buyer', 'super_user'].includes(role);
+            },
           },
           {
             name: 'Declined by BU Head',
             href: '/tickets?tab=bu-declined',
+            checkVisibility: (user, role) => {
+              return !!user?.is_head || ['admin', 'buyer', 'super_user'].includes(role);
+            },
           },
           {
             name: 'Final Approval',
@@ -96,7 +101,7 @@ const SIDEBAR_STRUCTURE: SidebarGroupConfig[] = [
               const isAdelGroup = ['BU1', 'BU2', 'BU5', 'BU10', 'CE01'].includes(
                 user?.AccountGroup || ''
               );
-              return isAdelGroup || role === 'adel' || ['admin', 'buyer', 'super_user'].includes(role);
+              return isAdelGroup || !!user?.is_adel || ['admin', 'buyer', 'super_user'].includes(role);
             },
           },
           {
@@ -106,7 +111,7 @@ const SIDEBAR_STRUCTURE: SidebarGroupConfig[] = [
               const isAdelGroup = ['BU1', 'BU2', 'BU5', 'BU10', 'CE01'].includes(
                 user?.AccountGroup || ''
               );
-              return isAdelGroup || role === 'adel' || ['admin', 'buyer', 'super_user'].includes(role);
+              return isAdelGroup || !!user?.is_adel || ['admin', 'buyer', 'super_user'].includes(role);
             },
           },
           { name: 'Pending Tickets', href: '/tickets?tab=non-focus&status=pending' },

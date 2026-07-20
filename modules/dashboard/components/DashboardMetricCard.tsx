@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Inbox, Clock, Zap, ShieldAlert, BookOpen, CheckCircle } from 'lucide-react';
 import { AppLabel, AppButton, AppCard } from '@/components/ui';
+import { useAuthStore } from '@/modules/auth';
 import type { Ticket as TicketType } from '@/lib/types';
 
 interface DashboardMetricCardProps {
@@ -11,6 +12,7 @@ interface DashboardMetricCardProps {
 export default function DashboardMetricCard({ counts }: DashboardMetricCardProps) {
   const router = useRouter();
   const [showAllCards, setShowAllCards] = useState(false);
+  const { is_adel, is_head } = useAuthStore();
 
   // 1. New Tickets Today (created in the last 24 hours)
   const newTicketsTodayCount = counts?.ticket_today ?? 0;
@@ -30,24 +32,38 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
   // 6. My Closed Tickets (status === 'closed')
   const closedCount = counts?.ticket_closed ?? 0;
 
-  const initialCards = [
-    { label: 'New Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
-    { label: 'My Pending Tickets', count: pendingCount, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
-    { label: 'My Focus Tickets', count: focusCount, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
-  ];
+  const initialCards = (is_adel || is_head)
+    ? [
+        { label: 'My Groups Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
+        { label: 'My Groups Pending Tickets', count: pendingCount, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
+        { label: 'My Groups Focus Tickets', count: focusCount, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
+      ]
+    : [
+        { label: 'New Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
+        { label: 'My Pending Tickets', count: pendingCount, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
+        { label: 'My Focus Tickets', count: focusCount, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
+      ];
 
-  const extraCards = [
-    { label: 'My Non Focus Tickets', count: nonFocusCount, status: 'non-focus', icon: <ShieldAlert size={18} />, iconBg: 'bg-pink-500/10', iconColor: 'text-pink-600' },
-    { label: 'My Open Tickets', count: openCount, status: 'open', icon: <BookOpen size={18} />, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600' },
-    { label: 'My Closed Tickets', count: closedCount, status: 'closed', icon: <CheckCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
-  ];
+  const extraCards = (is_adel || is_head)
+    ? [
+        { label: 'My Groups Non Focus Tickets', count: nonFocusCount, status: 'non-focus', icon: <ShieldAlert size={18} />, iconBg: 'bg-pink-500/10', iconColor: 'text-pink-600' },
+        { label: 'My Groups Open Tickets', count: openCount, status: 'open', icon: <BookOpen size={18} />, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600' },
+        { label: 'My Groups Closed Tickets', count: closedCount, status: 'closed', icon: <CheckCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
+      ]
+    : [
+        { label: 'My Non Focus Tickets', count: nonFocusCount, status: 'non-focus', icon: <ShieldAlert size={18} />, iconBg: 'bg-pink-500/10', iconColor: 'text-pink-600' },
+        { label: 'My Open Tickets', count: openCount, status: 'open', icon: <BookOpen size={18} />, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600' },
+        { label: 'My Closed Tickets', count: closedCount, status: 'closed', icon: <CheckCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
+      ];
 
   const cardsToRender = showAllCards ? [...initialCards, ...extraCards] : initialCards;
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <AppLabel as="h3" variant="subtitle">Status Overview</AppLabel>
+        <AppLabel as="h3" variant="subtitle">
+          {is_adel || is_head ? 'My Group Status Overview' : 'Status Overview'}
+        </AppLabel>
         <AppButton
           variant="link"
           size="sm"

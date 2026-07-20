@@ -12,4 +12,5 @@ export interface AuthUser {
     avatar: string | null;
     isDeveloper: boolean;
     is_head?: boolean;
+    is_adel?: boolean;
 }

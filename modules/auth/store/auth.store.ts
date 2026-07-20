@@ -5,6 +5,8 @@ import type { AuthUser } from '../types/user';
 interface AuthState {
     token: string | null;
     user: AuthUser | null;
+    is_head: boolean;
+    is_adel: boolean;
     setToken: (token: string | null) => void;
     setUser: (user: AuthUser | null) => void;
     logout: () => void;
@@ -15,9 +17,15 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             token: null,
             user: null,
+            is_head: false,
+            is_adel: false,
             setToken: (token) => set({ token }),
-            setUser: (user) => set({ user }),
-            logout: () => set({ token: null, user: null }),
+            setUser: (user) => set({
+                user,
+                is_head: user?.is_head ?? false,
+                is_adel: user?.is_adel ?? false,
+            }),
+            logout: () => set({ token: null, user: null, is_head: false, is_adel: false }),
         }),
         {
             name: 'proport-auth',

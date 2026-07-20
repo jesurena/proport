@@ -28,7 +28,7 @@ export function TicketActionButton({
 }: TicketActionButtonProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const { user } = useAuthStore();
+  const { user, is_head, is_adel } = useAuthStore();
   const [mockRole, setMockRole] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,15 +41,14 @@ export function TicketActionButton({
 
   const role = mockRole || user?.role_name || 'requestor';
   const accountId = user?.account_id ? String(user.account_id) : null;
-  const isHead = user?.is_head ?? false;
 
   const isBuyerOrAdmin = role === 'buyer' || role === 'admin' || role === 'super_user';
   const isRequestor =
     role === 'requestor' ||
     role === 'sales' ||
     (accountId !== null && String(ticket.requesterId) === accountId);
-  const isBUHead = role === 'bu_head' || isHead || role === 'super_user';
-  const isFinalApprover = role === 'adel' || accountId === '415' || role === 'super_user';
+  const isBUHead = is_head || role === 'super_user';
+  const isFinalApprover = is_adel || role === 'super_user';
 
   const status = normalizeStatusKey(ticket.status, (ticket as any).status_id);
 
