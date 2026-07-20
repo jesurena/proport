@@ -22,13 +22,6 @@ export default function TicketsPage() {
               Manage sales pricing questions and track quotes progress in a card-based workspace.
             </AppLabel>
           </div>
-          <AppButton
-            variant="primary"
-            leftIcon={<Plus size={16} />}
-            onClick={() => router.push('/compose')}
-          >
-            New Ticket
-          </AppButton>
         </div>
 
         <TicketTable />

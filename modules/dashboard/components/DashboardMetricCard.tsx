@@ -74,10 +74,10 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
                 router.push(`/tickets?status=${status}`);
               }
             }}
-            className="p-4 flex items-center justify-between cursor-pointer"
+            className="p-4 flex items-center justify-between cursor-pointer group transition-all duration-200 hover:border-accent-1/40 hover:shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-full ${iconBg} flex items-center justify-center ${iconColor} shrink-0`}>
+              <div className={`w-11 h-11 rounded-full ${iconBg} flex items-center justify-center ${iconColor} shrink-0 group-hover:scale-105 transition-transform duration-200`}>
                 {icon}
               </div>
               <div>
@@ -92,9 +92,9 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
             <AppButton
               variant="neutral"
               size="icon"
-              className="!w-8 !h-8 rounded-full"
+              className="!w-8 !h-8 rounded-full group-hover:!bg-accent-1 group-hover:!text-white group-hover:!border-accent-1 transition-colors duration-200"
             >
-              <ArrowRight size={13} />
+              <ArrowRight size={13} className="group-hover:transition-transform duration-200" />
             </AppButton>
           </AppCard>
         ))}
