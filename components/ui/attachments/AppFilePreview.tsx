@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, FileText, Download } from 'lucide-react';
-import { formatFileSize } from './AppAttachmentCard';
+import { X, Download } from 'lucide-react';
+import { AppLabel } from '../labels/AppLabel';
+import { AppButton } from '../buttons/AppButton';
+import { formatFileSize, getAttachmentIcon } from './AppAttachmentCard';
 
 export interface AppFilePreviewProps {
   open: boolean;
@@ -18,20 +20,21 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
   onDownload
 }) => {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   // Esc key and scroll locking logic
   useEffect(() => {
     if (!open) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
-    
+
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
@@ -41,8 +44,11 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
   useEffect(() => {
     if (!open || !file) {
       setBlobUrl(null);
+      setHasError(false);
       return;
     }
+
+    setHasError(false);
 
     if (file instanceof File) {
       const url = URL.createObjectURL(file);
@@ -51,13 +57,22 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
         URL.revokeObjectURL(url);
       };
     } else if (typeof file === 'string') {
-      const extension = file.split('.').pop()?.toLowerCase() || '';
-      const isImg = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico'].includes(extension);
-      if (isImg) {
-        setBlobUrl(`http://localhost:3001/viewFile/${file}`);
-      } else if (extension === 'pdf') {
-        setBlobUrl(`http://localhost:3001/viewFile/${file}`);
-      }
+      const targetUrl = file.startsWith('http://') || file.startsWith('https://') || file.startsWith('blob:') || file.startsWith('/')
+        ? file
+        : `http://localhost:7090/api/viewFile/${file}`;
+
+      // Check if file URL is valid / 200 OK
+      fetch(targetUrl, { method: 'HEAD' })
+        .then((res) => {
+          if (res.ok) {
+            setBlobUrl(targetUrl);
+          } else {
+            setHasError(true);
+          }
+        })
+        .catch(() => {
+          setHasError(true);
+        });
     }
   }, [open, file]);
 
@@ -85,17 +100,53 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+    } else if (blobUrl && !hasError) {
+      window.open(blobUrl, '_blank');
     } else {
-      window.open(`http://localhost:3001/viewFile/${fileName}`, '_blank');
+      window.open(`http://localhost:7090/api/viewFile/${fileName}`, '_blank');
     }
   };
 
   const renderPreviewContent = () => {
+    // If error occurs or format not supported or 404
+    if (hasError || (!isImage && !isPdf)) {
+      const iconSrc = getAttachmentIcon(fileName);
+
+      return (
+        <div className="flex flex-col items-center justify-center w-full h-full p-6 text-text-info animate-in fade-in duration-200">
+          <img
+            src={iconSrc}
+            alt={fileName}
+            className="w-20 h-20 mb-4 object-contain drop-shadow-md select-none"
+          />
+          <AppLabel as="h3" className="text-sm font-semibold text-text mb-1 max-w-md text-center truncate">
+            {fileName}
+          </AppLabel>
+          <AppLabel as="p" variant="description" className="text-xs max-w-xs text-center mb-6 text-text-info">
+            Preview failed or format not supported. Please download the file to view its contents.
+          </AppLabel>
+          <AppButton
+            variant="neutral"
+            size="sm"
+            leftIcon={<Download size={13} />}
+            onClick={handleDownload}
+          >
+            Download File
+          </AppButton>
+        </div>
+      );
+    }
+
     // 1. Image Preview
     if (isImage && blobUrl) {
       return (
         <div className="flex items-center justify-center w-full h-full p-4 overflow-auto">
-          <img src={blobUrl} alt={fileName} className="max-w-full max-h-full object-contain shadow-lg" />
+          <img
+            src={blobUrl}
+            alt={fileName}
+            onError={() => setHasError(true)}
+            className="max-w-full max-h-full object-contain shadow-lg rounded-lg"
+          />
         </div>
       );
     }
@@ -107,75 +158,69 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
           src={blobUrl}
           className="w-full h-full border-0 bg-white"
           title={fileName}
+          onError={() => setHasError(true)}
         />
       );
     }
 
-    // Static error layout (no mock spreadsheet/document templates)
-    return (
-      <div className="flex flex-col items-center justify-center w-full h-full p-6 text-zinc-400">
-        <FileText size={48} className="mb-3 opacity-30 text-white" />
-        <h3 className="text-sm font-semibold text-white mb-1">{fileName}</h3>
-        <p className="text-xs max-w-xs text-center mb-6 text-zinc-400">
-          Preview failed or format not supported. Please download the file to view its contents.
-        </p>
-        <button
-          onClick={handleDownload}
-          className="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
-        >
-          <Download size={13} />
-          Download File
-        </button>
-      </div>
-    );
+    return null;
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex flex-col bg-black/95 text-white animate-fade-in font-sans">
+    <div className="fixed inset-0 z-[2000] flex flex-col bg-background/95 text-text backdrop-blur-md animate-fade-in font-sans">
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between px-6 py-4 bg-black/40 border-b border-white/10 shrink-0">
-        <div className="min-w-0">
-          <h2 className="text-sm font-bold text-white truncate flex items-center gap-2">
-            <span className="bg-[#107c41] text-white text-[9px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0">
-              {extension || 'FILE'}
-            </span>
-            <span className="truncate">{fileName}</span>
-          </h2>
-          {fileSize && (
-            <p className="text-[10px] text-zinc-400 font-medium mt-0.5">{formatFileSize(fileSize)}</p>
-          )}
+      <div className="flex items-center justify-between px-6 py-3.5 bg-card-bg/90 border-b border-border/40 shrink-0">
+        <div className="min-w-0 flex items-center gap-3">
+          <img
+            src={getAttachmentIcon(fileName)}
+            alt="file icon"
+            className="w-6 h-6 object-contain shrink-0"
+          />
+          <div className="min-w-0">
+            <AppLabel as="h2" className="text-sm font-bold text-text truncate">
+              {fileName}
+            </AppLabel>
+            {fileSize && (
+              <AppLabel as="p" variant="description" className="text-[10px] text-text-info mt-0.5">
+                {formatFileSize(fileSize)}
+              </AppLabel>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3 shrink-0">
-          <button
+        <div className="flex items-center gap-2 shrink-0">
+          <AppButton
+            variant="ghost"
+            size="icon"
+            shape="pill"
             title="Download"
             onClick={handleDownload}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
           >
-            <Download size={16} />
-          </button>
-          <button
+            <Download size={15} />
+          </AppButton>
+          <AppButton
+            variant="ghost"
+            size="icon"
+            shape="pill"
             title="Close"
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
           >
-            <X size={18} />
-          </button>
+            <X size={16} />
+          </AppButton>
         </div>
       </div>
 
-      {/* Main Preview Container */}
-      <div 
+      <div
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             onClose();
           }
         }}
-        className="flex-1 w-full h-full overflow-hidden relative bg-[#121214] flex items-center justify-center cursor-zoom-out"
+        className="flex-1 w-full h-full overflow-hidden relative bg-neutral/5 flex items-center justify-center cursor-zoom-out"
       >
-        <div 
-          onClick={(e) => e.stopPropagation()} 
+        <div
+          onClick={(e) => e.stopPropagation()}
           className="w-full h-full flex items-center justify-center cursor-default"
         >
           {renderPreviewContent()}

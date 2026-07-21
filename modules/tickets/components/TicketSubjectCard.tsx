@@ -181,7 +181,10 @@ export function TicketSubjectCard({
         <div className="pl-12 mt-2 text-sm text-text leading-[1.75]">
           {isExpanded ? (
             <>
-              <div dangerouslySetInnerHTML={{ __html: localizeHtmlImages(description) }} />
+              <div
+                className="overflow-x-auto max-w-full my-2 text-text leading-[1.75] [&_table]:min-w-full [&_table]:border-collapse [&_th]:border [&_th]:border-border/60 [&_th]:p-2 [&_th]:bg-neutral/10 [&_td]:border [&_td]:border-border/60 [&_td]:p-2"
+                dangerouslySetInnerHTML={{ __html: localizeHtmlImages(description) }}
+              />
               {originalAttachments.length > 0 && (
                 <div className="mt-3 pt-3 border-t border-border/30">
                   <AppLabel as="span" variant="info" className="text-[11px] font-bold text-text-info/70 uppercase tracking-wide block mb-2">

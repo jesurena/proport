@@ -137,7 +137,6 @@ export function TicketActionsCard({
 
   return (
     <div className="rounded-xl border border-border/60 bg-card-bg shadow-sm flex flex-col relative z-20">
-      {/* Soft Pastel Status Alert Box - Full Upper Card */}
       <div
         className="p-5 space-y-3 relative overflow-hidden transition-all duration-300 border-b rounded-t-xl"
         style={{
@@ -177,39 +176,36 @@ export function TicketActionsCard({
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Encapsulated Action Button Bar */}
         <TicketActionButton ticket={ticket} onStatusChange={onStatusChange} />
-
-        {/* Assignee Selection - Visible to Buyers/Admins */}
-        {isBuyerOrAdmin && normalizedStatus !== 'closed' && (
-          <div className="mt-2 pt-3 border-t border-border/20">
-            <span className="text-[11px] font-bold text-text-info uppercase tracking-wider block mb-2">
-              Buyer (Assignee)
-            </span>
-            {ticket.assigneeName ? (
-              <div className="space-y-1.5 mb-3">
-                {ticket.assigneeName.split(',').map((name) => {
-                  const cleanName = name.trim();
-                  return (
-                    <div
-                      key={cleanName}
-                      className="flex items-center gap-2 bg-neutral/5 p-2 rounded-md border border-border/40"
-                    >
-                      <AppAvatar
-                        name={cleanName}
-                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${cleanName}`}
-                        size={20}
-                      />
-                      <span className="text-xs font-semibold text-text truncate flex-1">
-                        {cleanName}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-xs italic text-text-info mb-3">No buyer assigned</p>
-            )}
+        <div className="mt-2 pt-3 border-t border-border/20">
+          <span className="text-[11px] font-bold text-text-info uppercase tracking-wider block mb-2">
+            Buyer (Assignee)
+          </span>
+          {ticket.assigneeName ? (
+            <div className="space-y-1.5 mb-3">
+              {ticket.assigneeName.split(',').map((name) => {
+                const cleanName = name.trim();
+                return (
+                  <div
+                    key={cleanName}
+                    className="flex items-center gap-2 bg-neutral/5 p-2 rounded-md border border-border/40"
+                  >
+                    <AppAvatar
+                      name={cleanName}
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${cleanName}`}
+                      size={20}
+                    />
+                    <span className="text-xs font-semibold text-text truncate flex-1">
+                      {cleanName}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-xs italic text-text-info mb-3">No buyer assigned</p>
+          )}
+          {isBuyerOrAdmin && (
             <AppButton
               variant="secondary"
               size="sm"
@@ -219,8 +215,8 @@ export function TicketActionsCard({
             >
               Update Assignment
             </AppButton>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

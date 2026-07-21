@@ -49,7 +49,7 @@ export function TicketMainCard({
   };
 
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 max-w-full overflow-hidden">
       <TicketSubjectCard
         ticketId={ticket.id}
         subject={ticket.subject}

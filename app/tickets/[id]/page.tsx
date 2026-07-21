@@ -133,10 +133,7 @@ export default function TicketDetailPage() {
           </button>
         </div>
 
-        {/* ═══════════ Two-Column Layout ═══════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-
-          {/* ── LEFT COLUMN: Main ticket view card ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
           <TicketMainCard
             ticket={ticket}
             sending={sending}
@@ -150,7 +147,6 @@ export default function TicketDetailPage() {
             setPreviewFile={setPreviewFile}
           />
 
-          {/* ── RIGHT COLUMN: Actions, Info, Files ── */}
           <div className="space-y-4">
             <TicketActionsCard
               ticket={ticket}
@@ -165,7 +161,6 @@ export default function TicketDetailPage() {
         </div>
       </div>
 
-      {/* Assign Buyer Modal */}
       <AppReassignModal
         open={assignModalOpen}
         onClose={() => setAssignModalOpen(false)}

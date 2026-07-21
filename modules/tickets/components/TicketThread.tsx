@@ -120,7 +120,10 @@ export default function TicketThread({
             <div className="pl-12 mt-2 text-sm text-text leading-[1.75]">
               {isExpanded ? (
                 <>
-                  <div dangerouslySetInnerHTML={{ __html: localizeHtmlImages(msg.content) }} />
+                  <div
+                    className="overflow-x-auto max-w-full my-2 text-text leading-[1.75] [&_table]:min-w-full [&_table]:border-collapse [&_th]:border [&_th]:border-border/60 [&_th]:p-2 [&_th]:bg-neutral/10 [&_td]:border [&_td]:border-border/60 [&_td]:p-2"
+                    dangerouslySetInnerHTML={{ __html: localizeHtmlImages(msg.content) }}
+                  />
 
                   {/* Attachments section */}
                   {msgAttachments.length > 0 && (
