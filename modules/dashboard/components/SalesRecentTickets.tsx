@@ -18,7 +18,7 @@ export default function SalesRecentTickets() {
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
 
   const { user } = useAuthStore();
-  const isDeveloper = user?.isDeveloper ?? false;
+  const isDeveloper = user?.is_developer ?? false;
   const actualRole = user?.role_name ?? 'buyer';
 
   // Sync role and pins on mount

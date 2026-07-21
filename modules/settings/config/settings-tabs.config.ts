@@ -36,7 +36,7 @@ export const SETTINGS_TABS_CONFIG: SettingsTabItem[] = [
     icon: Shield,
     group: 'Preferences',
     component: RolesTab,
-    checkVisibility: (user) => Boolean(user?.isDeveloper),
+    checkVisibility: (user) => Boolean(user?.is_developer),
   },
 ];
 

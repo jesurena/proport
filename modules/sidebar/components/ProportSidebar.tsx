@@ -34,7 +34,7 @@ export default function ProportSidebar() {
   const [role, setRole] = useState<string>('super_user');
 
   const { user } = useAuthStore();
-  const isDeveloper = user?.isDeveloper ?? false;
+  const isDeveloper = user?.is_developer ?? false;
   const actualRole = user?.role_name ?? 'buyer';
 
   const toggleSubMenu = (name: string) => {

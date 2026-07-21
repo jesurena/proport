@@ -10,7 +10,7 @@ export interface AuthUser {
     AccountName: string | null;
     DomainAccount: string | null;
     avatar: string | null;
-    isDeveloper: boolean;
+    is_developer: boolean;
     is_head?: boolean;
     is_adel?: boolean;
 }

@@ -20,7 +20,7 @@ export default function DashboardTabTable() {
 
   useEffect(() => {
     const storedRole = typeof window !== 'undefined' ? localStorage.getItem('proport_my_role') : null;
-    const isDeveloper = user?.isDeveloper ?? false;
+    const isDeveloper = user?.is_developer ?? false;
     const actualRole = user?.role_name ?? 'buyer';
 
     if (isDeveloper && storedRole) {

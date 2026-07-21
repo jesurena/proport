@@ -97,7 +97,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
   const [localPageSize, setLocalPageSize] = React.useState<number>(10);
 
   const { user } = useAuthStore();
-  const isDeveloper = user?.isDeveloper ?? false;
+  const isDeveloper = user?.is_developer ?? false;
   const actualRole = user?.role_name ?? 'buyer';
 
   React.useEffect(() => {

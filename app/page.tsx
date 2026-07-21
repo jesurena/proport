@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
 
   const [role, setRole] = useState<string | null>(null);
-  const isDeveloper = user?.isDeveloper ?? false;
+  const isDeveloper = user?.is_developer ?? false;
   const actualRole = user?.role_name ?? 'buyer';
 
   useEffect(() => {

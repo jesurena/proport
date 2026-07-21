@@ -18,7 +18,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
 
     React.useEffect(() => {
         const storedRole = typeof window !== 'undefined' ? localStorage.getItem('proport_my_role') : null;
-        if (user?.isDeveloper && storedRole) {
+        if (user?.is_developer && storedRole) {
             setMockRole(storedRole);
         } else {
             setMockRole(user?.role_name || 'requestor');
