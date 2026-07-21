@@ -15,9 +15,9 @@ import { AppCustomerSelectModal } from './AppCustomerSelectModal';
 import { AppSummernoteEditor } from './AppSummernoteEditor';
 import { AppAttachmentCard, AppFilePreview } from '@/components/ui';
 import { useComposeStore } from '../stores';
-import { getBrands } from '@/lib/brands';
-import type { Brand } from '@/modules/brand';
-import { createTicket, getBusinessUnits, getUsers } from '@/lib/tickets';
+import { useAuthStore } from '@/modules/auth';
+import { useCcUsers } from '@/modules/tickets/hooks/useTickets';
+import { useComposeInitData, useComposeBrands, useCreateTicket } from '../hooks/useCompose';
 import { getSuppliers } from '@/lib/suppliers';
 import type { TicketPriority, User as UserType } from '@/lib/types';
 
@@ -60,12 +60,9 @@ interface SelectOption {
 
 export function ComposeModal() {
   const router = useRouter();
-  const businessUnits = getBusinessUnits();
-  const allUsers = getUsers();
   const suppliers = getSuppliers();
-
-  const buyers = allUsers.filter((u) => u.role === 'buyer' || u.role === 'admin');
-  const salesReps = allUsers.filter((u) => u.role === 'sales');
+  const { user } = useAuthStore();
+  const defaultAo = user?.account_id ? String(user.account_id) : '';
 
   const {
     isOpen,
@@ -78,18 +75,18 @@ export function ComposeModal() {
   } = useComposeStore();
   const [showDetails, setShowDetails] = useState(false);
 
-  const [ao, setAo] = useState('user-1');
+  const [ao, setAo] = useState('');
   const [selectedCcUsers, setSelectedCcUsers] = useState<UserType[]>([]);
   const [ccModalOpen, setCcModalOpen] = useState(false);
   const [requestType, setRequestType] = useState('');
   const [supplier, setSupplier] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
   const [estimatedQuantity, setEstimatedQuantity] = useState('');
-  const [assignTo, setAssignTo] = useState('');
   const [subject, setSubject] = useState('');
   const [priority, setPriority] = useState('medium');
   const [brandType, setBrandType] = useState<string>('');
-  const [brand, setBrand] = useState('');
+  const [brands, setBrands] = useState<string[]>([]);
+  const [customerID, setCustomerID] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [projectName, setProjectName] = useState('');
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
@@ -102,47 +99,77 @@ export function ComposeModal() {
   const [previewFile, setPreviewFile] = useState<File | string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const buyerOptions = [
-    { value: '', label: 'Unassigned' },
-    ...buyers.map((e) => ({ value: e.id, label: e.name })),
-  ];
+  const { data: initData } = useComposeInitData(isOpen);
+  const { data: apiCcUsers = [] } = useCcUsers(isOpen);
+
+  const tid = brandType === 'Focus' ? 1 : brandType === 'Non Focus' ? 2 : 0;
+  const { data: apiBrands = [] } = useComposeBrands(tid, isOpen && !!tid);
+
+  const createTicketMutation = useCreateTicket();
+
+  const salesReps = useMemo(() => {
+    if (!initData?.account_owners) return [];
+    return initData.account_owners.map((ao: any) => ({
+      id: String(ao.account_id),
+      name: ao.AccountName,
+      email: ao.Email,
+    }));
+  }, [initData]);
+
+  const ccUsers = useMemo(() => {
+    return apiCcUsers.map((u: any) => ({
+      id: String(u.id),
+      name: u.name,
+      email: u.email,
+      avatar: u.avatar || undefined,
+      role: u.account_group || undefined,
+    }));
+  }, [apiCcUsers]);
+
   const supplierOptions = suppliers.map((s) => ({ value: s.name, label: s.name }));
 
-  const brandsList = useMemo(() => {
-    const allBrands = getBrands();
-    if (brandType) {
-      return allBrands.filter((b: Brand) => b.type === brandType);
-    }
-    return allBrands;
-  }, [brandType]);
-
   const brandOptions = useMemo(() => {
-    return brandsList.map((b) => ({ value: b.name, label: b.name }));
-  }, [brandsList]);
+    return apiBrands.map((b) => ({ value: String(b.brand_id), label: b.brand }));
+  }, [apiBrands]);
 
   const handleCategoryChange = (val: string) => {
     setBrandType(val);
-    setBrand('');
+    setBrands([]);
   };
 
   // Reset when opened
   useEffect(() => {
     if (isOpen) {
-      setAo('user-1'); setSelectedCcUsers([]);
-      setRequestType(''); setSupplier(''); setTargetPrice(''); setEstimatedQuantity('');
-      setAssignTo(''); setSubject(''); setPriority('medium');
+      setAo(defaultAo);
+      setSelectedCcUsers([]);
+      setCustomerID('');
+      setRequestType('');
+      setSupplier('');
+      setTargetPrice('');
+      setEstimatedQuantity('');
+      setSubject('');
+      setPriority('medium');
       setBrandType(defaultBrandType || '');
-      setBrand('');
-      setCustomerName(''); setProjectName(''); setCustomerModalOpen(false);
-      setAttachments([]); setShowDetails(false);
+      setBrands([]);
+      setCustomerName('');
+      setProjectName('');
+      setCustomerModalOpen(false);
+      setAttachments([]);
+      setShowDetails(false);
       setDescription('');
       setPreviewFile(null);
     }
-  }, [isOpen, defaultBrandType]);
+  }, [isOpen, defaultBrandType, defaultAo]);
+
+  const selectedBrandNames = useMemo(() => {
+    return brands
+      .map((bId) => apiBrands.find((b: any) => String(b.brand_id) === bId)?.brand)
+      .filter(Boolean) as string[];
+  }, [brands, apiBrands]);
 
   // Dynamic subject auto-builder
   useEffect(() => {
-    if (requestType || customerName || brand) {
+    if (requestType || customerName || brands.length > 0) {
       const requestLabel = REQUEST_TYPES.find((r) => r.value === requestType)?.label || '';
       let prefix = requestLabel;
       if (requestType === 'cost') {
@@ -155,43 +182,48 @@ export function ComposeModal() {
       }
 
       const custPart = customerName || 'Customer Name';
-      const brandPart = `(${brand || 'Brand'})`;
+      const brandPart = `(${selectedBrandNames.join(', ') || 'Brand'})`;
       parts.push(`${custPart}: ${brandPart}`);
 
       setSubject(parts.join(' - '));
     } else {
       setSubject('');
     }
-  }, [requestType, customerName, brand]);
+  }, [requestType, customerName, brands, selectedBrandNames]);
 
   const handleSubmit = async () => {
     if (!subject.trim()) return;
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 400));
-    // Strip HTML tags to get plain text for the description field
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = description;
-    const bodyText = tempDiv.innerText?.trim() || '';
-    const ticket = createTicket({
-      subject: subject.trim(),
-      description: bodyText,
-      priority: priority as TicketPriority,
-      businessUnitId: businessUnits[0]?.id || '',
-      requesterId: ao,
-      supplierName: supplier || undefined,
-      targetPrice: targetPrice ? parseFloat(targetPrice) : undefined,
-      estimatedQuantity: estimatedQuantity ? parseInt(estimatedQuantity) : undefined,
-      brandType: brandType || undefined,
-      brandName: brand || undefined,
-      aoId: ao || undefined,
-      cc: selectedCcUsers.length ? selectedCcUsers.map((u) => u.email) : undefined,
-      customerName: customerName.trim() || undefined,
-      projectName: projectName.trim() || undefined,
-      tags: attachments.map((f) => f.name),
-    });
-    setSubmitting(false);
-    closeCompose();
-    router.push(`/tickets/${ticket.id}`);
+
+    const tTypeID = brandType === 'Focus' ? 1 : brandType === 'Non Focus' ? 2 : 1;
+    const requestTypeID =
+      requestType === 'cost' ? 1 :
+      requestType === 'demo' ? 2 :
+      requestType === 'service' ? 3 :
+      requestType === 'eta' ? 4 : 1;
+
+    try {
+      const res = await createTicketMutation.mutateAsync({
+        subject: subject.trim(),
+        requestContent: description,
+        customerID: customerID || '',
+        customerName: customerName.trim(),
+        projectName: projectName.trim(),
+        tTypeID,
+        aoID: ao,
+        requestTypeID,
+        brandID: brands.map((b) => parseInt(b)),
+        ccID: selectedCcUsers.length ? selectedCcUsers.map((u) => String(u.id)) : [],
+        files: attachments,
+      });
+
+      setSubmitting(false);
+      closeCompose();
+      router.push(`/tickets/${res.ticket_id}`);
+    } catch (err) {
+      console.error('Failed to submit ticket request:', err);
+      setSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -276,7 +308,7 @@ export function ComposeModal() {
                     Ao
                   </span>
                   <div className="flex-1 text-sm">
-                    <AppUserSelect users={allUsers} value={ao} onChange={setAo} placeholder="Choose AO..." variant="borderless" />
+                    <AppUserSelect users={salesReps} value={ao} onChange={setAo} placeholder="Choose AO..." variant="borderless" />
                   </div>
                 </div>
 
@@ -447,18 +479,20 @@ export function ComposeModal() {
                   <span
                     className={cn(
                       "text-sm text-text-info shrink-0 font-medium transition-all duration-200 overflow-hidden",
-                      brand ? "w-28 opacity-100 mr-2" : "w-0 opacity-0 mr-0"
+                      brands.length > 0 ? "w-28 opacity-100 mr-2" : "w-0 opacity-0 mr-0"
                     )}
                   >
-                    Brand
+                    Brands
                   </span>
                   <div className="flex-1 text-sm">
                     <AppSelect
                       options={brandOptions}
-                      value={brand}
-                      onChange={setBrand}
-                      placeholder={brand ? "Choose brand" : "Brand"}
+                      value={brands}
+                      onChange={setBrands}
+                      placeholder={brands.length > 0 ? "Choose brands" : "Brands"}
                       variant="borderless"
+                      showSearch={true}
+                      mode="multiple"
                     />
                   </div>
                 </div>
@@ -536,7 +570,7 @@ export function ComposeModal() {
           setCcModalOpen(false);
           setCcFocused(false);
         }}
-        users={allUsers}
+        users={ccUsers}
         selectedUsers={selectedCcUsers}
         onSelect={setSelectedCcUsers}
       />
@@ -544,7 +578,10 @@ export function ComposeModal() {
       <AppCustomerSelectModal
         open={customerModalOpen}
         onClose={() => setCustomerModalOpen(false)}
-        onSelect={setCustomerName}
+        onSelect={(name, id) => {
+          setCustomerName(name);
+          setCustomerID(id || '');
+        }}
         initialSearch={customerName}
       />
 

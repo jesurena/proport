@@ -1,4 +1,3 @@
-// ─── Ticket Statuses ────────────────────────────────────────────────────────
 export type TicketStatus =
   | 'unassigned'
   | 'assigned'
@@ -21,9 +20,6 @@ export type TicketStatus =
   | 'declined-by-final-approver';
 
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
-
-// ─── Core Entities ──────────────────────────────────────────────────────────
-
 export interface User {
   id: string;
   name: string;
@@ -84,7 +80,6 @@ export interface Ticket {
   tags?: string[];
   attachments?: Attachment[];
   
-  // Custom Price Inquiry Fields
   supplierName?: string;
   targetPrice?: number;
   estimatedQuantity?: number;
@@ -92,9 +87,9 @@ export interface Ticket {
   projectName?: string;
   brandName?: string;
   GAvatarReq?: string;
+  requesterAvatar?: string;
+  AccountGroup?: string;
 }
-
-// ─── Stat Types ─────────────────────────────────────────────────────────────
 
 export interface StatusCount {
   status: TicketStatus;
@@ -112,7 +107,6 @@ export interface MonthlyTrend {
   count: number;
 }
 
-// ─── Status metadata ────────────────────────────────────────────────────────
 
 export const STATUS_META: Record<TicketStatus, { label: string; color: string; chipVariant: string }> = {
   unassigned: { label: 'Unassigned', color: '#8b8b8b', chipVariant: 'unassigned' },

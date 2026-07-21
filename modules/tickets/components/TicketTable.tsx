@@ -182,7 +182,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
         } else {
           const rawParticipants = Array.from(
             new Set(
-              [record.assigneeName, ...(record.replies || []).map((r) => r.authorName)].filter(
+              [record.assigneeName, ...(record.replies || []).map((r: any) => r.authorName)].filter(
                 (name): name is string => Boolean(name) && name !== record.requesterName
               )
             )

@@ -39,7 +39,7 @@ function getSalesAreaChipVariant(area: string): AppChipVariant {
 interface AppCustomerSelectModalProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (customerName: string) => void;
+  onSelect: (customerName: string, customerID?: string) => void;
   initialSearch?: string;
 }
 
@@ -100,8 +100,8 @@ export function AppCustomerSelectModal({
     }
   };
 
-  const handleSelect = (customerName: string) => {
-    onSelect(customerName);
+  const handleSelect = (customer: Customer) => {
+    onSelect(customer.name.split('\n')[0], customer.id);
     onClose();
   };
 
@@ -256,7 +256,7 @@ export function AppCustomerSelectModal({
               size="small"
               scroll={{ x: 750 }}
               onRow={(record) => ({
-                onClick: () => handleSelect(record.name.split('\n')[0]),
+                onClick: () => handleSelect(record),
                 className: 'group cursor-pointer hover:bg-neutral/40 transition-colors',
               })}
               className="cursor-pointer"

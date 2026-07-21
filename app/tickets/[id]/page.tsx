@@ -55,6 +55,7 @@ export default function TicketDetailPage() {
           content: contentText,
           cc_ids: selectedCcUsers.map((u) => String(u.id)),
           status_action: statusAction,
+          files: attachments,
         },
       });
       setAttachments([]);

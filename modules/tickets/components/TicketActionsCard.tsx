@@ -42,6 +42,7 @@ export function TicketActionsCard({
 
   const role = mockRole || user?.role_name || 'requestor';
   const isBuyerOrAdmin = role === 'buyer' || role === 'admin' || role === 'super_user';
+  const canAssign = role === 'buyer' || role === 'admin';
 
   const normalizedStatus = normalizeStatusKey(ticket.status, (ticket as any).status_id);
   const statusMeta =
@@ -205,7 +206,7 @@ export function TicketActionsCard({
           ) : (
             <p className="text-xs italic text-text-info mb-3">No buyer assigned</p>
           )}
-          {isBuyerOrAdmin && (
+          {canAssign && (
             <AppButton
               variant="secondary"
               size="sm"

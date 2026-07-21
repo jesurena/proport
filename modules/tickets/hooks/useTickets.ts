@@ -14,7 +14,7 @@ export const useTickets = (params?: {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsService.getTickets(params),
-    refetchInterval: 10000,
+    refetchInterval: 15000,
     refetchIntervalInBackground: false,
   });
 };
@@ -24,7 +24,7 @@ export const useTicketDetail = (id: string) => {
     queryKey: ['ticket', id],
     queryFn: () => ticketsService.getTicketById(id),
     enabled: !!id,
-    refetchInterval: 10000,
+    refetchInterval: 15000,
     refetchIntervalInBackground: false,
   });
 };
@@ -32,7 +32,7 @@ export const useTicketDetail = (id: string) => {
 export const useAddReply = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: { content: string; cc_ids?: string[]; status_action?: string } }) =>
+    mutationFn: ({ id, payload }: { id: string; payload: { content: string; cc_ids?: string[]; status_action?: string; files?: File[] } }) =>
       ticketsService.addReply(id, payload),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['ticket', variables.id] });

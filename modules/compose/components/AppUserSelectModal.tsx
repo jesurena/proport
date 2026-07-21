@@ -139,7 +139,6 @@ export function AppUserSelectModal({
           </AppModal.Description>
         </div>
 
-        {/* Search Input and Filters */}
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <AppInput
@@ -151,8 +150,7 @@ export function AppUserSelectModal({
               className="w-full"
             />
           </div>
-
-          {/* Filter Popover Component */}
+          
           <AppFilterPopover
             open={filterPopoverOpen}
             onOpenChange={setFilterPopoverOpen}

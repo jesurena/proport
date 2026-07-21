@@ -13,7 +13,8 @@ export interface AppSelectOption {
 }
 
 export interface AppSelectProps {
-    value?: string | number;
+    value?: any;
+    mode?: 'multiple' | 'tags';
     onChange?: (value: any) => void;
     options: AppSelectOption[];
     placeholder?: string;
@@ -49,7 +50,8 @@ export const AppSelect = ({
     notFoundImageSrc,
     notFoundTitle,
     notFoundDescription,
-    variant = 'default'
+    variant = 'default',
+    mode
 }: AppSelectProps) => {
     const extractText = (node: React.ReactNode): string => {
         if (typeof node === 'string' || typeof node === 'number') {
@@ -103,6 +105,7 @@ export const AppSelect = ({
                 disabled={disabled}
                 filterOption={onSearch ? false : filterOption}
                 variant={isBorderless ? 'borderless' : undefined}
+                mode={mode}
                 notFoundContent={
                     <AppEmptyState
                         title={notFoundTitle || "No options found"}

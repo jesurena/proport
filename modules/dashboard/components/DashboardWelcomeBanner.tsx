@@ -49,6 +49,10 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     tag = 'PROPORT · BU HEAD DASHBOARD';
   } else if (isSales) {
     tag = 'PROPORT · PRICING TICKET HUB';
+  } else if (role === 'super_user') {
+    tag = 'PROPORT · SUPER USER WORKSPACE';
+  } else if (role === 'admin') {
+    tag = 'PROPORT · ADMIN WORKSPACE';
   }
 
   let welcomeMessage = "Welcome back! Help sales obtain the best price quotes from suppliers, resolve incoming tickets, and manage quotes.";
@@ -58,6 +62,10 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     welcomeMessage = "Welcome back! Monitor your business unit's ticket activities, endorse pending requests, and manage ticket queues.";
   } else if (isSales) {
     welcomeMessage = "Need help with product pricing or quotes? Submit a ticket and our buyers will get the best pricing options from suppliers.";
+  } else if (role === 'super_user') {
+    welcomeMessage = "Welcome back, Super User. Monitor system activity, view reports, manage brand focus catalogs, and reply to all requests.";
+  } else if (role === 'admin') {
+    welcomeMessage = "Welcome back, Admin. Proport administrator dashboard. View reports, configure brand classification, and update ticket assignments.";
   }
 
   return (

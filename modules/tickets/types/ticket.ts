@@ -49,6 +49,7 @@ export interface Ticket {
   priority: TicketPriority;
   requesterId: string;
   requesterName: string;
+  requesterAvatar?: string;
   assigneeId?: string;
   assigneeName?: string;
   assigneeAvatar?: string;
@@ -56,6 +57,7 @@ export interface Ticket {
   requestType?: string;
   businessUnitId: string;
   businessUnitName: string;
+  AccountGroup?: string;
   aoId?: string;
   aoName?: string;
   cc?: string[];

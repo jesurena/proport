@@ -74,7 +74,7 @@ export default function TicketThread({
         }
 
         const imageToShow = firstImgAttachment 
-          ? `http://localhost:3001/viewFile/${firstImgAttachment.name}` 
+          ? `http://localhost:7090/api/viewFile/${encodeURIComponent(btoa(firstImgAttachment.name))}` 
           : firstEmbeddedImg;
 
         return (
@@ -140,7 +140,7 @@ export default function TicketThread({
                             variant="shared"
                             onClick={() => onAttachmentClick?.(file.name)}
                             onDownload={() => {
-                              window.open(`http://localhost:3001/viewFile/${file.name}`, '_blank');
+                              window.open(`http://localhost:7090/api/viewFile/${encodeURIComponent(btoa(file.name))}`, '_blank');
                             }}
                           />
                         ))}

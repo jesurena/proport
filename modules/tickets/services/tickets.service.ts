@@ -27,9 +27,27 @@ export const ticketsService = {
 
   async addReply(
     id: string,
-    payload: { content: string; cc_ids?: string[]; status_action?: string }
+    payload: { content: string; cc_ids?: string[]; status_action?: string; files?: File[] }
   ): Promise<any> {
-    const { data } = await api.post(`/tickets/${id}/reply`, payload);
+    const { files, ...fields } = payload;
+
+    if (files && files.length > 0) {
+      const formData = new FormData();
+      Object.entries(fields).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData.append(`${key}[]`, String(v)));
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+      files.forEach((file) => formData.append('files[]', file));
+      const { data } = await api.post(`/tickets/${id}/reply`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return data;
+    }
+
+    const { data } = await api.post(`/tickets/${id}/reply`, fields);
     return data;
   },
 

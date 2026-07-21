@@ -1,6 +1,5 @@
 import { Ticket, Reply, User, BusinessUnit, TicketStatus } from './types';
 import { getItem, setItem, STORAGE_KEYS } from './storage';
-import { SEED_TICKETS, SEED_USERS, SEED_BUSINESS_UNITS, INITIAL_NEXT_TICKET_NUMBER } from './seed-data';
 
 // ─── Seeding ────────────────────────────────────────────────────────────────
 
