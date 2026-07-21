@@ -133,6 +133,24 @@ export const useBuyerDateCounts = (params?: {
   });
 };
 
+export const useSalesDateCounts = (
+  params?: {
+    page?: number;
+    per_page?: number;
+    sort_field?: string;
+    sort_order?: 'asc' | 'desc';
+  },
+  enabled = true
+) => {
+  return useQuery<{ data: any[]; total: number }>({
+    queryKey: ['sales-date-counts', params],
+    queryFn: async () => {
+      return dashboardService.getSalesDateCounts(params);
+    },
+    enabled,
+  });
+};
+
 export const useBuyerPeriodCounts = () => {
   return useQuery<{ today: any[]; week: any[] }>({
     queryKey: ['buyer-period-counts'],

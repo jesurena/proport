@@ -119,17 +119,20 @@ export function TicketInfoCard({ ticket }: TicketInfoCardProps) {
               Carbon Copy
             </AppLabel>
             {ccUsers.length > 0 ? (
-              <div className="flex -space-x-1.5 overflow-hidden mt-1.5 shrink-0">
-                {ccUsers.map((u) => {
+              <div className="flex -space-x-1.5 mt-1.5 shrink-0 py-1 px-0.5">
+                {ccUsers.map((u, i) => {
                   const avatarUrl = u.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${u.name}`;
                   return (
                     <Tooltip key={u.email} title={`${u.name} (${u.email})`} placement="top" mouseEnterDelay={0.2}>
-                      <div className="shrink-0 relative z-10 hover:z-20 transition-all">
+                      <div
+                        className="shrink-0 relative transition-all duration-200 hover:scale-110 hover:z-30 cursor-pointer"
+                        style={{ zIndex: ccUsers.length - i }}
+                      >
                         <AppAvatar
                           name={u.name}
                           src={avatarUrl}
                           size={24}
-                          className="ring-2 ring-background rounded-full shrink-0"
+                          className="ring-2 ring-background rounded-full shrink-0 shadow-sm"
                         />
                       </div>
                     </Tooltip>

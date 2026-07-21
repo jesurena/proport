@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@integrated-computer-system/ui-kit';
+import { AppCard, AppLabel } from '@/components/ui';
 import { StatusCount, STATUS_META, TicketStatus } from '@/lib/types';
 import {
   Inbox,
@@ -13,7 +14,7 @@ import {
   ArrowRightLeft,
 } from 'lucide-react';
 
-const STATUS_ICONS: Record<TicketStatus, React.ReactNode> = {
+const STATUS_ICONS: Partial<Record<TicketStatus, React.ReactNode>> = {
   unassigned: <Inbox size={18} />,
   assigned: <CircleDot size={18} />,
   pending: <Clock size={18} />,
@@ -34,11 +35,14 @@ interface TicketStatusGridProps {
 
 export default function TicketStatusGrid({ counts, onStatusClick }: TicketStatusGridProps) {
   return (
-    <div className="rounded-2xl bg-card-bg border border-border/60 p-5">
-      <h3 className="text-sm font-semibold text-text mb-4">Inquiries by Status</h3>
+    <AppCard variant="default" padding="md">
+      <AppLabel as="h3" variant="title" className="!text-sm !font-semibold mb-4">
+        Inquiries by Status
+      </AppLabel>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {counts.map((item) => {
           const meta = STATUS_META[item.status] || { label: item.status, color: '#6b7280', chipVariant: 'default' };
+          const icon = STATUS_ICONS[item.status] || <CircleDot size={18} />;
           return (
             <button
               key={item.status}
@@ -53,16 +57,20 @@ export default function TicketStatusGrid({ counts, onStatusClick }: TicketStatus
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
                 style={{ backgroundColor: `${meta.color}15`, color: meta.color }}
               >
-                {STATUS_ICONS[item.status]}
+                {icon}
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-lg font-bold text-text">{item.count}</span>
-                <span className="text-[11px] font-medium text-text-info truncate">{meta.label}</span>
+                <AppLabel as="span" className="text-lg font-bold text-text">
+                  {item.count}
+                </AppLabel>
+                <AppLabel as="span" variant="description" className="text-[11px] font-medium text-text-info truncate">
+                  {meta.label}
+                </AppLabel>
               </div>
             </button>
           );
         })}
       </div>
-    </div>
+    </AppCard>
   );
 }

@@ -60,6 +60,16 @@ export const dashboardService = {
     return data;
   },
 
+  async getSalesDateCounts(params?: {
+    page?: number;
+    per_page?: number;
+    sort_field?: string;
+    sort_order?: 'asc' | 'desc';
+  }): Promise<{ data: any[]; total: number }> {
+    const { data } = await api.get('/dashboard/sales-date-counts', { params });
+    return data;
+  },
+
   async getBuyerPeriodCounts(): Promise<{ today: any[]; week: any[] }> {
     const { data } = await api.get('/dashboard/buyer-period-counts');
     return data.data;

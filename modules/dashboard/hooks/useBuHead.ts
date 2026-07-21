@@ -9,3 +9,21 @@ export const useBuHeadCounts = () => {
     },
   });
 };
+
+export const useBuHeadAging = () => {
+  return useQuery({
+    queryKey: ['dashboard-bu-head-aging'],
+    queryFn: async () => {
+      return buHeadService.getAging();
+    },
+  });
+};
+
+export const useBuHeadGroupCreations = () => {
+  return useQuery({
+    queryKey: ['dashboard-bu-head-group-creations'],
+    queryFn: async () => {
+      return buHeadService.getGroupCreations();
+    },
+  });
+};

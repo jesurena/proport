@@ -28,7 +28,7 @@ export function TicketAvatar({ src, name, size = 24, status, className, style }:
     <Tooltip title={name} placement="top" mouseEnterDelay={0.2}>
       <div
         className={cn(
-          "rounded-full p-[1px] border-2 flex items-center justify-center shrink-0 bg-background",
+          "rounded-full p-[1px] border-2 flex items-center justify-center shrink-0 bg-background transition-all duration-200 hover:!z-50 hover:shadow-md cursor-pointer relative",
           borderColor,
           className
         )}

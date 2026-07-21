@@ -82,14 +82,26 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
           onClick={handleAction}
           className="flex items-center gap-3 px-5 py-2.5 bg-black text-white hover:bg-neutral-900 rounded-full font-semibold text-xs mt-6 transition-all select-none w-fit cursor-pointer"
         >
-          <span>
-            {is_adel
-              ? `For Final Approval (${counts?.for_final_approval ?? 0})`
-              : is_head
-              ? `For BU Head Approval (${counts?.for_bu_head_approval ?? 0})`
-              : isSales
-              ? 'Compose Ticket'
-              : 'View Tickets'}
+          <span className="flex items-center gap-2">
+            {is_adel ? (
+              <>
+                For Final Approval
+                <span className="inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-full min-w-[18px]">
+                  {counts?.for_final_approval ?? 0}
+                </span>
+              </>
+            ) : is_head ? (
+              <>
+                For BU Head Approval
+                <span className="inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-full min-w-[18px]">
+                  {counts?.for_bu_head_approval ?? 0}
+                </span>
+              </>
+            ) : isSales ? (
+              'Compose Ticket'
+            ) : (
+              'View Tickets'
+            )}
           </span>
           <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-black shrink-0">
             <ChevronRight size={12} className="stroke-[3]" />

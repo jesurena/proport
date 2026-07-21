@@ -4,7 +4,7 @@ import React from 'react';
 import DashboardWelcomeBanner from '../DashboardWelcomeBanner';
 import DashboardMetricCard from '../DashboardMetricCard';
 import SalesRecentTickets from '../SalesRecentTickets';
-import DashboardTicketCountAo from '../DashboardTicketCountAo';
+import DashboardTabTable from '../DashboardTabTable';
 import DashboardFocusBreakdown from '../DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from '../DashboardBookmarkedTickets';
 
@@ -20,7 +20,7 @@ export default function SalesDashboard() {
         <DashboardWelcomeBanner role="sales" />
         <DashboardMetricCard counts={counts} />
         <SalesRecentTickets />
-        <DashboardTicketCountAo />
+        <DashboardTabTable />
       </div>
 
       {/* ── RIGHT COLUMN ── */}

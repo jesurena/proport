@@ -3,7 +3,7 @@
 import React from 'react';
 import DashboardWelcomeBanner from '../DashboardWelcomeBanner';
 import DashboardMetricCard from '../DashboardMetricCard';
-import DashboardTicketCountAo from '../DashboardTicketCountAo';
+import DashboardTabTable from '../DashboardTabTable';
 import DashboardFocusBreakdown from '../DashboardFocusBreakdown';
 import DashboardBookmarkedTickets from '../DashboardBookmarkedTickets';
 import DashboardTicketPerBuyer from '../DashboardTicketPerBuyer';
@@ -23,7 +23,7 @@ export default function BuyerDashboard({ role }: BuyerDashboardProps) {
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role={role} />
         <DashboardMetricCard counts={counts} />
-        <DashboardTicketCountAo />
+        <DashboardTabTable />
       </div>
 
       {/* ── RIGHT COLUMN ── */}

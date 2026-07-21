@@ -208,7 +208,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
 
         return (
           <div className="flex items-center gap-2">
-            <div className="flex -space-x-1.5 overflow-hidden shrink-0">
+            <div className="flex -space-x-1.5 py-1 px-0.5">
               {participants.slice(0, 3).map((name, i) => (
                 <TicketAvatar
                   key={name}

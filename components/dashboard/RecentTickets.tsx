@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { AppChip, cn } from '@integrated-computer-system/ui-kit';
+import { AppCard, AppLabel } from '@/components/ui';
 import { Ticket, STATUS_META } from '@/lib/types';
 import { Clock, ArrowRight } from 'lucide-react';
 
@@ -32,12 +33,14 @@ export default function RecentTickets({ tickets }: RecentTicketsProps) {
   const router = useRouter();
 
   return (
-    <div className="rounded-2xl bg-card-bg border border-border/60 p-5">
+    <AppCard variant="default" padding="md">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-text">Recent Inquiries</h3>
+        <AppLabel as="h3" variant="title" className="!text-sm !font-semibold">
+          Recent Inquiries
+        </AppLabel>
         <button
           onClick={() => router.push('/tickets')}
-          className="text-xs font-medium text-accent-1 hover:text-accent-1/80 transition-colors flex items-center gap-1"
+          className="text-xs font-medium text-accent-1 hover:text-accent-1/80 transition-colors flex items-center gap-1 cursor-pointer"
         >
           View all <ArrowRight size={12} />
         </button>
@@ -45,7 +48,9 @@ export default function RecentTickets({ tickets }: RecentTicketsProps) {
 
       <div className="flex flex-col gap-2">
         {tickets.length === 0 && (
-          <p className="text-sm text-text-info py-8 text-center">No inquiries yet</p>
+          <AppLabel variant="description" className="text-sm py-8 text-center block">
+            No inquiries yet
+          </AppLabel>
         )}
         {tickets.map((ticket) => {
           const statusMeta = STATUS_META[ticket.status] || { label: ticket.status, color: '#6b7280', chipVariant: 'default' };
@@ -56,25 +61,27 @@ export default function RecentTickets({ tickets }: RecentTicketsProps) {
               className={cn(
                 'flex items-center gap-4 p-3 rounded-xl',
                 'transition-all duration-200 hover:bg-hover/50',
-                'text-left w-full group'
+                'text-left w-full group cursor-pointer'
               )}
             >
               {/* Ticket number */}
               <div className="w-10 h-10 rounded-lg bg-neutral flex items-center justify-center shrink-0">
-                <span className="text-xs font-bold text-text-info">
+                <AppLabel className="text-xs font-bold text-text-info">
                   #{String(ticket.ticketNumber).padStart(4, '0')}
-                </span>
+                </AppLabel>
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text truncate group-hover:text-accent-1 transition-colors">
+                <AppLabel className="text-sm font-medium text-text truncate group-hover:text-accent-1 transition-colors block">
                   {ticket.subject}
-                </p>
+                </AppLabel>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] text-text-info">{ticket.requesterName}</span>
+                  <AppLabel variant="description" className="text-[11px]">
+                    {ticket.requesterName}
+                  </AppLabel>
                   <span className="text-text-info/30">•</span>
-                  <span className="text-[11px] text-text-info flex items-center gap-1">
+                  <span className="text-[11px] text-text-info flex items-center gap-1 font-mono">
                     <Clock size={10} />
                     {timeAgo(ticket.updatedAt)}
                   </span>
@@ -91,6 +98,6 @@ export default function RecentTickets({ tickets }: RecentTicketsProps) {
           );
         })}
       </div>
-    </div>
+    </AppCard>
   );
 }

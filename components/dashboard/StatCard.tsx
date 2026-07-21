@@ -3,6 +3,7 @@
 import React from 'react';
 import { cn } from '@integrated-computer-system/ui-kit';
 import { LucideIcon } from 'lucide-react';
+import { AppCard, AppLabel } from '@/components/ui';
 
 interface StatCardProps {
   label: string;
@@ -27,11 +28,11 @@ export default function StatCard({
   className,
 }: StatCardProps) {
   return (
-    <div
+    <AppCard
+      variant="default"
+      padding="md"
       className={cn(
-        'relative overflow-hidden rounded-2xl bg-card-bg border border-border/60 p-5',
-        'transition-all duration-200 hover:shadow-md hover:border-border',
-        'group',
+        'relative overflow-hidden group hover:shadow-md transition-all duration-200',
         className
       )}
     >
@@ -39,9 +40,13 @@ export default function StatCard({
       <div className="absolute inset-0 bg-gradient-to-br from-accent-1/[0.02] to-transparent pointer-events-none" />
 
       <div className="relative flex items-start justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="text-[13px] font-medium text-text-info">{label}</span>
-          <span className="text-3xl font-bold text-text tracking-tight">{value}</span>
+        <div className="flex flex-col gap-1 min-w-0">
+          <AppLabel as="span" variant="description" className="text-[13px] font-medium text-text-info truncate">
+            {label}
+          </AppLabel>
+          <AppLabel as="span" className="text-3xl font-bold text-text tracking-tight">
+            {value}
+          </AppLabel>
           {trend && (
             <span
               className={cn(
@@ -55,7 +60,7 @@ export default function StatCard({
         </div>
         <div
           className={cn(
-            'w-11 h-11 rounded-xl flex items-center justify-center shrink-0',
+            'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ml-3',
             'transition-transform duration-200 group-hover:scale-105',
             iconBg
           )}
@@ -63,6 +68,6 @@ export default function StatCard({
           <Icon size={22} className={iconColor} />
         </div>
       </div>
-    </div>
+    </AppCard>
   );
 }
