@@ -32,7 +32,7 @@ export function AppAvatarCard({
         className
       )}
     >
-      <AppAvatar src={avatarUrl} name={user.name} size={24} />
+      <AppAvatar src={avatarUrl} name={user.name} size={32} />
       <div className="flex-1 min-w-0 text-left">
         <AppLabel as="span" className="text-xs font-bold text-text uppercase block truncate leading-none mb-0.5">
           {user.name}

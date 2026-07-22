@@ -28,11 +28,8 @@ export function AppReassignModal({
   const [isDragOverAssigned, setIsDragOverAssigned] = useState(false);
   const [isDragOverAvailable, setIsDragOverAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // Fetch real assignees and available buyers from database constant
   const { data: assigneesRes, isLoading } = useTicketAssignees(String(ticket.id), open);
 
-  // Initialize lists when data is loaded
   useEffect(() => {
     if (assigneesRes) {
       setAssignedList(assigneesRes.assigned);
@@ -124,7 +121,7 @@ export function AppReassignModal({
                 onDragLeave={() => setIsDragOverAssigned(false)}
                 onDrop={handleDropToAssigned}
                 className={cn(
-                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[220px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
+                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[260px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
                   isDragOverAssigned && "bg-neutral-200 border-accent-1/40 border-dashed"
                 )}
               >
@@ -169,7 +166,7 @@ export function AppReassignModal({
                 onDragLeave={() => setIsDragOverAvailable(false)}
                 onDrop={handleDropToAvailable}
                 className={cn(
-                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[220px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
+                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[260px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
                   isDragOverAvailable && "bg-neutral-200 border-accent-1/40 border-dashed"
                 )}
               >
