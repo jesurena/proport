@@ -31,14 +31,18 @@ export default function TicketInfoPanel({ ticket }: TicketInfoPanelProps) {
       {/* Assignee */}
       <div className="space-y-1.5">
         <span className="text-[11px] font-bold text-text-info uppercase tracking-wider block">Buyer (Assignee)</span>
-        {ticket.assigneeId ? (
-          <div className="flex items-center gap-2">
-            <AppAvatar
-              name={ticket.assigneeName!}
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${ticket.assigneeName}`}
-              size={24}
-            />
-            <span className="text-sm font-medium text-text">{ticket.assigneeName}</span>
+        {ticket.assignees && ticket.assignees.length > 0 ? (
+          <div className="space-y-1.5">
+            {ticket.assignees.map((assignee) => (
+              <div key={assignee.id} className="flex items-center gap-2">
+                <AppAvatar
+                  name={assignee.name}
+                  src={assignee.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${assignee.name}`}
+                  size={24}
+                />
+                <span className="text-sm font-medium text-text">{assignee.name}</span>
+              </div>
+            ))}
           </div>
         ) : (
           <span className="text-sm font-semibold text-text-info italic">Not assigned</span>

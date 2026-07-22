@@ -44,6 +44,16 @@ export function TicketActionsCard({
   const isBuyerOrAdmin = role === 'buyer' || role === 'admin' || role === 'super_user';
   const canAssign = role === 'buyer' || role === 'admin';
 
+  const resolvedAssignees = React.useMemo(() => {
+    if (ticket.assignees && Array.isArray(ticket.assignees)) {
+      return ticket.assignees.map((a: any) => ({
+        name: a.name,
+        avatar: a.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${a.name}`,
+      }));
+    }
+    return [];
+  }, [ticket.assignees]);
+
   const normalizedStatus = normalizeStatusKey(ticket.status, (ticket as any).status_id);
   const statusMeta =
     STATUS_META[normalizedStatus] || STATUS_META[ticket.status] || { label: ticket.status, color: '#6b7280' };
@@ -52,37 +62,47 @@ export function TicketActionsCard({
     switch (status) {
       case 'unassigned':
         return {
-          color: '#6b7280',
+          color: '#71717a',
           heading: 'Unassigned Ticket',
           description: 'No buyer has been assigned to this ticket yet. It is waiting for review.',
           icon: <Inbox size={12} className="inline mr-1" />,
         };
       case 'assigned':
+        return {
+          color: '#059669',
+          heading: 'Ticket Assigned',
+          description: 'A buyer is actively analyzing the quote request and specifications.',
+          icon: <CircleDot size={12} className="inline mr-1" />,
+        };
       case 'reassigned':
         return {
-          color: '#3b82f6',
-          heading: 'Ticket in Progress',
+          color: '#4f46e5',
+          heading: 'Ticket Reassigned',
           description: 'A buyer is actively analyzing the quote request and specifications.',
           icon: <CircleDot size={12} className="inline mr-1" />,
         };
       case 'pending':
         return {
-          color: '#ffc107',
+          color: '#f59e0b',
           heading: 'Pending Response',
           description: 'Ticket is pending action or replies from supplier/buyer.',
           icon: <Clock3 size={12} className="inline mr-1" />,
         };
       case 'bu-approval':
+      case 'for approval of bu head':
+      case 'for-approval-of-bu-head':
         return {
-          color: '#2d5a27',
+          color: '#db2777',
           heading: 'Awaiting BU Head Approval',
           description:
             'Non-Focus request created; pending approval signature from the Business Unit Head.',
           icon: <CheckCircle2 size={12} className="inline mr-1" />,
         };
       case 'final-approval':
+      case 'for final approval':
+      case 'for-final-approval':
         return {
-          color: '#2d5a27',
+          color: '#059669',
           heading: 'Awaiting Final Approval',
           description:
             'Request endorsed by BU Head; pending final executive approval from Adel.',
@@ -90,7 +110,7 @@ export function TicketActionsCard({
         };
       case 'answered':
         return {
-          color: '#17a2b8',
+          color: '#0d9488',
           heading: 'Quote Answered',
           description:
             'Pricing details have been provided. Requestor can review and accept/close or reply.',
@@ -98,35 +118,39 @@ export function TicketActionsCard({
         };
       case 'closed':
         return {
-          color: '#20c997',
+          color: '#059669',
           heading: 'Ticket Closed',
           description: 'This ticket has been resolved and closed successfully.',
           icon: <XCircle size={12} className="inline mr-1" />,
         };
       case 'bu-declined':
+      case 'declined by bu head':
+      case 'declined-by-bu-head':
         return {
-          color: '#dc3545',
+          color: '#dc2626',
           heading: 'Declined by BU Head',
           description: 'This Non-Focus request was declined by the Business Unit Head.',
           icon: <AlertTriangle size={12} className="inline mr-1" />,
         };
       case 'adel-declined':
+      case 'declined by final approver':
+      case 'declined-by-final-approver':
         return {
-          color: '#dc3545',
+          color: '#dc2626',
           heading: 'Declined by Executive (Adel)',
           description: 'This request was declined during final executive approval.',
           icon: <AlertTriangle size={12} className="inline mr-1" />,
         };
       case 'escalated':
         return {
-          color: '#dc3545',
+          color: '#dc2626',
           heading: 'Ticket Escalated',
           description: 'This ticket has been escalated and requires immediate attention.',
           icon: <AlertTriangle size={12} className="inline mr-1" />,
         };
       default:
         return {
-          color: '#6b7280',
+          color: '#71717a',
           heading: 'Ticket Active',
           description: 'This ticket is currently active and open for discussion.',
           icon: <FileText size={12} className="inline mr-1" />,
@@ -182,22 +206,21 @@ export function TicketActionsCard({
           <span className="text-[11px] font-bold text-text-info uppercase tracking-wider block mb-2">
             Buyer (Assignee)
           </span>
-          {ticket.assigneeName ? (
+          {resolvedAssignees.length > 0 ? (
             <div className="space-y-1.5 mb-3">
-              {ticket.assigneeName.split(',').map((name) => {
-                const cleanName = name.trim();
+              {resolvedAssignees.map((assignee) => {
                 return (
                   <div
-                    key={cleanName}
+                    key={assignee.name}
                     className="flex items-center gap-2 bg-neutral/5 p-2 rounded-md border border-border/40"
                   >
                     <AppAvatar
-                      name={cleanName}
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${cleanName}`}
+                      name={assignee.name}
+                      src={assignee.avatar}
                       size={20}
                     />
                     <span className="text-xs font-semibold text-text truncate flex-1">
-                      {cleanName}
+                      {assignee.name}
                     </span>
                   </div>
                 );
@@ -210,7 +233,7 @@ export function TicketActionsCard({
             <AppButton
               variant="secondary"
               size="sm"
-              leftIcon={ticket.assigneeId ? <UserCheck size={14} /> : <UserPlus size={14} />}
+              leftIcon={resolvedAssignees.length > 0 ? <UserCheck size={14} /> : <UserPlus size={14} />}
               onClick={onAssignClick}
               className="w-full text-center text-xs font-semibold text-text bg-neutral/15 hover:bg-neutral/25 border border-border/40 py-2 rounded-md transition-colors cursor-pointer flex items-center justify-center gap-1.5 h-9"
             >

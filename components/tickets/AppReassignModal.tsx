@@ -13,7 +13,7 @@ interface AppReassignModalProps {
   open: boolean;
   onClose: () => void;
   ticket: Ticket;
-  onUpdateAssignment: (assigneeIds: string, assigneeNames: string, remarks: string) => void;
+  onUpdateAssignment: (assigneeIds: string, assigneeNames: string, remarks: string) => Promise<void>;
 }
 
 export function AppReassignModal({
@@ -27,6 +27,7 @@ export function AppReassignModal({
   const [remarks, setRemarks] = useState('');
   const [isDragOverAssigned, setIsDragOverAssigned] = useState(false);
   const [isDragOverAvailable, setIsDragOverAvailable] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Fetch real assignees and available buyers from database constant
   const { data: assigneesRes, isLoading } = useTicketAssignees(String(ticket.id), open);
@@ -77,11 +78,19 @@ export function AppReassignModal({
     }
   };
 
-  const handleUpdate = () => {
-    const ids = assignedList.map((u) => u.id).join(',');
-    const names = assignedList.map((u) => u.name).join(', ');
-    onUpdateAssignment(ids, names, remarks);
-    onClose();
+  const handleUpdate = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const ids = assignedList.map((u) => u.id).join(',');
+      const names = assignedList.map((u) => u.name).join(', ');
+      await onUpdateAssignment(ids, names, remarks);
+      onClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -204,13 +213,15 @@ export function AppReassignModal({
         <AppButton
           variant="neutral"
           onClick={onClose}
+          disabled={loading}
         >
           Cancel
         </AppButton>
         <AppButton
           variant="primary"
           onClick={handleUpdate}
-          disabled={isLoading}
+          loading={loading}
+          disabled={loading || isLoading}
         >
           Update Assignment
         </AppButton>

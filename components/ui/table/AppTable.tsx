@@ -59,7 +59,11 @@ export function AppTable<RecordType extends object>({
           Table: {
             headerBg: 'var(--neutral)',
             headerColor: 'var(--text-info)',
-            rowHoverBg: 'transparent',
+            rowHoverBg: 'var(--hover-bg)',
+            colorBgContainer: 'transparent',
+            headerSplitColor: 'transparent',
+            cellPaddingBlock: 12,
+            cellPaddingInline: 14,
           },
         },
       }}

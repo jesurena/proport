@@ -10,6 +10,8 @@ import { timeAgo, fullDate } from '@/components/utils/time';
 import { getPreviewText, displayFileName, localizeHtmlImages } from '@/components/utils/ticket';
 import { BrandTicketChip } from '@/components/tickets/BrandTicketChip';
 import type { TicketStatus, Attachment } from '@/lib/types';
+import { useAuthStore } from '@/modules/auth';
+import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
 
 interface TicketSubjectCardProps {
   ticketId: string;
@@ -40,33 +42,41 @@ export function TicketSubjectCard({
   brandName,
   brandType,
 }: TicketSubjectCardProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isPinned, setIsPinned] = useState(false);
+  const token = useAuthStore.getState().token;
+  const getAttachmentUrl = useAttachmentUrl();
+
+  useEffect(() => {
+    const checkPinned = () => {
+      const pins = localStorage.getItem('proport_pinned_tickets');
+      if (pins) {
+        const parsed = JSON.parse(pins) as string[];
+        setIsPinned(parsed.includes(ticketId));
+      }
+    };
+    checkPinned();
+
+    window.addEventListener('proport-pins-updated', checkPinned);
+    window.addEventListener('storage', checkPinned);
+    return () => {
+      window.removeEventListener('proport-pins-updated', checkPinned);
+      window.removeEventListener('storage', checkPinned);
+    };
+  }, [ticketId]);
+
   const statusMeta = STATUS_META[status] || {
     label: typeof status === 'string' ? status : 'Unknown',
     color: '#8b8b8b',
     chipVariant: 'default'
   };
 
-  const [isPinned, setIsPinned] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const pins = localStorage.getItem('proport_pinned_tickets');
-      if (pins) {
-        const parsed = JSON.parse(pins) as string[];
-        setIsPinned(parsed.includes(ticketId));
-      }
-    }
-  }, [ticketId]);
-
-  const togglePin = () => {
+  const handleTogglePin = () => {
     modal.confirm({
-      title: isPinned ? 'Remove Bookmark?' : 'Bookmark Ticket?',
-      content: isPinned
-        ? 'Are you sure you want to remove this ticket from your bookmarks?'
-        : 'Are you sure you want to bookmark this ticket for quick access?',
-      okText: 'Yes',
-      cancelText: 'No',
+      title: isPinned ? 'Unpin request?' : 'Pin request?',
+      content: isPinned ? 'This will remove the request from your pinned list.' : 'This will add the request to your pinned list.',
+      okText: 'Confirm',
+      cancelText: 'Cancel',
       centered: true,
       onOk() {
         const pins = localStorage.getItem('proport_pinned_tickets');
@@ -108,7 +118,7 @@ export function TicketSubjectCard({
   }
 
   const imageToShow = firstImgAttachment
-    ? `http://localhost:3001/viewFile/${firstImgAttachment.name}`
+    ? getAttachmentUrl(firstImgAttachment.name)
     : firstEmbeddedImg;
 
   return (
@@ -118,7 +128,7 @@ export function TicketSubjectCard({
         <div className="flex items-center text-left mb-3.5">
           <AppBookmark
             active={isPinned}
-            onClick={togglePin}
+            onClick={handleTogglePin}
             size={20}
             className="mr-2"
             title={isPinned ? 'Remove Bookmark' : 'Bookmark Ticket'}
@@ -199,7 +209,7 @@ export function TicketSubjectCard({
                         variant="shared"
                         onClick={() => setPreviewFile(file.name)}
                         onDownload={() => {
-                          window.open(`http://localhost:3001/viewFile/${file.name}`, '_blank');
+                          window.open(getAttachmentUrl(file.name), '_blank');
                         }}
                       />
                     ))}

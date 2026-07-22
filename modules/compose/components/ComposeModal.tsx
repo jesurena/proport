@@ -544,7 +544,7 @@ export function ComposeModal() {
 
             {/* ── Action Bar ── */}
             <div className="flex items-center gap-1 px-3 py-2.5 border-t border-border/50 bg-background/80 shrink-0">
-              <AppButton variant="primary" size="sm" leftIcon={<Send size={12} />} onClick={handleSubmit} loading={submitting}>
+              <AppButton variant="primary" size="sm" leftIcon={<Send size={12} />} onClick={handleSubmit} loading={submitting} disabled={submitting}>
                 Send
               </AppButton>
 

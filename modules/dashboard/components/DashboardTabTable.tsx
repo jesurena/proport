@@ -6,7 +6,6 @@ import { getDashboardTabs } from '../config/dashboard-tabs.config';
 import {
   DashboardAoTable,
   DashboardSalesDateTable,
-  DashboardBuHeadAging,
   DashboardBuChart,
   DashboardBuyerDateTable,
   DashboardBuyerCategoryTable,
@@ -57,10 +56,8 @@ export default function DashboardTabTable() {
         ))}
       </div>
 
-      {/* Tab Content Components */}
       {activeTab === 'ao' && <DashboardAoTable />}
       {activeTab === 'sales-date' && <DashboardSalesDateTable />}
-      {activeTab === 'aging' && <DashboardBuHeadAging />}
       {activeTab === 'bu' && <DashboardBuChart />}
       {activeTab === 'buyer-date' && <DashboardBuyerDateTable />}
       {activeTab === 'buyer-category' && <DashboardBuyerCategoryTable />}

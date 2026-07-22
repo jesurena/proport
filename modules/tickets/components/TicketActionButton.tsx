@@ -28,6 +28,7 @@ export function TicketActionButton({
 }: TicketActionButtonProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { user, is_head, is_adel } = useAuthStore();
   const [mockRole, setMockRole] = useState<string | null>(null);
 
@@ -52,6 +53,18 @@ export function TicketActionButton({
 
   const status = normalizeStatusKey(ticket.status, (ticket as any).status_id);
 
+  const handleStatusClick = async (newStatus: TicketStatus) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      await onStatusChange(newStatus);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Render primary status button according to status and role
   const renderPrimaryButton = () => {
     // 1. BU Head Approval (Status: bu-approval)
@@ -61,7 +74,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<Check size={14} />}
-          onClick={() => onStatusChange('pending')}
+          onClick={() => handleStatusClick('pending')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Approve Request
@@ -76,7 +91,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<Check size={14} />}
-          onClick={() => onStatusChange('pending')}
+          onClick={() => handleStatusClick('pending')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Final Approve
@@ -91,7 +108,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<RotateCcw size={14} />}
-          onClick={() => onStatusChange('pending')}
+          onClick={() => handleStatusClick('pending')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Re-Approve Request
@@ -106,7 +125,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<RotateCcw size={14} />}
-          onClick={() => onStatusChange('pending')}
+          onClick={() => handleStatusClick('pending')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Re-Approve Request
@@ -127,7 +148,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<Check size={14} />}
-          onClick={() => onStatusChange('answered')}
+          onClick={() => handleStatusClick('answered')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-[#0B2545] hover:bg-[#0B2545]/90 dark:bg-[#134074] dark:hover:bg-[#134074]/90 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Mark Answered
@@ -142,7 +165,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<XCircle size={14} />}
-          onClick={() => onStatusChange('closed')}
+          onClick={() => handleStatusClick('closed')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-[#0B2545] hover:bg-[#0B2545]/90 dark:bg-[#134074] dark:hover:bg-[#134074]/90 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Close Ticket
@@ -157,7 +182,9 @@ export function TicketActionButton({
           variant="primary"
           size="sm"
           leftIcon={<RotateCcw size={14} />}
-          onClick={() => onStatusChange('assigned')}
+          onClick={() => handleStatusClick('assigned')}
+          loading={loading}
+          disabled={loading}
           className="w-full text-xs py-2 bg-[#0B2545] hover:bg-[#0B2545]/90 dark:bg-[#134074] dark:hover:bg-[#134074]/90 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Reopen Ticket
@@ -177,8 +204,9 @@ export function TicketActionButton({
           <>
             <div className="flex-1">{primaryBtn}</div>
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-9 h-9 border border-border/60 bg-neutral/5 hover:bg-hover text-text-info hover:text-text rounded-md transition-colors cursor-pointer flex items-center justify-center shrink-0"
+              onClick={() => !loading && setDropdownOpen(!dropdownOpen)}
+              disabled={loading}
+              className="w-9 h-9 border border-border/60 bg-neutral/5 hover:bg-hover text-text-info hover:text-text rounded-md transition-colors cursor-pointer flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MoreHorizontal size={14} />
             </button>
@@ -201,10 +229,11 @@ export function TicketActionButton({
             {status === 'bu-approval' && isBUHead && (
               <button
                 onClick={() => {
-                  onStatusChange('bu-declined');
+                  handleStatusClick('bu-declined');
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-2 font-semibold"
+                disabled={loading}
+                className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-2 font-semibold disabled:opacity-50"
               >
                 <X size={13} className="shrink-0" />
                 <span>Decline Request</span>
@@ -214,10 +243,11 @@ export function TicketActionButton({
             {status === 'final-approval' && isFinalApprover && (
               <button
                 onClick={() => {
-                  onStatusChange('adel-declined');
+                  handleStatusClick('adel-declined');
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-2 font-semibold"
+                disabled={loading}
+                className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-2 font-semibold disabled:opacity-50"
               >
                 <X size={13} className="shrink-0" />
                 <span>Final Decline</span>
@@ -227,10 +257,11 @@ export function TicketActionButton({
             {status === 'answered' && isBuyerOrAdmin && (
               <button
                 onClick={() => {
-                  onStatusChange('assigned');
+                  handleStatusClick('assigned');
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-3.5 py-2 text-xs text-text hover:bg-hover transition-colors flex items-center gap-2 font-medium"
+                disabled={loading}
+                className="w-full text-left px-3.5 py-2 text-xs text-text hover:bg-hover transition-colors flex items-center gap-2 font-medium disabled:opacity-50"
               >
                 <RotateCcw size={13} className="text-text-info shrink-0" />
                 <span>Mark Unanswered</span>

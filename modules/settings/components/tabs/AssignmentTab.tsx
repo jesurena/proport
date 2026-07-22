@@ -18,7 +18,7 @@ export default function AssignmentTab() {
       <div>
         <AppLabel as="h3" variant="title">Default Ticket Assignment</AppLabel>
         <AppLabel as="p" variant="description" className="mt-1">
-          Configure whether new incoming inquiries matching your category or brand scope should automatically be assigned to you as a default buyer.
+          Configure whether new incoming inquiries should automatically be assigned to you as a default buyer.
         </AppLabel>
       </div>
 
@@ -33,7 +33,7 @@ export default function AssignmentTab() {
         </div>
         <AppSwitch
           checked={isDefaultAssigned}
-          disabled={isLoading || updateMutation.isPending}
+          disabled={isLoading}
           onChange={handleToggleDefaultAssignment}
         />
       </div>

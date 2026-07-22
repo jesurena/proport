@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { AppAvatar, AppLabel } from '@integrated-computer-system/ui-kit';
 import { Tooltip } from 'antd';
@@ -34,11 +34,10 @@ export function TicketInfoCard({ ticket }: TicketInfoCardProps) {
     });
   };
 
-  // Map CC emails to user objects for avatars
-  const ccUsers = (ticket.cc || []).map((email) => {
-    const u = allUsers.find((user) => user.email === email);
-    return u || { name: email.split('@')[0], email, avatar: undefined };
-  });
+  // Map CC emails to user objects for avatars, using ticket.ccUsers if available
+  const ccUsers = useMemo(() => {
+    return ticket.ccUsers || [];
+  }, [ticket.ccUsers]);
 
   const requestTypeLabel = ticket.requestType ? (REQUEST_TYPE_LABELS[ticket.requestType] || ticket.requestType) : '—';
 
@@ -125,7 +124,7 @@ export function TicketInfoCard({ ticket }: TicketInfoCardProps) {
                   return (
                     <Tooltip key={u.email} title={`${u.name} (${u.email})`} placement="top" mouseEnterDelay={0.2}>
                       <div
-                        className="shrink-0 relative transition-all duration-200 hover:scale-110 hover:z-30 cursor-pointer"
+                        className="shrink-0 relative transition-all duration-200 hover:!z-50 cursor-pointer"
                         style={{ zIndex: ccUsers.length - i }}
                       >
                         <AppAvatar

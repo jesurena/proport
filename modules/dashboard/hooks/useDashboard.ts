@@ -23,9 +23,13 @@ const mapTicket = (t: any): TicketType => {
     priority: 'medium',
     requesterId: String(t.ao_id),
     requesterName: t.requestor_name || 'Unknown User',
-    assigneeId: t.req_id ? String(t.req_id) : undefined,
-    assigneeName: t.ao_name || undefined,
-    assigneeAvatar: t.GAvatarAO || undefined,
+    assignees: t.ao_name ? [
+      {
+        id: String(t.req_id || ''),
+        name: t.ao_name,
+        avatar: t.GAvatarAO || undefined,
+      }
+    ] : [],
     brandType: t.transaction_description || undefined,
     requestType: t.request_type || undefined,
     businessUnitId: t.AccountGroup || 'Unknown',
@@ -160,14 +164,54 @@ export const useBuyerPeriodCounts = () => {
   });
 };
 
-export const useBuyerPeriodTickets = (buyer: string | null, period: 'today' | 'week') => {
+export const useBuyerPeriodTickets = (buyer: string | null, period: 'today' | 'week', enabled = true) => {
   return useQuery<any[]>({
     queryKey: ['buyer-period-tickets', buyer, period],
     queryFn: async () => {
       if (!buyer) return [];
       return dashboardService.getBuyerPeriodTickets(buyer, period);
     },
-    enabled: !!buyer,
+    enabled: !!buyer && enabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};
+
+export const useBuyerTicketsStats = (buyer: string | null, period: 'today' | 'week', enabled = true) => {
+  return useQuery<{
+    total: number;
+    answered: number;
+    pending: number;
+    user?: {
+      name: string;
+      avatar?: string | null;
+      group?: string | null;
+    } | null;
+  }>({
+    queryKey: ['buyer-tickets-stats', buyer, period],
+    queryFn: async () => {
+      if (!buyer) return { total: 0, answered: 0, pending: 0, user: null };
+      return dashboardService.getBuyerTicketsStats(buyer, period);
+    },
+    enabled: !!buyer && enabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};
+
+export const useBuyerLogs = (buyer: string | null, period: 'today' | 'week', enabled = true) => {
+  return useQuery<any[]>({
+    queryKey: ['buyer-logs', buyer, period],
+    queryFn: async () => {
+      if (!buyer) return [];
+      return dashboardService.getBuyerLogs(buyer, period);
+    },
+    enabled: !!buyer && enabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 

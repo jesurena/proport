@@ -13,6 +13,7 @@ interface BrandRow {
 interface BrandModalProps {
   controller: BrandModalController;
   onSave: (items: { name: string; type: 'Focus' | 'Non Focus' }[]) => void;
+  loading?: boolean;
 }
 
 const TYPE_OPTIONS = [
@@ -23,6 +24,7 @@ const TYPE_OPTIONS = [
 export default function BrandModal({
   controller,
   onSave,
+  loading,
 }: BrandModalProps) {
   const { open, close, mode, brandName, brandType } = controller;
   const [rows, setRows] = useState<BrandRow[]>([]);
@@ -196,10 +198,10 @@ export default function BrandModal({
 
         {/* Footer Actions */}
         <div className="flex justify-end gap-2 pt-2">
-          <AppButton variant="neutral" onClick={close}>
+          <AppButton variant="neutral" onClick={close} disabled={loading}>
             Cancel
           </AppButton>
-          <AppButton variant="primary" onClick={handleSaveClick}>
+          <AppButton variant="primary" onClick={handleSaveClick} loading={loading} disabled={loading}>
             {mode === 'add' ? 'Save' : 'Save Changes'}
           </AppButton>
         </div>

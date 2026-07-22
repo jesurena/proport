@@ -39,32 +39,32 @@
 /* ─── Dark Theme ─────────────────────────────────────────────────────────── */
 [data-theme='dark'],
 .dark {
-  --background: #141414;
-  --foreground: #ffffff;
-  --text: #ffffff;
-  --text-info: #a1a1aa;
-  --primary: #1e293b;
-  --accent-1: #3b82f6;
-  --accent-2: #f97316;
-  --neutral: #18181b;
-  --border: #27272a;
-  --sidebar-bg: #141414;
-  --sidebar-active-bg: var(--accent-1);
-  --sidebar-active-text: #ffffff;
-  --card-bg: #1e293b;
+  --background: #212121;
+  --foreground: #ececec;
+  --text: #ececec;
+  --text-info: #a3a3a3;
+  --muted: #8e8ea0;
+  --primary: #2f2f2f;
+  --accent-1: #10a37f;
+  --accent-2: #3b82f6;
+  --neutral: #2f2f2f;
+  --card-bg: #2f2f2f;
   --chat-bg: #212121;
-  --attachment-bg: #1e1e1e;
-  --hover-bg: rgba(255, 255, 255, 0.08);
+  --attachment-bg: #2a2a2a;
+  --sidebar-bg: #171717;
+  --border: #3f3f46;
+  --hover-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-active-bg: #343541;
+  --sidebar-active-text: #ffffff;
   --user-bubble-text: #ffffff;
-  --success: #10b981;
+  --success: #22c55e;
   --danger: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
-  --muted: #64748b;
-  --skeleton-bg: #27272a;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --skeleton-bg: #313131;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
 /* ─── Custom Color Themes ────────────────────────────────────────────────── */
@@ -304,9 +304,15 @@ body {
 /* ─── AppTable (Ant Design Table) ────────────────────────────────────────── */
 .app-table-wrapper .ant-table {
   background: transparent !important;
+  color: var(--text) !important;
+}
+
+.app-table-wrapper .ant-table-container {
+  background: transparent !important;
 }
 
 .app-table-wrapper .ant-table-thead>tr>th {
+  background: var(--neutral) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
@@ -316,14 +322,15 @@ body {
 }
 
 .app-table-wrapper .ant-table-tbody>tr>td {
+  background: transparent !important;
   font-size: 14px !important;
   font-weight: 500 !important;
   color: var(--text) !important;
-  border-bottom: 1px solid rgba(217, 218, 219, 0.3) !important;
+  border-bottom: 1px solid rgba(217, 218, 219, 0.2) !important;
 }
 
 .dark .app-table-wrapper .ant-table-tbody>tr>td {
-  border-bottom: 1px solid rgba(39, 39, 42, 0.3) !important;
+  border-bottom: 1px solid rgba(39, 39, 42, 0.4) !important;
 }
 
 .app-table-wrapper .ant-table-tbody>tr:last-child>td {
@@ -334,8 +341,36 @@ body {
   transition: all 0.2s ease !important;
 }
 
-.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td {
+/* Fix sticky / fixed left and right column backgrounds so they match the card theme */
+.app-table-wrapper .ant-table-cell-fix-left,
+.app-table-wrapper .ant-table-cell-fix-right {
+  background-color: var(--card-bg) !important;
+}
+
+.app-table-wrapper .ant-table-thead>tr>th.ant-table-cell-fix-left,
+.app-table-wrapper .ant-table-thead>tr>th.ant-table-cell-fix-right {
+  background-color: var(--neutral) !important;
+}
+
+/* Row hover highlight across all cells including fixed left/right cells */
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td,
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td.ant-table-cell-fix-left,
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td.ant-table-cell-fix-right {
   background-color: var(--hover-bg) !important;
+}
+
+/* Sorter icon styling */
+.app-table-wrapper .ant-table-thead th.ant-table-column-has-sorters:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.app-table-wrapper .ant-table-column-sorter {
+  color: var(--text-info) !important;
+}
+
+.app-table-wrapper .ant-table-column-sorter-up.active,
+.app-table-wrapper .ant-table-column-sorter-down.active {
+  color: var(--accent-1) !important;
 }
 
 /* ─── AppTable Pagination Overrides ──────────────────────────────────────── */
@@ -356,13 +391,15 @@ body {
 .app-table-wrapper .ant-pagination-next {
   border-radius: 8px !important;
   border: 1px solid var(--border) !important;
-  background-color: var(--background) !important;
+  background-color: var(--card-bg) !important;
   color: var(--text) !important;
   font-weight: 600 !important;
   transition: all 0.2s ease !important;
 }
 
-.app-table-wrapper .ant-pagination-item a {
+.app-table-wrapper .ant-pagination-item a,
+.app-table-wrapper .ant-pagination-prev .ant-pagination-item-link,
+.app-table-wrapper .ant-pagination-next .ant-pagination-item-link {
   color: var(--text) !important;
 }
 
@@ -389,4 +426,40 @@ body {
 .app-table-wrapper .ant-pagination-disabled:hover .ant-pagination-item-link {
   color: var(--muted) !important;
   opacity: 0.5 !important;
+}
+
+/* Page size select dropdown */
+.app-table-wrapper .ant-pagination-options .ant-select-selector {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 8px !important;
+}
+
+.app-table-wrapper .ant-pagination-options .ant-select-arrow {
+  color: var(--text-info) !important;
+}
+
+/* Global Select Dropdown Portal styling */
+.ant-select-dropdown {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.ant-select-dropdown .ant-select-item {
+  color: var(--text) !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+  color: var(--accent-1) !important;
+  font-weight: 600 !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
 }

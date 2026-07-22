@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { useAuthStore } from '@/modules/auth';
 
 export const ticketsService = {
   async getTickets(params?: {
@@ -79,5 +80,12 @@ export const ticketsService = {
   async searchTickets(search: string): Promise<any[]> {
     const { data } = await api.get('/tickets/search', { params: { search } });
     return data;
+  },
+
+  getAttachmentUrl(fileName: string): string {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
+    const { token } = useAuthStore.getState();
+    const encoded = encodeURIComponent(btoa(fileName));
+    return `${apiBase}/attachments/view/${encoded}?token=${token}`;
   },
 };

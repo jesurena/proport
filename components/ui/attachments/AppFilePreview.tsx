@@ -5,6 +5,7 @@ import { X, Download } from 'lucide-react';
 import { AppLabel } from '../labels/AppLabel';
 import { AppButton } from '../buttons/AppButton';
 import { formatFileSize, getAttachmentIcon } from './AppAttachmentCard';
+import { useAuthStore } from '@/modules/auth';
 
 export interface AppFilePreviewProps {
   open: boolean;
@@ -57,9 +58,12 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
         URL.revokeObjectURL(url);
       };
     } else if (typeof file === 'string') {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
+      const token = useAuthStore.getState().token;
+      const encoded = encodeURIComponent(btoa(file));
       const targetUrl = file.startsWith('http://') || file.startsWith('https://') || file.startsWith('blob:') || file.startsWith('/')
         ? file
-        : `http://localhost:7090/api/viewFile/${file}`;
+        : `${apiBase}/attachments/view/${encoded}?token=${token}`;
 
       // Check if file URL is valid / 200 OK
       fetch(targetUrl, { method: 'HEAD' })
@@ -103,7 +107,10 @@ export const AppFilePreview: React.FC<AppFilePreviewProps> = ({
     } else if (blobUrl && !hasError) {
       window.open(blobUrl, '_blank');
     } else {
-      window.open(`http://localhost:7090/api/viewFile/${fileName}`, '_blank');
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
+      const token = useAuthStore.getState().token;
+      const encoded = encodeURIComponent(btoa(fileName));
+      window.open(`${apiBase}/attachments/view/${encoded}?token=${token}`, '_blank');
     }
   };
 

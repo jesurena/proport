@@ -3,15 +3,17 @@ import type { Ticket as TicketType } from '@/lib/types';
 
 export const useBuyerAnalytics = (allTickets: TicketType[]) => {
   const buyerAverages = useMemo(() => {
-    const closed = allTickets.filter((t) => t.closedAt && t.assigneeId);
+    const closed = allTickets.filter((t) => t.closedAt && t.assignees && t.assignees.length > 0);
     const buyerTimes: Record<string, { totalHours: number; count: number }> = {};
     closed.forEach((t) => {
+      const primaryBuyer = t.assignees?.[0];
+      const buyerName = primaryBuyer?.name || 'Unknown';
       const hrs = (new Date(t.closedAt!).getTime() - new Date(t.createdAt).getTime()) / (1000 * 60 * 60);
-      if (!buyerTimes[t.assigneeName!]) {
-        buyerTimes[t.assigneeName!] = { totalHours: 0, count: 0 };
+      if (!buyerTimes[buyerName]) {
+        buyerTimes[buyerName] = { totalHours: 0, count: 0 };
       }
-      buyerTimes[t.assigneeName!].totalHours += hrs;
-      buyerTimes[t.assigneeName!].count++;
+      buyerTimes[buyerName].totalHours += hrs;
+      buyerTimes[buyerName].count++;
     });
     const buyerAvg = Object.entries(buyerTimes).map(([name, val]) => ({
       name,
@@ -33,7 +35,8 @@ export const useBuyerAnalytics = (allTickets: TicketType[]) => {
     };
     allTickets.forEach((t) => {
       const day = new Date(t.createdAt).getDay();
-      const name = t.assigneeName || 'Unassigned';
+      const primaryBuyer = t.assignees?.[0];
+      const name = primaryBuyer?.name || 'Unassigned';
       if (weeklyMatrix[name]) {
         weeklyMatrix[name][day]++;
       }

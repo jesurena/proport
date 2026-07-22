@@ -33,3 +33,26 @@ export function fullDate(dateStr: string): string {
   });
 }
 
+export function formatActivityDateKey(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    }
+    if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    }
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch (e) {
+    return 'Earlier';
+  }
+}
+

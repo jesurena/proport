@@ -1,21 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsService } from '../services/tickets.service';
 
-export const useTickets = (params?: {
-  page?: number;
-  per_page?: number;
-  tab?: string;
-  search?: string;
-  sort_by?: string;
-  status?: string;
-  brand_type?: string;
-  my_tickets?: string;
-}) => {
+export const useTickets = (
+  params?: {
+    page?: number;
+    per_page?: number;
+    tab?: string;
+    search?: string;
+    sort_by?: string;
+    status?: string;
+    brand_type?: string;
+    my_tickets?: string;
+  },
+  enabled = true
+) => {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsService.getTickets(params),
     refetchInterval: 15000,
     refetchIntervalInBackground: false,
+    enabled,
   });
 };
 
@@ -97,4 +101,8 @@ export const useSearchTickets = (search: string, enabled = true) => {
     refetchOnReconnect: false,
     staleTime: 30000, // Cache search results for 30s
   });
+};
+
+export const useAttachmentUrl = () => {
+  return (fileName: string) => ticketsService.getAttachmentUrl(fileName);
 };

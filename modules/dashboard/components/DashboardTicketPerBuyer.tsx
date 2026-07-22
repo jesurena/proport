@@ -2,21 +2,20 @@
 
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { useBuyerPeriodCounts } from '../hooks/useDashboard';
+import BuyerTicketsModal from './modals/BuyerTicketsModal';
+import { AppButton } from '@integrated-computer-system/ui-kit';
 import { Segmented } from 'antd';
 import { AppLabel, AppAvatar, AppCard } from '@/components/ui';
-import type { Ticket as TicketType } from '@/lib/types';
-import { useBuyerPeriodCounts, useBuyerPeriodTickets } from '../hooks/useDashboard';
-import BuyerTicketsModal from './modals/BuyerTicketsModal';
 
 export default function DashboardTicketPerBuyer() {
   const router = useRouter();
   const [buyerPeriod, setBuyerPeriod] = useState<'today' | 'week'>('today');
   const [showAllBuyers, setShowAllBuyers] = useState(false);
-  const [selectedBuyerForModal, setSelectedBuyerForModal] = useState<string | null>(null);
+  const [selectedBuyer, setSelectedBuyer] = useState<{ id: string | number; name: string } | null>(null);
 
   const { data: periodCounts, isLoading } = useBuyerPeriodCounts();
-  const { data: modalTickets } = useBuyerPeriodTickets(selectedBuyerForModal, buyerPeriod);
 
   const buyerCounts = useMemo(() => {
     if (!periodCounts) return [];
@@ -51,11 +50,15 @@ export default function DashboardTicketPerBuyer() {
           />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-1">
           {displayedBuyers.map((buyer) => (
-            <div key={buyer.name} className="flex items-center justify-between gap-3">
+            <AppCard
+              key={buyer.name}
+              onClick={() => setSelectedBuyer({ id: buyer.id, name: buyer.name })}
+              className="!p-2 flex items-center justify-between cursor-pointer border-none shadow-none hover:bg-neutral/5 transition-all select-none rounded-xl"
+            >
               <div className="flex items-center gap-2.5">
-                <AppAvatar src={buyer.avatar} name={buyer.name} size={36} />
+                <AppAvatar src={buyer.avatar} name={buyer.name} size={32} />
                 <div>
                   <AppLabel as="p" className="text-xs font-bold text-text leading-none mb-0.5">
                     {buyer.name}
@@ -66,14 +69,16 @@ export default function DashboardTicketPerBuyer() {
                   </AppLabel>
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedBuyerForModal(buyer.name)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-accent-1/30 text-accent-1 text-[10px] font-bold hover:bg-accent-1 hover:text-white transition-colors cursor-pointer shrink-0"
+              <AppButton
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedBuyer({ id: buyer.id, name: buyer.name });
+                }}
               >
-                <Users size={10} />
-                View
-              </button>
-            </div>
+                <ArrowRight size={14} />
+              </AppButton>
+            </AppCard>
           ))}
         </div>
 
@@ -88,13 +93,15 @@ export default function DashboardTicketPerBuyer() {
       </AppCard>
 
       {/* Embedded TicketTable Modal */}
-      <BuyerTicketsModal
-        open={!!selectedBuyerForModal}
-        onClose={() => setSelectedBuyerForModal(null)}
-        buyer={selectedBuyerForModal || ''}
-        buyerPeriod={buyerPeriod}
-        tickets={modalTickets || []}
-      />
+      {selectedBuyer && (
+        <BuyerTicketsModal
+          open={!!selectedBuyer}
+          onClose={() => setSelectedBuyer(null)}
+          buyerId={selectedBuyer.id}
+          buyerName={selectedBuyer.name}
+          buyerPeriod={buyerPeriod}
+        />
+      )}
     </>
   );
 }

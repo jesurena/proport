@@ -82,6 +82,20 @@ export const dashboardService = {
     return data.data || [];
   },
 
+  async getBuyerTicketsStats(buyer: string, period: 'today' | 'week'): Promise<{ total: number; answered: number; pending: number }> {
+    const { data } = await api.get('/dashboard/buyer-tickets-stats', {
+      params: { buyer, period },
+    });
+    return data.data || { total: 0, answered: 0, pending: 0 };
+  },
+
+  async getBuyerLogs(buyer: string, period: 'today' | 'week'): Promise<any[]> {
+    const { data } = await api.get('/dashboard/buyer-logs', {
+      params: { buyer, period },
+    });
+    return data.data || [];
+  },
+
   async getRecentTickets(): Promise<any[]> {
     const { data } = await api.get('/dashboard/recent-tickets');
     return data.data || [];

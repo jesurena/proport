@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, Send, Trash2, X, Plus, Paperclip } from 'lucide-react';
-import { AppAvatar, AppLabel } from '@integrated-computer-system/ui-kit';
+import { AppAvatar, AppLabel, AppButton } from '@integrated-computer-system/ui-kit';
 import { AppSummernoteEditor } from '@/modules/compose/components/AppSummernoteEditor';
 import { AppUserSelectModal } from '@/modules/compose/components/AppUserSelectModal';
 import { AppAttachmentCard } from '@/components/ui';
@@ -171,20 +171,26 @@ export function TicketReplyComposer({
         {/* Action button split group */}
         <div className="flex items-center gap-2">
           <div className="relative flex items-stretch">
-            <button
+            <AppButton
+              variant="primary"
+              size="sm"
+              leftIcon={!sending && <Send size={12} />}
               onClick={handleMainSend}
+              loading={sending}
               disabled={sending}
-              className="bg-[#0B2545] dark:bg-[#134074] hover:opacity-90 disabled:opacity-50 text-white text-xs font-semibold px-4 py-2 rounded-l-md transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+              className="!bg-[#0B2545] dark:!bg-[#134074] hover:opacity-90 disabled:opacity-50 text-white text-xs font-semibold px-4 py-2 !rounded-l-md !rounded-r-none transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
-              <Send size={12} />
               {sending ? 'Sending...' : actions[selectedAction].label}
-            </button>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="bg-[#0B2545] dark:bg-[#134074] hover:opacity-95 text-white border-l border-white/20 px-2 rounded-r-md flex items-center justify-center cursor-pointer transition-colors"
+            </AppButton>
+            <AppButton
+              variant="primary"
+              size="sm"
+              onClick={() => !sending && setDropdownOpen(!dropdownOpen)}
+              disabled={sending}
+              className="!bg-[#0B2545] dark:!bg-[#134074] hover:opacity-95 text-white border-l border-white/20 px-2 !rounded-r-md !rounded-l-none flex items-center justify-center cursor-pointer transition-colors"
             >
               <ChevronDown size={14} />
-            </button>
+            </AppButton>
 
             {dropdownOpen && (
               <div className="absolute right-0 bottom-full mb-1.5 w-56 bg-card-bg border border-border shadow-lg rounded-lg py-1.5 z-20">

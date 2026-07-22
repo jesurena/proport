@@ -23,9 +23,10 @@ export interface TicketTableProps {
   tickets?: Ticket[];
   hideHeader?: boolean;
   hideFilters?: boolean;
+  refetch?: boolean;
 }
 
-export function TicketTable({ tickets, hideHeader = false, hideFilters = false }: TicketTableProps = {}) {
+export function TicketTable({ tickets, hideHeader = false, hideFilters = false, refetch = true }: TicketTableProps = {}) {
   const router = useRouter();
   const {
     searchQuery,
@@ -68,7 +69,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
     };
   }, [page, pageSize, activeTab, searchQuery, sortBy, selectedStatuses, selectedBrandTypes, myTicketsOnly]);
 
-  const { data, isLoading } = useTickets(queryParams);
+  const { data, isLoading } = useTickets(queryParams, refetch);
 
   const filteredTickets = React.useMemo(() => {
     return data?.data || [];
@@ -182,7 +183,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false }
         } else {
           const rawParticipants = Array.from(
             new Set(
-              [record.assigneeName, ...(record.replies || []).map((r: any) => r.authorName)].filter(
+              [...((record.assignees || []).map((a: any) => a.name)), ...(record.replies || []).map((r: any) => r.authorName)].filter(
                 (name): name is string => Boolean(name) && name !== record.requesterName
               )
             )

@@ -5,6 +5,7 @@ import { Minus, Plus } from 'lucide-react';
 import { AppAttachmentCard } from '@/components/ui';
 import { AppLabel } from '@integrated-computer-system/ui-kit';
 import type { Ticket } from '@/lib/types';
+import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
 
 interface TicketFilesCardProps {
   ticket: Ticket;
@@ -17,6 +18,7 @@ function displayFileName(name: string): string {
 
 export function TicketFilesCard({ ticket, setPreviewFile }: TicketFilesCardProps) {
   const [expanded, setExpanded] = useState(true);
+  const getAttachmentUrl = useAttachmentUrl();
 
   return (
     <div className="rounded-xl border border-border/60 bg-card-bg shadow-sm overflow-hidden">
@@ -48,7 +50,7 @@ export function TicketFilesCard({ ticket, setPreviewFile }: TicketFilesCardProps
                   variant="shared"
                   onClick={() => setPreviewFile(file.name)}
                   onDownload={() => {
-                    window.open(`http://localhost:3001/viewFile/${file.name}`, '_blank');
+                    window.open(getAttachmentUrl(file.name), '_blank');
                   }}
                 />
               ))

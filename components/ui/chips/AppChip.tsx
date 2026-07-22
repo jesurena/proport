@@ -78,7 +78,7 @@ const VARIANT_CLASSES: Record<AppChipVariant, string> = {
     closed: 'bg-emerald-600 text-white',
     escalated: 'bg-red-600 text-white',
     reassigned: 'bg-indigo-600 text-white',
-    'bu-approval': 'bg-emerald-800 text-white',
+    'bu-approval': 'bg-pink-600 text-white',
     'bu-declined': 'bg-red-600 text-white',
     'final-approval': 'bg-emerald-600 text-white',
     'adel-declined': 'bg-red-600 text-white',

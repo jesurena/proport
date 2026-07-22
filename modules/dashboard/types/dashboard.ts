@@ -15,3 +15,17 @@ export interface MonthlyTrend {
   year: number;
   count: number;
 }
+
+export interface ActivityItem {
+  id: string;
+  ticketId: string;
+  ticketNumber: string;
+  subject: string;
+  type: 'reply' | 'status' | 'assignment';
+  actorName: string;
+  actorAvatar?: string;
+  actionText: string;
+  detail?: string;
+  timestamp: string;
+  statusBadge?: string;
+}

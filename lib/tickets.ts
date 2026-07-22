@@ -87,7 +87,11 @@ export function createTicket(data: {
     businessUnitName: bu?.name || 'Unknown',
     aoId: aoUser?.id,
     aoName: aoUser?.name,
-    cc: data.cc,
+    ccUsers: (data.cc || []).map((email: string) => {
+      const users = getUsers();
+      const u = users.find((user) => user.email === email);
+      return u || { id: String(Math.random()), name: email.split('@')[0], email, avatar: undefined };
+    }),
     createdAt: now,
     updatedAt: now,
     replies: [],
@@ -160,8 +164,7 @@ export function updateTicketAssignee(ticketId: string, assigneeId?: string): Tic
   if (idx === -1) return null;
 
   if (!assigneeId) {
-    tickets[idx].assigneeId = undefined;
-    tickets[idx].assigneeName = undefined;
+    tickets[idx].assignees = [];
     tickets[idx].status = 'unassigned';
   } else {
     const users = getUsers();
@@ -169,8 +172,12 @@ export function updateTicketAssignee(ticketId: string, assigneeId?: string): Tic
     const selectedUsers = users.filter((u) => ids.includes(u.id));
     if (selectedUsers.length === 0) return null;
 
-    tickets[idx].assigneeId = selectedUsers.map((u) => u.id).join(',');
-    tickets[idx].assigneeName = selectedUsers.map((u) => u.name).join(', ');
+    tickets[idx].assignees = selectedUsers.map((u) => ({
+      id: u.id,
+      name: u.name,
+      avatar: u.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${u.name}`,
+      email: u.email,
+    }));
     tickets[idx].status = 'assigned';
   }
 
@@ -199,7 +206,11 @@ export function updateTicketCc(ticketId: string, cc: string[]): Ticket | null {
   const idx = tickets.findIndex((t) => t.id === ticketId);
   if (idx === -1) return null;
 
-  tickets[idx].cc = cc;
+  const users = getUsers();
+  tickets[idx].ccUsers = cc.map((email) => {
+    const u = users.find((user) => user.email === email);
+    return u || { id: String(Math.random()), name: email.split('@')[0], email, avatar: undefined };
+  });
   tickets[idx].updatedAt = new Date().toISOString();
 
   setItem(STORAGE_KEYS.TICKETS, tickets);

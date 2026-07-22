@@ -63,16 +63,14 @@ export interface Ticket {
   priority: TicketPriority;
   requesterId: string;
   requesterName: string;
-  assigneeId?: string;
-  assigneeName?: string;
-  assigneeAvatar?: string;
+  assignees?: { id: string; name: string; avatar?: string; email?: string }[];
   brandType?: string;
   requestType?: string;
   businessUnitId: string;
   businessUnitName: string;
   aoId?: string;
   aoName?: string;
-  cc?: string[];
+  ccUsers?: { id: string; name: string; email: string; avatar?: string }[];
   createdAt: string;   // ISO string
   updatedAt: string;   // ISO string
   closedAt?: string;   // ISO string
@@ -109,25 +107,25 @@ export interface MonthlyTrend {
 
 
 export const STATUS_META: Record<TicketStatus, { label: string; color: string; chipVariant: string }> = {
-  unassigned: { label: 'Unassigned', color: '#8b8b8b', chipVariant: 'unassigned' },
-  assigned:   { label: 'Assigned',   color: '#3b82f6', chipVariant: 'assigned' },
+  unassigned: { label: 'Unassigned', color: '#71717a', chipVariant: 'unassigned' },
+  assigned:   { label: 'Assigned',   color: '#059669', chipVariant: 'assigned' },
   pending:    { label: 'Pending',    color: '#f59e0b', chipVariant: 'pending' },
-  answered:   { label: 'Answered',   color: '#10b981', chipVariant: 'answered' },
-  closed:     { label: 'Closed',     color: '#6b7280', chipVariant: 'closed' },
-  escalated:  { label: 'Escalated',  color: '#ef4444', chipVariant: 'escalated' },
-  reassigned: { label: 'Reassigned', color: '#8b5cf6', chipVariant: 'reassigned' },
-  'bu-approval': { label: 'BU Approval', color: '#ec4899', chipVariant: 'bu-approval' },
-  'bu-declined': { label: 'BU Declined', color: '#ef4444', chipVariant: 'bu-declined' },
-  'final-approval': { label: 'Final Approval', color: '#10b981', chipVariant: 'final-approval' },
-  'adel-declined': { label: 'Declined by Adel', color: '#ef4444', chipVariant: 'adel-declined' },
-  'for approval of bu head': { label: 'For Approval of BU Head', color: '#ec4899', chipVariant: 'for-approval-of-bu-head' },
-  'for-approval-of-bu-head': { label: 'For Approval of BU Head', color: '#ec4899', chipVariant: 'for-approval-of-bu-head' },
-  'declined by bu head': { label: 'Declined by BU Head', color: '#ef4444', chipVariant: 'bu-declined' },
-  'declined-by-bu-head': { label: 'Declined by BU Head', color: '#ef4444', chipVariant: 'bu-declined' },
-  'for final approval': { label: 'For Final Approval', color: '#10b981', chipVariant: 'final-approval' },
-  'for-final-approval': { label: 'For Final Approval', color: '#10b981', chipVariant: 'final-approval' },
-  'declined by final approver': { label: 'Declined by Final Approver', color: '#ef4444', chipVariant: 'adel-declined' },
-  'declined-by-final-approver': { label: 'Declined by Final Approver', color: '#ef4444', chipVariant: 'adel-declined' },
+  answered:   { label: 'Answered',   color: '#0d9488', chipVariant: 'answered' },
+  closed:     { label: 'Closed',     color: '#059669', chipVariant: 'closed' },
+  escalated:  { label: 'Escalated',  color: '#dc2626', chipVariant: 'escalated' },
+  reassigned: { label: 'Reassigned', color: '#4f46e5', chipVariant: 'reassigned' },
+  'bu-approval': { label: 'BU Approval', color: '#db2777', chipVariant: 'bu-approval' },
+  'bu-declined': { label: 'BU Declined', color: '#dc2626', chipVariant: 'bu-declined' },
+  'final-approval': { label: 'Final Approval', color: '#059669', chipVariant: 'final-approval' },
+  'adel-declined': { label: 'Declined by Adel', color: '#dc2626', chipVariant: 'adel-declined' },
+  'for approval of bu head': { label: 'For Approval of BU Head', color: '#db2777', chipVariant: 'for-approval-of-bu-head' },
+  'for-approval-of-bu-head': { label: 'For Approval of BU Head', color: '#db2777', chipVariant: 'for-approval-of-bu-head' },
+  'declined by bu head': { label: 'Declined by BU Head', color: '#dc2626', chipVariant: 'bu-declined' },
+  'declined-by-bu-head': { label: 'Declined by BU Head', color: '#dc2626', chipVariant: 'bu-declined' },
+  'for final approval': { label: 'For Final Approval', color: '#059669', chipVariant: 'final-approval' },
+  'for-final-approval': { label: 'For Final Approval', color: '#059669', chipVariant: 'final-approval' },
+  'declined by final approver': { label: 'Declined by Final Approver', color: '#dc2626', chipVariant: 'adel-declined' },
+  'declined-by-final-approver': { label: 'Declined by Final Approver', color: '#dc2626', chipVariant: 'adel-declined' },
 };
 
 export function normalizeStatusKey(status: string | undefined | null, status_id?: number): TicketStatus {

@@ -64,5 +64,6 @@ export const useBrandActions = (modalController: BrandModalController) => {
   return {
     saveBrand,
     deleteBrand,
+    loading: addMutation.isPending || updateMutation.isPending,
   };
 };

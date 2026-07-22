@@ -57,7 +57,7 @@ export default function BrandsPage() {
       </div>
 
       {/* Modal */}
-      <BrandModal controller={modal} onSave={actions.saveBrand} />
+      <BrandModal controller={modal} onSave={actions.saveBrand} loading={actions.loading} />
     </>
   );
 }

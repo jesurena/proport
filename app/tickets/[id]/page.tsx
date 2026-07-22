@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import { AppButton } from '@integrated-computer-system/ui-kit';
 import { ArrowLeft, XCircle } from 'lucide-react';
 import { ProportNavbar } from '@/modules/sidebar';
@@ -31,7 +31,6 @@ export default function TicketDetailPage() {
     return {
       ...ticketData.ticket,
       businessUnitName: ticketData.ticket.businessUnitName ?? ticketData.ticket.brandName ?? 'N/A',
-      cc: (ticketData.ticket.ccUsers || []).map((u: any) => u.email),
       replies: (ticketData.ticket.replies || []).map((r: any) => ({
         id: r.id ?? r.reply_id,
         authorName: r.authorName,
@@ -93,6 +92,7 @@ export default function TicketDetailPage() {
       }
     } catch (err) {
       console.error(err);
+      throw err;
     }
   };
 
@@ -105,18 +105,7 @@ export default function TicketDetailPage() {
   }
 
   if (!ticket) {
-    return (
-      <>
-        <ProportNavbar title="Ticket Not Found" />
-        <div className="flex flex-col items-center justify-center h-[60vh] text-text-info">
-          <XCircle size={48} className="mb-3 opacity-30" />
-          <p className="text-lg font-medium">Ticket not found</p>
-          <AppButton variant="ghost" className="mt-4" onClick={() => router.push('/tickets')}>
-            ← Back to Tickets
-          </AppButton>
-        </div>
-      </>
-    );
+    notFound();
   }
 
   return (

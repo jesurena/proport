@@ -7,6 +7,7 @@ import { AppAttachmentCard } from '@/components/ui';
 import { timeAgo, fullDate } from '@/components/utils/time';
 import { getPreviewText, displayFileName, localizeHtmlImages } from '@/components/utils/ticket';
 import type { Reply, Attachment } from '@/lib/types';
+import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
 
 interface TicketThreadProps {
   replies: Reply[];
@@ -28,6 +29,7 @@ export default function TicketThread({
   onAttachmentClick,
 }: TicketThreadProps) {
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+  const getAttachmentUrl = useAttachmentUrl();
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -74,7 +76,7 @@ export default function TicketThread({
         }
 
         const imageToShow = firstImgAttachment 
-          ? `http://localhost:7090/api/viewFile/${encodeURIComponent(btoa(firstImgAttachment.name))}` 
+          ? getAttachmentUrl(firstImgAttachment.name)
           : firstEmbeddedImg;
 
         return (
@@ -140,7 +142,7 @@ export default function TicketThread({
                             variant="shared"
                             onClick={() => onAttachmentClick?.(file.name)}
                             onDownload={() => {
-                              window.open(`http://localhost:7090/api/viewFile/${encodeURIComponent(btoa(file.name))}`, '_blank');
+                              window.open(getAttachmentUrl(file.name), '_blank');
                             }}
                           />
                         ))}

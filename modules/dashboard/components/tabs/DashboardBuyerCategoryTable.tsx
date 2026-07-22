@@ -34,11 +34,12 @@ export default function DashboardBuyerCategoryTable() {
       title: 'Buyer',
       dataIndex: 'buyer',
       key: 'buyer',
+      fixed: 'left' as const,
       sorter: true,
       render: (text: string, record: any) => (
-        <div className="flex items-center gap-2">
-          <AppAvatar src={record.avatar} name={text} size={24} />
-          <AppLabel variant="body">{text}</AppLabel>
+        <div className="flex items-center gap-2.5 min-w-[200px]">
+          <AppAvatar src={record.avatar} name={text} size={26} />
+          <AppLabel variant="body" className="font-semibold">{text}</AppLabel>
         </div>
       ),
     },
