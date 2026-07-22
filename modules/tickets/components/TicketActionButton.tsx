@@ -28,7 +28,7 @@ export function TicketActionButton({
 }: TicketActionButtonProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user, is_head, is_adel } = useAuthStore();
   const [mockRole, setMockRole] = useState<string | null>(null);
 
@@ -54,14 +54,14 @@ export function TicketActionButton({
   const status = normalizeStatusKey(ticket.status, (ticket as any).status_id);
 
   const handleStatusClick = async (newStatus: TicketStatus) => {
-    if (loading) return;
-    setLoading(true);
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       await onStatusChange(newStatus);
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -75,8 +75,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<Check size={14} />}
           onClick={() => handleStatusClick('pending')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Approve Request
@@ -92,8 +92,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<Check size={14} />}
           onClick={() => handleStatusClick('pending')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Final Approve
@@ -109,8 +109,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<RotateCcw size={14} />}
           onClick={() => handleStatusClick('pending')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Re-Approve Request
@@ -126,8 +126,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<RotateCcw size={14} />}
           onClick={() => handleStatusClick('pending')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Re-Approve Request
@@ -149,8 +149,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<Check size={14} />}
           onClick={() => handleStatusClick('answered')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-[#0B2545] hover:bg-[#0B2545]/90 dark:bg-[#134074] dark:hover:bg-[#134074]/90 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Mark Answered
@@ -166,8 +166,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<XCircle size={14} />}
           onClick={() => handleStatusClick('closed')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-[#0B2545] hover:bg-[#0B2545]/90 dark:bg-[#134074] dark:hover:bg-[#134074]/90 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Close Ticket
@@ -183,8 +183,8 @@ export function TicketActionButton({
           size="sm"
           leftIcon={<RotateCcw size={14} />}
           onClick={() => handleStatusClick('assigned')}
-          loading={loading}
-          disabled={loading}
+          loading={isLoading}
+          disabled={isLoading}
           className="w-full text-xs py-2 bg-[#0B2545] hover:bg-[#0B2545]/90 dark:bg-[#134074] dark:hover:bg-[#134074]/90 text-white font-semibold rounded-md shadow-sm h-9 flex items-center justify-center cursor-pointer"
         >
           Reopen Ticket
@@ -204,8 +204,8 @@ export function TicketActionButton({
           <>
             <div className="flex-1">{primaryBtn}</div>
             <button
-              onClick={() => !loading && setDropdownOpen(!dropdownOpen)}
-              disabled={loading}
+              onClick={() => !isLoading && setDropdownOpen(!dropdownOpen)}
+              disabled={isLoading}
               className="w-9 h-9 border border-border/60 bg-neutral/5 hover:bg-hover text-text-info hover:text-text rounded-md transition-colors cursor-pointer flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MoreHorizontal size={14} />
@@ -232,7 +232,7 @@ export function TicketActionButton({
                   handleStatusClick('bu-declined');
                   setDropdownOpen(false);
                 }}
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-2 font-semibold disabled:opacity-50"
               >
                 <X size={13} className="shrink-0" />
@@ -246,7 +246,7 @@ export function TicketActionButton({
                   handleStatusClick('adel-declined');
                   setDropdownOpen(false);
                 }}
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-2 font-semibold disabled:opacity-50"
               >
                 <X size={13} className="shrink-0" />
@@ -260,7 +260,7 @@ export function TicketActionButton({
                   handleStatusClick('assigned');
                   setDropdownOpen(false);
                 }}
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full text-left px-3.5 py-2 text-xs text-text hover:bg-hover transition-colors flex items-center gap-2 font-medium disabled:opacity-50"
               >
                 <RotateCcw size={13} className="text-text-info shrink-0" />

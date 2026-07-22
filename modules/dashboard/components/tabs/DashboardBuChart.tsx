@@ -38,11 +38,16 @@ export default function DashboardBuChart() {
       const count = Number(item.cnt || 0);
       const percent = count / total;
       const sliceStart = cumulativePercent;
-      const startX = Math.cos(2 * Math.PI * cumulativePercent) * 46 + 50;
-      const startY = Math.sin(2 * Math.PI * cumulativePercent) * 46 + 50;
+      
+      const startAngle = 2 * Math.PI * (cumulativePercent - 0.25);
+      const startX = Math.cos(startAngle) * 46 + 50;
+      const startY = Math.sin(startAngle) * 46 + 50;
+      
       cumulativePercent += percent;
-      const endX = Math.cos(2 * Math.PI * cumulativePercent) * 46 + 50;
-      const endY = Math.sin(2 * Math.PI * cumulativePercent) * 46 + 50;
+      
+      const endAngle = 2 * Math.PI * (cumulativePercent - 0.25);
+      const endX = Math.cos(endAngle) * 46 + 50;
+      const endY = Math.sin(endAngle) * 46 + 50;
       const largeArcFlag = percent > 0.5 ? 1 : 0;
 
       const pathData = percent === 1
@@ -52,8 +57,9 @@ export default function DashboardBuChart() {
       const color = COLORS[index % COLORS.length];
 
       const middlePercent = sliceStart + (percent / 2);
-      const labelX = Math.cos(2 * Math.PI * middlePercent) * 28 + 50;
-      const labelY = Math.sin(2 * Math.PI * middlePercent) * 28 + 50;
+      const middleAngle = 2 * Math.PI * (middlePercent - 0.25);
+      const labelX = Math.cos(middleAngle) * 28 + 50;
+      const labelY = Math.sin(middleAngle) * 28 + 50;
 
       return {
         name,
@@ -78,7 +84,7 @@ export default function DashboardBuChart() {
       <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 px-4">
         {/* SVG Pie Chart Widget */}
         <div className="relative w-80 h-80 shrink-0">
-          <svg className="w-80 h-80 -rotate-90" viewBox="0 0 100 100">
+          <svg className="w-80 h-80" viewBox="0 0 100 100">
             {buSlices.map((slice) => {
               const isSelected = selectedBU === slice.name;
               return (
@@ -102,7 +108,6 @@ export default function DashboardBuChart() {
                       textAnchor="middle"
                       dominantBaseline="central"
                       className="select-none pointer-events-none transition-all duration-300"
-                      style={{ transformOrigin: '50px 50px', transform: 'rotate(90deg)' }}
                     >
                       {slice.name}
                     </text>
