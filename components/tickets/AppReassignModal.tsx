@@ -27,6 +27,8 @@ export function AppReassignModal({
   const [remarks, setRemarks] = useState('');
   const [isDragOverAssigned, setIsDragOverAssigned] = useState(false);
   const [isDragOverAvailable, setIsDragOverAvailable] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragSource, setDragSource] = useState<'available' | 'assigned' | null>(null);
   const [loading, setLoading] = useState(false);
   const { data: assigneesRes, isLoading } = useTicketAssignees(String(ticket.id), open);
 
@@ -37,17 +39,30 @@ export function AppReassignModal({
       setRemarks('');
       setIsDragOverAssigned(false);
       setIsDragOverAvailable(false);
+      setIsDragging(false);
+      setDragSource(null);
     }
   }, [assigneesRes]);
 
   const handleDragStart = (e: React.DragEvent, userId: string, source: 'available' | 'assigned') => {
     e.dataTransfer.setData('text/plain', userId);
     e.dataTransfer.setData('source', source);
+    setIsDragging(true);
+    setDragSource(source);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDragSource(null);
+    setIsDragOverAssigned(false);
+    setIsDragOverAvailable(false);
   };
 
   const handleDropToAssigned = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOverAssigned(false);
+    setIsDragging(false);
+    setDragSource(null);
     const userId = e.dataTransfer.getData('text/plain');
     const source = e.dataTransfer.getData('source');
 
@@ -63,6 +78,8 @@ export function AppReassignModal({
   const handleDropToAvailable = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOverAvailable(false);
+    setIsDragging(false);
+    setDragSource(null);
     const userId = e.dataTransfer.getData('text/plain');
     const source = e.dataTransfer.getData('source');
 
@@ -106,13 +123,18 @@ export function AppReassignModal({
             <span className="text-xs text-text-info font-medium mt-3">Loading buyers list...</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_50px_1fr] gap-4 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_50px_1fr] gap-4 items-stretch">
 
             {/* Assigned Buyers column (Left Side) */}
             <div className="flex flex-col h-full">
-              <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info mb-2 text-left">
-                Assigned Buyer(s)
-              </AppLabel>
+              <div className="flex items-center justify-between mb-2">
+                <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info text-left">
+                  Assigned Buyer(s)
+                </AppLabel>
+                <AppLabel as="span" variant="description" className="text-[10px] font-semibold text-text-info/40">
+                  {assignedList.length} buyer{assignedList.length !== 1 ? 's' : ''}
+                </AppLabel>
+              </div>
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -121,8 +143,14 @@ export function AppReassignModal({
                 onDragLeave={() => setIsDragOverAssigned(false)}
                 onDrop={handleDropToAssigned}
                 className={cn(
-                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[260px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
-                  isDragOverAssigned && "bg-neutral-200 border-accent-1/40 border-dashed"
+                  "border-2 rounded-xl p-3 h-[260px] overflow-y-auto flex flex-col gap-1.5 transition-all duration-200 select-none",
+                  isDragOverAssigned
+                    ? "bg-accent-1/5 border-accent-1/50 border-dashed ring-2 ring-accent-1/20"
+                    : isDragging && dragSource === 'available'
+                      ? "border-dashed border-accent-1/30 bg-accent-1/[0.02]"
+                      : isDragging && dragSource === 'assigned'
+                        ? "border-transparent bg-neutral/5"
+                        : "border-border/50 bg-neutral/5"
                 )}
               >
                 {assignedList.length > 0 ? (
@@ -132,15 +160,28 @@ export function AppReassignModal({
                       user={buyer}
                       draggable
                       onDragStart={(e) => handleDragStart(e, buyer.id, 'assigned')}
+                      onDragEnd={handleDragEnd}
                     />
                   ))
                 ) : (
-                  <div className="m-auto flex flex-col items-center justify-center text-center p-4 border border-dashed border-border/60 rounded-lg w-full h-full">
-                    <AppLabel as="span" className="text-xs text-text-info/50 italic mb-1">
-                      Drag & Drop
+                  <div className={cn(
+                    "m-auto flex flex-col items-center justify-center text-center p-4 rounded-lg w-full h-full transition-all",
+                    isDragging && dragSource === 'available'
+                      ? "border-2 border-dashed border-accent-1/40"
+                      : "border border-dashed border-border/40"
+                  )}>
+                    <MoveLeft size={20} className={cn(
+                      "mb-2 transition-colors",
+                      isDragging && dragSource === 'available' ? "text-accent-1" : "text-text-info/25"
+                    )} />
+                    <AppLabel as="span" className={cn(
+                      "text-xs font-semibold mb-0.5 transition-colors",
+                      isDragging && dragSource === 'available' ? "text-accent-1" : "text-text-info/40"
+                    )}>
+                      {isDragging && dragSource === 'available' ? 'Drop here to assign' : 'No buyers assigned'}
                     </AppLabel>
-                    <AppLabel as="span" variant="description" className="text-[10px] text-text-info/40">
-                      to assign a buyer to this ticket
+                    <AppLabel as="span" variant="description" className="text-[10px] text-text-info/30">
+                      {isDragging && dragSource === 'available' ? 'Release to add this buyer' : 'Drag a buyer from the right'}
                     </AppLabel>
                   </div>
                 )}
@@ -148,16 +189,28 @@ export function AppReassignModal({
             </div>
 
             {/* Indicator icons */}
-            <div className="hidden md:flex flex-col items-center gap-3 mt-6 text-text-info/30 font-bold">
-              <MoveRight size={18} />
-              <MoveLeft size={18} />
+            <div className="hidden md:flex flex-col items-center justify-center gap-2 text-text-info/25">
+              <MoveRight size={16} className={cn(
+                "transition-all",
+                isDragging && dragSource === 'assigned' && "text-accent-1 scale-110"
+              )} />
+              <div className="h-px w-4 bg-border/30" />
+              <MoveLeft size={16} className={cn(
+                "transition-all",
+                isDragging && dragSource === 'available' && "text-accent-1 scale-110"
+              )} />
             </div>
 
             {/* Available Buyers column (Right Side) */}
             <div className="flex flex-col h-full">
-              <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info mb-2 text-left">
-                Available Buyers
-              </AppLabel>
+              <div className="flex items-center justify-between mb-2">
+                <AppLabel as="h4" variant="label" className="text-[13px] font-bold text-text-info text-left">
+                  Available Buyers
+                </AppLabel>
+                <AppLabel as="span" variant="description" className="text-[10px] font-semibold text-text-info/40">
+                  {availableList.length} buyer{availableList.length !== 1 ? 's' : ''}
+                </AppLabel>
+              </div>
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -166,8 +219,14 @@ export function AppReassignModal({
                 onDragLeave={() => setIsDragOverAvailable(false)}
                 onDrop={handleDropToAvailable}
                 className={cn(
-                  "border border-border/60 bg-neutral/5 rounded-lg p-3 h-[260px] overflow-y-auto flex flex-col gap-1.5 transition-colors duration-200 select-none",
-                  isDragOverAvailable && "bg-neutral-200 border-accent-1/40 border-dashed"
+                  "border-2 rounded-xl p-3 h-[260px] overflow-y-auto flex flex-col gap-1.5 transition-all duration-200 select-none",
+                  isDragOverAvailable
+                    ? "bg-accent-1/5 border-accent-1/50 border-dashed ring-2 ring-accent-1/20"
+                    : isDragging && dragSource === 'assigned'
+                      ? "border-dashed border-accent-1/30 bg-accent-1/[0.02]"
+                      : isDragging && dragSource === 'available'
+                        ? "border-transparent bg-neutral/5"
+                        : "border-border/50 bg-neutral/5"
                 )}
               >
                 {availableList.length > 0 ? (
@@ -177,12 +236,28 @@ export function AppReassignModal({
                       user={buyer}
                       draggable
                       onDragStart={(e) => handleDragStart(e, buyer.id, 'available')}
+                      onDragEnd={handleDragEnd}
                     />
                   ))
                 ) : (
-                  <div className="m-auto flex flex-col items-center justify-center text-center opacity-40">
-                    <AppLabel as="span" className="text-xs text-text-info italic">
-                      No buyers available
+                  <div className={cn(
+                    "m-auto flex flex-col items-center justify-center text-center p-4 rounded-lg w-full h-full transition-all",
+                    isDragging && dragSource === 'assigned'
+                      ? "border-2 border-dashed border-accent-1/40"
+                      : "border border-dashed border-border/40"
+                  )}>
+                    <MoveRight size={20} className={cn(
+                      "mb-2 transition-colors",
+                      isDragging && dragSource === 'assigned' ? "text-accent-1" : "text-text-info/25"
+                    )} />
+                    <AppLabel as="span" className={cn(
+                      "text-xs font-semibold mb-0.5 transition-colors",
+                      isDragging && dragSource === 'assigned' ? "text-accent-1" : "text-text-info/40"
+                    )}>
+                      {isDragging && dragSource === 'assigned' ? 'Drop here to unassign' : 'No buyers available'}
+                    </AppLabel>
+                    <AppLabel as="span" variant="description" className="text-[10px] text-text-info/30">
+                      {isDragging && dragSource === 'assigned' ? 'Release to remove this buyer' : 'All buyers are assigned'}
                     </AppLabel>
                   </div>
                 )}

@@ -10,6 +10,7 @@ interface AppAvatarCardProps {
   user: User;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
   className?: string;
 }
 
@@ -17,6 +18,7 @@ export function AppAvatarCard({
   user,
   draggable,
   onDragStart,
+  onDragEnd,
   className,
 }: AppAvatarCardProps) {
   const avatarUrl = user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
@@ -27,6 +29,7 @@ export function AppAvatarCard({
       padding="sm"
       draggable={draggable}
       onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       className={cn(
         "flex items-center gap-2 cursor-grab active:cursor-grabbing hover:border-border transition-all select-none !rounded-lg !py-2 !px-3",
         className

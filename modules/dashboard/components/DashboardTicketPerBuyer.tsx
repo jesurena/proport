@@ -1,16 +1,14 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { useBuyerPeriodCounts } from '../hooks/useDashboard';
 import BuyerTicketsModal from './modals/BuyerTicketsModal';
-import { AppButton } from '@integrated-computer-system/ui-kit';
 import { Segmented } from 'antd';
 import { AppLabel, AppAvatar, AppCard } from '@/components/ui';
+import { useRouter } from 'next/router';
 
 export default function DashboardTicketPerBuyer() {
-  const router = useRouter();
   const [buyerPeriod, setBuyerPeriod] = useState<'today' | 'week'>('today');
   const [showAllBuyers, setShowAllBuyers] = useState(false);
   const [selectedBuyer, setSelectedBuyer] = useState<{ id: string | number; name: string } | null>(null);
@@ -52,15 +50,15 @@ export default function DashboardTicketPerBuyer() {
 
         <div className="space-y-1">
           {displayedBuyers.map((buyer) => (
-            <AppCard
+            <div
               key={buyer.name}
               onClick={() => setSelectedBuyer({ id: buyer.id, name: buyer.name })}
-              className="!p-2 flex items-center justify-between cursor-pointer border-none shadow-none hover:bg-neutral/5 transition-all select-none rounded-xl"
+              className="group flex items-center justify-between cursor-pointer p-2.5 rounded-xl border border-transparent hover:bg-neutral/40 hover:border-border/30 transition-all select-none"
             >
               <div className="flex items-center gap-2.5">
                 <AppAvatar src={buyer.avatar} name={buyer.name} size={32} />
                 <div>
-                  <AppLabel as="p" className="text-xs font-bold text-text leading-none mb-0.5">
+                  <AppLabel as="p" className="text-xs font-bold text-foreground leading-none mb-0.5">
                     {buyer.name}
                   </AppLabel>
                   <AppLabel as="p" variant="description" className="text-[10px]">
@@ -69,16 +67,8 @@ export default function DashboardTicketPerBuyer() {
                   </AppLabel>
                 </div>
               </div>
-              <AppButton
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedBuyer({ id: buyer.id, name: buyer.name });
-                }}
-              >
-                <ArrowRight size={14} />
-              </AppButton>
-            </AppCard>
+              <ArrowRight size={14} className="text-text-info/30 group-hover:text-accent-1 transition-colors shrink-0" />
+            </div>
           ))}
         </div>
 
