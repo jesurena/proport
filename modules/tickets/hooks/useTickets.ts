@@ -106,3 +106,13 @@ export const useSearchTickets = (search: string, enabled = true) => {
 export const useAttachmentUrl = () => {
   return (fileName: string) => ticketsService.getAttachmentUrl(fileName);
 };
+
+export const useUserProfile = (id?: string | number, enabled = false) => {
+  const userIdStr = id ? String(id) : '';
+  return useQuery({
+    queryKey: ['user-profile', userIdStr],
+    queryFn: () => ticketsService.getUserProfile(userIdStr),
+    enabled: Boolean(userIdStr) && enabled,
+    staleTime: 5 * 60 * 1000, // Cache user profile for 5 minutes
+  });
+};

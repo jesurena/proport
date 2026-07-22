@@ -13,6 +13,12 @@ import { TicketActionsCard } from '@/modules/tickets/components/TicketActionsCar
 import { TicketInfoCard } from '@/modules/tickets/components/TicketInfoCard';
 import { TicketFilesCard } from '@/modules/tickets/components/TicketFilesCard';
 import { AppReassignModal } from '@/components/tickets/AppReassignModal';
+import { AppSkeleton } from '@/components/ui/skeleton';
+import {
+  TicketThreadSkeleton,
+  TicketInfoPanelSkeleton,
+  TicketActionsCardSkeleton,
+} from '@/components/skeleton/tickets';
 
 export default function TicketDetailPage() {
   const params = useParams();
@@ -33,6 +39,7 @@ export default function TicketDetailPage() {
       businessUnitName: ticketData.ticket.businessUnitName ?? ticketData.ticket.brandName ?? 'N/A',
       replies: (ticketData.ticket.replies || []).map((r: any) => ({
         id: r.id ?? r.reply_id,
+        authorId: r.authorId ?? r.user_id,
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
         content: r.content ?? r.replyContent ?? r.reply ?? '',
@@ -98,9 +105,28 @@ export default function TicketDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[100vh] text-text-info bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <ProportNavbar title="Loading Ticket..." />
+        <div className="p-6 max-w-6xl mx-auto space-y-6">
+          <AppSkeleton variant="text" width="120px" height={20} className="mb-4" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="rounded-2xl border border-border/60 bg-card-bg p-5 space-y-4 shadow-sm">
+                <AppSkeleton variant="text" width="65%" height={24} />
+                <AppSkeleton variant="text" width="95%" height={16} />
+                <AppSkeleton variant="text" width="80%" height={16} />
+              </div>
+              <div className="border border-border/60 bg-card-bg p-5 rounded-2xl shadow-sm">
+                <TicketThreadSkeleton count={3} />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <TicketActionsCardSkeleton />
+              <TicketInfoPanelSkeleton />
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 

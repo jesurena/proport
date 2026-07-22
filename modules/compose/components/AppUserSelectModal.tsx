@@ -13,6 +13,7 @@ import {
 import { useCcUsers } from '@/modules/tickets/hooks/useTickets';
 import { Filter } from 'lucide-react';
 import type { User } from '@/lib/types';
+import { AppUserSelectSkeleton } from '@/components/skeleton';
 
 interface AppUserSelectModalProps {
   open: boolean;
@@ -192,43 +193,46 @@ export function AppUserSelectModal({
 
         {/* Users Table */}
         <div className="max-h-[50vh] overflow-y-auto">
-          <AppTable<User>
-            columns={columns}
-            dataSource={filtered}
-            loading={isLoading}
-            rowKey="id"
-            pagination={false}
-            size="small"
-            rowSelection={{
-              type: 'checkbox',
-              selectedRowKeys: tempSelected.map((u) => u.id),
-              onChange: (_, selectedRows) => {
-                setTempSelected(selectedRows);
-              },
-            }}
-            onRow={(record) => ({
-              onClick: (event) => {
-                const target = event.target as HTMLElement;
-                if (
-                  target.closest('.ant-checkbox-wrapper') ||
-                  target.closest('.ant-checkbox-input') ||
-                  target.closest('.ant-checkbox')
-                ) {
-                  return;
-                }
-
-                setTempSelected((prev) => {
-                  const exists = prev.some((u) => u.id === record.id);
-                  if (exists) {
-                    return prev.filter((u) => u.id !== record.id);
-                  } else {
-                    return [...prev, record];
+          {isLoading ? (
+            <AppUserSelectSkeleton rows={6} />
+          ) : (
+            <AppTable<User>
+              columns={columns}
+              dataSource={filtered}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              rowSelection={{
+                type: 'checkbox',
+                selectedRowKeys: tempSelected.map((u) => u.id),
+                onChange: (_, selectedRows) => {
+                  setTempSelected(selectedRows);
+                },
+              }}
+              onRow={(record) => ({
+                onClick: (event) => {
+                  const target = event.target as HTMLElement;
+                  if (
+                    target.closest('.ant-checkbox-wrapper') ||
+                    target.closest('.ant-checkbox-input') ||
+                    target.closest('.ant-checkbox')
+                  ) {
+                    return;
                   }
-                });
-              },
-            })}
-            className="cursor-pointer"
-          />
+
+                  setTempSelected((prev) => {
+                    const exists = prev.some((u) => u.id === record.id);
+                    if (exists) {
+                      return prev.filter((u) => u.id !== record.id);
+                    } else {
+                      return [...prev, record];
+                    }
+                  });
+                },
+              })}
+              className="cursor-pointer"
+            />
+          )}
         </div>
 
         {/* Footer */}

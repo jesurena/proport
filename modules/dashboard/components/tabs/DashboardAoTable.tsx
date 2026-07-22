@@ -4,6 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { AppTable, AppLabel, AppAvatar } from '@/components/ui';
 import { useTicketCountAo } from '../../hooks/useDashboard';
 
+import { DashboardTabTableSkeleton } from '@/components/skeleton/dashboard';
+
 export default function DashboardAoTable() {
   const [params, setParams] = useState({
     page: 1,
@@ -29,6 +31,10 @@ export default function DashboardAoTable() {
       nonFocusClosed: Number(item.nf_closed_count || 0),
     }));
   }, [data]);
+
+  if (isLoading) {
+    return <DashboardTabTableSkeleton />;
+  }
 
   const columns = [
     {

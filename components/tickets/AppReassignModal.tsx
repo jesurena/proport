@@ -8,6 +8,7 @@ import { AppAvatarCard } from './AppAvatarCard';
 import { useTicketAssignees } from '@/modules/tickets/hooks/useTickets';
 import type { Ticket, User } from '@/lib/types';
 import { cn } from '@/components/utils/cn';
+import { AppReassignSkeleton } from '@/components/skeleton';
 
 interface AppReassignModalProps {
   open: boolean;
@@ -118,10 +119,7 @@ export function AppReassignModal({
 
       <AppModal.Body className="space-y-6">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-accent-1 border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs text-text-info font-medium mt-3">Loading buyers list...</span>
-          </div>
+          <AppReassignSkeleton />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-[1fr_50px_1fr] gap-4 items-stretch">
 

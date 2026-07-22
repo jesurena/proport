@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { Popover } from 'antd';
 import { AppAvatar, AppLabel } from '@integrated-computer-system/ui-kit';
 import { AppEmptyState, AppTable, AppChip } from '@/components/ui';
 import { TicketAvatar } from '@/components/tickets/TicketAvatar';
@@ -12,6 +13,7 @@ import { useTickets } from '../hooks/useTickets';
 import { useTicketFilters } from '../hooks/useTicketFilters';
 import { TicketTabs } from './TicketTabs';
 import { TicketFilters } from './TicketFilters';
+import { TicketTableSkeleton } from '@/components/skeleton/tickets';
 import { useAuthStore } from '@/modules/auth';
 import { timeAgo } from '@/components/utils/time';
 
@@ -222,12 +224,39 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
                 />
               ))}
               {participants.length > 3 && (
-                <div
-                  className="w-[24px] h-[24px] rounded-full bg-neutral text-[9px] font-bold text-text-info flex items-center justify-center ring-2 ring-background shrink-0 select-none relative"
-                  style={{ zIndex: 5 }}
+                <Popover
+                  content={
+                    <div className="flex flex-col gap-2 max-h-56 overflow-y-auto p-1 select-none min-w-[160px]">
+                      <AppLabel as="span" className="text-[10px] font-bold text-text-info/60 uppercase tracking-wider border-b border-border/40 pb-1 mb-0.5">
+                        Additional Assignees ({participants.length - 3})
+                      </AppLabel>
+                      {participants.slice(3).map((name, i) => (
+                        <div key={name} className="flex items-center gap-2 py-0.5">
+                          <AppAvatar
+                            name={name}
+                            src={participantAvatars[i + 3]}
+                            size={22}
+                            className="shrink-0 rounded-full"
+                          />
+                          <AppLabel as="span" className="text-xs font-medium text-foreground truncate">
+                            {name}
+                          </AppLabel>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                  trigger="hover"
+                  placement="top"
+                  arrow={false}
+                  overlayInnerStyle={{ padding: '10px 12px', borderRadius: '10px' }}
                 >
-                  +{participants.length - 3}
-                </div>
+                  <div
+                    className="w-[24px] h-[24px] rounded-full bg-neutral hover:bg-neutral/80 text-[9px] font-bold text-text-info flex items-center justify-center ring-2 ring-background shrink-0 select-none relative cursor-pointer transition-colors"
+                    style={{ zIndex: 5 }}
+                  >
+                    +{participants.length - 3}
+                  </div>
+                </Popover>
               )}
             </div>
           </div>
@@ -328,8 +357,9 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
         />
       )}
 
-      {/* Ticket Table list */}
-      {resolvedTickets.length === 0 && !isLoading ? (
+      {isLoading ? (
+        <TicketTableSkeleton rows={pageSize || 5} />
+      ) : resolvedTickets.length === 0 ? (
         <div className="py-12 flex justify-center border border-border/60 bg-background rounded-2xl shadow-sm">
           <AppEmptyState
             title={emptyState.title}

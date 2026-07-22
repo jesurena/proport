@@ -4,6 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { AppTable, AppLabel, AppAvatar } from '@/components/ui';
 import { useBuyerCategoryCounts } from '../../hooks/useDashboard';
 
+import { DashboardTabTableSkeleton } from '@/components/skeleton/dashboard';
+
 export default function DashboardBuyerCategoryTable() {
   const [params, setParams] = useState({
     page: 1,
@@ -28,6 +30,10 @@ export default function DashboardBuyerCategoryTable() {
       nonFocusClosed: Number(item.nf_closed_count || 0),
     }));
   }, [data]);
+
+  if (isLoading) {
+    return <DashboardTabTableSkeleton />;
+  }
 
   const columns = [
     {

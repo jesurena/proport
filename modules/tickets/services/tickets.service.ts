@@ -82,6 +82,11 @@ export const ticketsService = {
     return data;
   },
 
+  async getUserProfile(id: string): Promise<any> {
+    const { data } = await api.get(`/users/${id}/profile`);
+    return data?.data ?? data;
+  },
+
   getAttachmentUrl(fileName: string): string {
     const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
     const { token } = useAuthStore.getState();

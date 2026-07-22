@@ -4,6 +4,7 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import { AppButton, AppLabel } from '@integrated-computer-system/ui-kit';
 import { ProportNavbar } from '@/modules/sidebar';
+import { BrandTableSkeleton } from '@/components/skeleton';
 import {
   BrandMaintenanceTable,
   BrandModal,
@@ -49,11 +50,15 @@ export default function BrandsPage() {
         <BrandToolbar filters={filters} />
 
         {/* Table */}
-        <BrandMaintenanceTable
-          filteredBrands={filters.filteredBrands}
-          onEdit={modal.openEdit}
-          onDelete={actions.deleteBrand}
-        />
+        {isLoading ? (
+          <BrandTableSkeleton />
+        ) : (
+          <BrandMaintenanceTable
+            filteredBrands={filters.filteredBrands}
+            onEdit={modal.openEdit}
+            onDelete={actions.deleteBrand}
+          />
+        )}
       </div>
 
       {/* Modal */}

@@ -8,6 +8,7 @@ import { timeAgo, fullDate } from '@/components/utils/time';
 import { getPreviewText, displayFileName, localizeHtmlImages } from '@/components/utils/ticket';
 import type { Reply, Attachment } from '@/lib/types';
 import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
+import { UserProfilePopover } from '@/components/tickets/UserProfilePopover';
 
 interface TicketThreadProps {
   replies: Reply[];
@@ -37,9 +38,10 @@ export default function TicketThread({
 
   const messages = replies
     .filter((r) => !r.content.includes('Assignment Updated'))
-    .map((r) => ({
+    .map((r: any) => ({
       id: r.id,
       replyId: String(r.id),
+      authorId: r.authorId ?? r.user_id,
       authorName: r.authorName,
       authorAvatar: r.authorAvatar,
       content: r.content,
@@ -87,16 +89,27 @@ export default function TicketThread({
               className="flex items-start justify-between gap-3 cursor-pointer select-none group"
             >
               <div className="flex items-start gap-3">
-                <AppAvatar
-                  name={msg.authorName}
-                  src={avatarSrc}
-                  size={36}
-                />
+                <UserProfilePopover authorId={msg.authorId} authorName={msg.authorName} avatarSrc={avatarSrc}>
+                  <div onClick={(e) => e.stopPropagation()} className="shrink-0 cursor-pointer">
+                    <AppAvatar
+                      name={msg.authorName}
+                      src={avatarSrc}
+                      size={36}
+                    />
+                  </div>
+                </UserProfilePopover>
+
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <AppLabel as="span" className="text-sm font-semibold text-text block">
-                      {msg.authorName}
-                    </AppLabel>
+                    <UserProfilePopover authorId={msg.authorId} authorName={msg.authorName} avatarSrc={avatarSrc}>
+                      <AppLabel
+                        as="span"
+                        className="text-sm font-semibold text-text block hover:underline cursor-pointer"
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                      >
+                        {msg.authorName}
+                      </AppLabel>
+                    </UserProfilePopover>
                     {msgAttachments.length > 0 && !firstImgAttachment && (
                       <Paperclip size={12} className="text-text-info/50" />
                     )}

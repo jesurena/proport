@@ -6,6 +6,7 @@ import { Bookmark, ArrowRight } from 'lucide-react';
 import { AppLabel, AppCard, AppButton, AppChip } from '@/components/ui';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 import { useBookmarkedTickets } from '../hooks/useDashboard';
+import { DashboardBookmarkedTicketsSkeleton } from '@/components/skeleton/dashboard';
 
 export default function DashboardBookmarkedTickets() {
   const router = useRouter();
@@ -42,10 +43,7 @@ export default function DashboardBookmarkedTickets() {
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-accent-1 border-t-transparent rounded-full animate-spin" />
-          <span className="text-[10px] text-text-info font-medium mt-2">Loading bookmarks...</span>
-        </div>
+        <DashboardBookmarkedTicketsSkeleton />
       ) : bookmarkedTickets.length === 0 ? (
         <AppEmptyState
           title="No bookmarked tickets"

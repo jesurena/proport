@@ -5,6 +5,8 @@ import { AppLabel, AppButton, AppCard } from '@/components/ui';
 import { useAuthStore } from '@/modules/auth';
 import type { Ticket as TicketType } from '@/lib/types';
 
+import { DashboardMetricCardSkeleton } from '@/components/skeleton/dashboard';
+
 interface DashboardMetricCardProps {
   counts?: any;
 }
@@ -13,6 +15,10 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
   const router = useRouter();
   const [showAllCards, setShowAllCards] = useState(false);
   const { is_adel, is_head } = useAuthStore();
+
+  if (!counts) {
+    return <DashboardMetricCardSkeleton cardsCount={3} />;
+  }
 
   // 1. New Tickets Today (created in the last 24 hours)
   const newTicketsTodayCount = counts?.ticket_today ?? 0;

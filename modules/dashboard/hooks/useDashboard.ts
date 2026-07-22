@@ -36,7 +36,7 @@ const mapTicket = (t: any): TicketType => {
     businessUnitName: t.AccountGroup || 'Unknown',
     aoId: t.req_id ? String(t.req_id) : undefined,
     aoName: t.ao_name || undefined,
-    cc: [],
+    ccUsers: [],
     createdAt: t.date_created ? new Date(t.date_created).toISOString() : new Date().toISOString(),
     updatedAt: t.last_updated ? new Date(t.last_updated).toISOString() : new Date().toISOString(),
     closedAt: t.status_id === 3 && t.last_updated ? new Date(t.last_updated).toISOString() : undefined,

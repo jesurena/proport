@@ -5,6 +5,7 @@ import { ProportNavbar } from '@/modules/sidebar';
 import {
   Dashboard
 } from '@/modules/dashboard';
+import { DashboardPageSkeleton } from '@/components/skeleton/dashboard';
 import { useAuthStore } from '@/modules/auth';
 
 export default function DashboardPage() {
@@ -29,9 +30,7 @@ export default function DashboardPage() {
 
       <div className="p-6 max-w-[1400px] mx-auto">
         {role === null ? (
-          <div className="p-12 text-center text-text-info text-sm">
-            Loading dashboard...
-          </div>
+          <DashboardPageSkeleton />
         ) : (
           <Dashboard role={role} />
         )}

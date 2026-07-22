@@ -463,3 +463,18 @@ body {
 .ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
   background-color: var(--hover-bg) !important;
 }
+
+/* ─── AppSkeleton Manual CSS Animation ───────────────────────────────────── */
+@keyframes app-skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.app-skeleton {
+  background-color: var(--skeleton-bg, rgba(200, 200, 200, 0.5));
+  animation: app-skeleton-pulse 1.5s ease-in-out infinite;
+}

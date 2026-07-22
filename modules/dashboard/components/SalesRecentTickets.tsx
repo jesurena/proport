@@ -10,6 +10,7 @@ import type { Ticket as TicketType } from '@/lib/types';
 import { useRecentTickets } from '../hooks/useDashboard';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 import { useAuthStore } from '@/modules/auth';
+import { SalesRecentTicketsSkeleton } from '@/components/skeleton/dashboard';
 
 export default function SalesRecentTickets() {
   const router = useRouter();
@@ -54,16 +55,7 @@ export default function SalesRecentTickets() {
   const startIndex = page * itemsPerPage;
   const visibleTickets = displayTickets.slice(startIndex, startIndex + itemsPerPage);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        <AppLabel as="h3" variant="subtitle">Your Recent Tickets</AppLabel>
-        <div className="py-12 text-center text-text-info text-xs font-semibold">
-          Loading recent tickets...
-        </div>
-      </div>
-    );
-  }
+
 
   const handleToggleBookmark = (ticketId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,7 +93,7 @@ export default function SalesRecentTickets() {
             variant="neutral"
             size="icon"
             onClick={() => setPage(0)}
-            disabled={page === 0}
+            disabled={page === 0 || isLoading}
             className="!w-7 !h-7 rounded-full"
           >
             <ChevronLeft size={14} />
@@ -110,7 +102,7 @@ export default function SalesRecentTickets() {
             variant={page === 1 ? 'neutral' : 'accent'}
             size="icon"
             onClick={() => setPage(1)}
-            disabled={page === 1 || displayTickets.length <= itemsPerPage}
+            disabled={page === 1 || displayTickets.length <= itemsPerPage || isLoading}
             className="!w-7 !h-7 rounded-full"
           >
             <ChevronRight size={14} />
@@ -118,7 +110,9 @@ export default function SalesRecentTickets() {
         </div>
       </div>
 
-      {visibleTickets.length === 0 ? (
+      {isLoading ? (
+        <SalesRecentTicketsSkeleton count={3} />
+      ) : visibleTickets.length === 0 ? (
         <AppCard variant="default">
           <AppEmptyState
             title="No recent tickets"

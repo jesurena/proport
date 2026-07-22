@@ -9,6 +9,8 @@ export * from './dropdown';
 export * from './empty-state';
 export * from './inputs';
 export * from './labels';
+export * from './skeleton';
+
 export * from './modal';
 export * from './navbar';
 export * from './popover';
@@ -19,6 +21,4 @@ export * from './tabs';
 export * from './toggle';
 export * from './table';
 export * from './attachments';
-export * from './popover';
 export * from './bookmark';
-
