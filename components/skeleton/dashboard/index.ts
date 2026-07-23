@@ -6,3 +6,5 @@ export * from './DashboardPageSkeleton';
 export * from './DashboardBookmarkedTicketsSkeleton';
 export * from './SalesRecentTicketsSkeleton';
 export * from './BuyerActivityLogsSkeleton';
+export * from './DashboardBuChartSkeleton';
+export * from './DashboardGroupTicketCreationsSkeleton';

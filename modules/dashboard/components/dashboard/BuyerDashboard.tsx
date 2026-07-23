@@ -15,14 +15,14 @@ interface BuyerDashboardProps {
 }
 
 export default function BuyerDashboard({ role }: BuyerDashboardProps) {
-  const { counts } = useDashboard();
+  const { counts, isLoading } = useDashboard();
 
   return (
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role={role} />
-        <DashboardMetricCard counts={counts} />
+        <DashboardMetricCard counts={counts} isLoading={isLoading} />
         <DashboardTabTable />
       </div>
 

@@ -9,16 +9,15 @@ import { DashboardMetricCardSkeleton } from '@/components/skeleton/dashboard';
 
 interface DashboardMetricCardProps {
   counts?: any;
+  isLoading?: boolean;
 }
 
-export default function DashboardMetricCard({ counts }: DashboardMetricCardProps) {
+export default function DashboardMetricCard({ counts, isLoading }: DashboardMetricCardProps) {
   const router = useRouter();
   const [showAllCards, setShowAllCards] = useState(false);
   const { is_adel, is_head } = useAuthStore();
 
-  if (!counts) {
-    return <DashboardMetricCardSkeleton cardsCount={3} />;
-  }
+  const isLoadingOrNoCounts = isLoading || !counts;
 
   // 1. New Tickets Today (created in the last 24 hours)
   const newTicketsTodayCount = counts?.ticket_today ?? 0;
@@ -65,7 +64,10 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
   const cardsToRender = showAllCards ? [...initialCards, ...extraCards] : initialCards;
 
   return (
-    <div className="space-y-3">
+    isLoadingOrNoCounts ? (
+      <DashboardMetricCardSkeleton cardsCount={showAllCards ? 6 : 3} />
+    ) : (
+      <div className="space-y-3">
       <div className="flex items-center justify-between">
         <AppLabel as="h3" variant="subtitle">
           {is_adel || is_head ? 'My Group Status Overview' : 'Status Overview'}
@@ -121,6 +123,7 @@ export default function DashboardMetricCard({ counts }: DashboardMetricCardProps
           </AppCard>
         ))}
       </div>
-    </div>
+      </div>
+    )
   );
 }

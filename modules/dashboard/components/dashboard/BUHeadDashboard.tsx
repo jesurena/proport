@@ -10,14 +10,14 @@ import DashboardGroupTicketCreations from '../DashboardGroupTicketCreations';
 import { useBuHeadCounts } from '../../hooks/useBuHead';
 
 export default function BUHeadDashboard() {
-  const { data: counts } = useBuHeadCounts();
+  const { data: counts, isLoading } = useBuHeadCounts();
 
   return (
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="bu_head" counts={counts} />
-        <DashboardMetricCard counts={counts} />
+        <DashboardMetricCard counts={counts} isLoading={isLoading} />
         <DashboardTabTable />
       </div>
 

@@ -32,10 +32,6 @@ export default function DashboardAoTable() {
     }));
   }, [data]);
 
-  if (isLoading) {
-    return <DashboardTabTableSkeleton />;
-  }
-
   const columns = [
     {
       title: 'AO',
@@ -108,30 +104,34 @@ export default function DashboardAoTable() {
   ];
 
   return (
-    <div className="space-y-3 animate-in fade-in duration-200 w-full">
-      <AppTable
-        columns={columns}
-        dataSource={tableData}
-        rowKey="id"
-        pagination={{
-          current: params.page,
-          pageSize: params.per_page,
-          total: data?.total || 0,
-        }}
-        onChange={(pagination, filters, sorter: any) => {
-          const sortField = sorter.field || 'AccountName';
-          const sortOrder = sorter.order === 'descend' ? 'desc' : 'asc';
-          setParams((prev) => ({
-            ...prev,
-            page: pagination.current || 1,
-            per_page: pagination.pageSize || 10,
-            sort_field: sortField,
-            sort_order: sortOrder,
-          }));
-        }}
-        loading={isLoading}
-        scroll={{ x: 'max-content' }}
-      />
-    </div>
+    isLoading ? (
+      <DashboardTabTableSkeleton />
+    ) : (
+      <div className="space-y-3 animate-in fade-in duration-200 w-full">
+        <AppTable
+          columns={columns}
+          dataSource={tableData}
+          rowKey="id"
+          pagination={{
+            current: params.page,
+            pageSize: params.per_page,
+            total: data?.total || 0,
+          }}
+          onChange={(pagination, filters, sorter: any) => {
+            const sortField = sorter.field || 'AccountName';
+            const sortOrder = sorter.order === 'descend' ? 'desc' : 'asc';
+            setParams((prev) => ({
+              ...prev,
+              page: pagination.current || 1,
+              per_page: pagination.pageSize || 10,
+              sort_field: sortField,
+              sort_order: sortOrder,
+            }));
+          }}
+          loading={isLoading}
+          scroll={{ x: 'max-content' }}
+        />
+      </div>
+    )
   );
 }

@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { AppCard, AppLabel } from '@/components/ui';
 import { useChartPerBu } from '../../hooks/useDashboard';
+import { DashboardBuChartSkeleton } from '@/components/skeleton';
 
 const COLORS = [
   '#3b82f6', // blue
@@ -23,7 +24,9 @@ const COLORS = [
 
 export default function DashboardBuChart() {
   const [selectedBU, setSelectedBU] = useState<string | null>(null);
-  const { data: chartPerBuData } = useChartPerBu(true);
+  const { data: chartPerBuData, isLoading } = useChartPerBu(true);
+
+
 
   const buSlices = useMemo(() => {
     if (!chartPerBuData) return [];
@@ -78,7 +81,10 @@ export default function DashboardBuChart() {
   };
 
   return (
-    <AppCard variant="default" padding="lg" className="py-6 space-y-5 animate-in fade-in duration-200">
+    isLoading ? (
+      <DashboardBuChartSkeleton />
+    ) : (
+      <AppCard variant="default" padding="lg" className="py-6 space-y-5 animate-in fade-in duration-200">
       <AppLabel as="h4" className="text-sm font-bold text-text mb-2 text-center">Tickets per BU</AppLabel>
 
       <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 px-4">
@@ -155,6 +161,7 @@ export default function DashboardBuChart() {
           </div>
         </div>
       </div>
-    </AppCard>
+      </AppCard>
+    )
   );
 }

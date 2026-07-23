@@ -6,6 +6,7 @@ import { AppLabel, AppCard, AppAvatar } from '@/components/ui';
 import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 import { useBuHeadGroupCreations } from '../hooks/useBuHead';
 import type { BuHeadGroupCreation } from '../services/bu-head.service';
+import { DashboardGroupTicketCreationsSkeleton } from '@/components/skeleton/dashboard';
 
 export default function DashboardGroupTicketCreations() {
   const router = useRouter();
@@ -23,12 +24,7 @@ export default function DashboardGroupTicketCreations() {
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-accent-1 border-t-transparent rounded-full animate-spin" />
-          <span className="text-[10px] text-text-info font-medium mt-2">
-            Loading group creations...
-          </span>
-        </div>
+        <DashboardGroupTicketCreationsSkeleton count={3} />
       ) : creations.length === 0 ? (
         <AppEmptyState
           title="No recent ticket creations"

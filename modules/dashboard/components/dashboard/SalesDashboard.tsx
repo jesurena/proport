@@ -11,14 +11,14 @@ import DashboardBookmarkedTickets from '../DashboardBookmarkedTickets';
 import { useDashboard } from '../../hooks/useDashboard';
 
 export default function SalesDashboard() {
-  const { counts } = useDashboard();
+  const { counts, isLoading } = useDashboard();
 
   return (
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
         <DashboardWelcomeBanner role="sales" />
-        <DashboardMetricCard counts={counts} />
+        <DashboardMetricCard counts={counts} isLoading={isLoading} />
         <SalesRecentTickets />
         <DashboardTabTable />
       </div>
