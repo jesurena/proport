@@ -172,13 +172,15 @@ export function UserProfilePopover({
       open={isOpen}
       onOpenChange={setIsOpen}
       content={
-        <UserProfileCard
-          authorId={authorId}
-          name={authorName}
-          avatar={avatarSrc}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
+        <div className="py-2">
+          <UserProfileCard
+            authorId={authorId}
+            name={authorName}
+            avatar={avatarSrc}
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+          />
+        </div>
       }
       trigger="hover"
       placement={placement}

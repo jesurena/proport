@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import { AppButton } from '@integrated-computer-system/ui-kit';
 import { AppLabel } from '@/components/ui';
 import { ProportNavbar } from '@/modules/sidebar';
-import { TicketTable } from '@/modules/tickets/components/TicketTable';
+import { TicketTable } from '@/modules/tickets/components/ticket-table/TicketTable';
 
 export default function TicketsPage() {
   const router = useRouter();

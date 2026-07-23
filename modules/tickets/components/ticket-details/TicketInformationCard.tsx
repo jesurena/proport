@@ -7,7 +7,7 @@ import { Tooltip } from 'antd';
 import { getUsers } from '@/lib/tickets';
 import type { Ticket } from '@/lib/types';
 
-interface TicketInfoCardProps {
+interface TicketInformationCardProps {
   ticket: Ticket;
 }
 
@@ -18,7 +18,7 @@ const REQUEST_TYPE_LABELS: Record<string, string> = {
   eta: 'ETA Ticket',
 };
 
-export function TicketInfoCard({ ticket }: TicketInfoCardProps) {
+export function TicketInformationCard({ ticket }: TicketInformationCardProps) {
   const [expanded, setExpanded] = useState(true);
   const allUsers = getUsers();
 

@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { ProportNavbar } from '@/modules/sidebar';
 import { getSuppliers, addSupplier, updateSupplier, deleteSupplier, type Supplier } from '@/lib/suppliers';
 import { AppTable } from '@/components/ui';
-import { notification, modal, message } from '@/modules/theme';
+import { notification, modal, message } from '@/components/Providers/theme-provider';
 
 const TYPE_OPTIONS = [
   { value: '1', label: 'Hardware/Systems' },

@@ -7,7 +7,7 @@ import { AppLabel } from '@integrated-computer-system/ui-kit';
 import type { Ticket } from '@/lib/types';
 import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
 
-interface TicketFilesCardProps {
+interface TicketFilesSharedCardProps {
   ticket: Ticket;
   setPreviewFile: (file: string) => void;
 }
@@ -16,7 +16,7 @@ function displayFileName(name: string): string {
   return name.replace(/^\d+_/, '');
 }
 
-export function TicketFilesCard({ ticket, setPreviewFile }: TicketFilesCardProps) {
+export function TicketFilesSharedCard({ ticket, setPreviewFile }: TicketFilesSharedCardProps) {
   const [expanded, setExpanded] = useState(true);
   const getAttachmentUrl = useAttachmentUrl();
 

@@ -8,10 +8,10 @@ import { ProportNavbar } from '@/modules/sidebar';
 import type { TicketStatus, User } from '@/lib/types';
 import { useTicketDetail, useAddReply, useUpdateAssignment, useUpdateStatus } from '@/modules/tickets/hooks/useTickets';
 
-import { TicketMainCard } from '@/modules/tickets/components/TicketMainCard';
-import { TicketActionsCard } from '@/modules/tickets/components/TicketActionsCard';
-import { TicketInfoCard } from '@/modules/tickets/components/TicketInfoCard';
-import { TicketFilesCard } from '@/modules/tickets/components/TicketFilesCard';
+import { TicketMainCard } from '@/modules/tickets/components/ticket-details/TicketMainCard';
+import { TicketActionsCard } from '@/modules/tickets/components/ticket-details/TicketActionsCard';
+import { TicketInformationCard } from '@/modules/tickets/components/ticket-details/TicketInformationCard';
+import { TicketFilesSharedCard } from '@/modules/tickets/components/ticket-details/TicketFilesSharedCard';
 import { AppReassignModal } from '@/components/tickets/AppReassignModal';
 import { AppSkeleton } from '@/components/ui/skeleton';
 import {
@@ -170,9 +170,9 @@ export default function TicketDetailPage() {
               onAssignClick={() => setAssignModalOpen(true)}
             />
 
-            <TicketInfoCard ticket={ticket} />
+            <TicketInformationCard ticket={ticket} />
 
-            <TicketFilesCard ticket={ticket} setPreviewFile={setPreviewFile} />
+            <TicketFilesSharedCard ticket={ticket} setPreviewFile={setPreviewFile} />
           </div>
         </div>
       </div>

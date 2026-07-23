@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AppLabel, AppButton, AppCard, AppBookmark, AppChip } from '@/components/ui';
-import { modal } from '@/modules/theme';
+import { modal } from '@/components/Providers/theme-provider';
 import { STATUS_META } from '@/lib/types';
 import type { Ticket as TicketType } from '@/lib/types';
 import { useRecentTickets } from '../hooks/useDashboard';

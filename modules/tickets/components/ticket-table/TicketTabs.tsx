@@ -3,7 +3,7 @@
 import React from 'react';
 import { AppTabs } from '@/components/ui';
 import { AuthUser } from '@/modules/auth/types/user';
-import { getTicketTabs } from '../config/ticket-tabs.config';
+import { getTicketTabs } from '../../config/ticket-tabs.config';
 
 interface TicketTabsProps {
   activeTab: string;

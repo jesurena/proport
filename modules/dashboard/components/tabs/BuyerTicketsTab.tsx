@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { AppEmptyState, AppLabel } from '@/components/ui';
-import { TicketTable } from '@/modules/tickets/components/TicketTable';
+import { TicketTable } from '@/modules/tickets/components/ticket-table/TicketTable';
 import { useBuyerPeriodTickets } from '@/modules/dashboard/hooks/useDashboard';
 import { TicketTableSkeleton } from '@/components/skeleton';
 

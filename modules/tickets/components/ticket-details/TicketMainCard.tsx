@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { CornerUpLeft } from 'lucide-react';
 import { AppLabel, AppButton } from '@integrated-computer-system/ui-kit';
-import { TicketSubjectCard } from './TicketSubjectCard';
+import { TicketHeader } from './TicketHeader';
 import TicketThread from './TicketThread';
 import { TicketReplyComposer } from './TicketReplyComposer';
 import { AppFilePreview } from '@/components/ui';
@@ -50,7 +50,7 @@ export function TicketMainCard({
 
   return (
     <div className="flex-1 min-w-0 max-w-full overflow-hidden">
-      <TicketSubjectCard
+      <TicketHeader
         ticketId={ticket.id}
         subject={ticket.subject}
         status={ticket.status}
@@ -63,6 +63,7 @@ export function TicketMainCard({
         setPreviewFile={setPreviewFile}
         brandName={ticket.brandName}
         brandType={ticket.brandType}
+        requesterId={ticket.requesterId}
       />
 
       {/* 2. Conversation Thread (Replies) */}

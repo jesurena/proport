@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Paperclip } from 'lucide-react';
 import { AppBookmark, AppAttachmentCard, AppChip } from '@/components/ui';
 import { AppAvatar, AppLabel } from '@integrated-computer-system/ui-kit';
-import { modal } from '@/modules/theme';
+import { modal } from '@/components/Providers/theme-provider';
 import { STATUS_META } from '@/lib/types';
 import { timeAgo, fullDate } from '@/components/utils/time';
 import { getPreviewText, displayFileName, localizeHtmlImages } from '@/components/utils/ticket';
@@ -12,8 +12,9 @@ import { BrandTicketChip } from '@/components/tickets/BrandTicketChip';
 import type { TicketStatus, Attachment } from '@/lib/types';
 import { useAuthStore } from '@/modules/auth';
 import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
+import { UserProfilePopover } from '@/components/tickets/UserProfilePopover';
 
-interface TicketSubjectCardProps {
+interface TicketHeaderProps {
   ticketId: string;
   subject: string;
   status: TicketStatus;
@@ -26,9 +27,10 @@ interface TicketSubjectCardProps {
   setPreviewFile: (file: any) => void;
   brandName?: string;
   brandType?: string;
+  requesterId?: string | number;
 }
 
-export function TicketSubjectCard({
+export function TicketHeader({
   ticketId,
   subject,
   status,
@@ -41,7 +43,8 @@ export function TicketSubjectCard({
   setPreviewFile,
   brandName,
   brandType,
-}: TicketSubjectCardProps) {
+  requesterId,
+}: TicketHeaderProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isPinned, setIsPinned] = useState(false);
   const token = useAuthStore.getState().token;
@@ -157,16 +160,26 @@ export function TicketSubjectCard({
           className="flex items-start justify-between gap-3 cursor-pointer select-none group"
         >
           <div className="flex items-start gap-3">
-            <AppAvatar
-              name={requesterName}
-              src={requesterAvatar ?? `https://api.dicebear.com/7.x/initials/svg?seed=${requesterName.split(' ').map((n) => n[0]).join('')}`}
-              size={36}
-            />
+            <UserProfilePopover authorId={requesterId} authorName={requesterName} avatarSrc={requesterAvatar}>
+              <div onClick={(e) => e.stopPropagation()} className="shrink-0 cursor-pointer">
+                <AppAvatar
+                  name={requesterName}
+                  src={requesterAvatar ?? `https://api.dicebear.com/7.x/initials/svg?seed=${requesterName.split(' ').map((n) => n[0]).join('')}`}
+                  size={36}
+                />
+              </div>
+            </UserProfilePopover>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <AppLabel as="span" className="text-sm font-semibold text-text block">
-                  {requesterName}
-                </AppLabel>
+                <UserProfilePopover authorId={requesterId} authorName={requesterName} avatarSrc={requesterAvatar}>
+                  <AppLabel
+                    as="span"
+                    className="text-sm font-semibold text-text block hover:underline cursor-pointer"
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                  >
+                    {requesterName}
+                  </AppLabel>
+                </UserProfilePopover>
                 {originalAttachments.length > 0 && !firstImgAttachment && (
                   <Paperclip size={12} className="text-text-info/50" />
                 )}

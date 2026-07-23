@@ -1,5 +1,5 @@
 import { useAddBrands, useUpdateBrand, useDeleteBrand } from './use-brands';
-import { notification, modal, message } from '@/modules/theme';
+import { notification, modal, message } from '@/components/Providers/theme-provider';
 import type { Brand } from '../types/brand';
 import type { BrandModalController } from './use-brand-modal';
 
