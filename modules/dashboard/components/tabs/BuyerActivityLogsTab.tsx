@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { AppChip, AppEmptyState, AppLabel } from '@/components/ui';
 import { useBuyerLogs } from '@/modules/dashboard/hooks/useDashboard';
+import { BuyerActivityLogsSkeleton } from '@/components/skeleton';
 import { timeAgo, formatActivityDateKey } from '@/components/utils/time';
 import { formatActivityText, getLogCategoryMeta } from '../../utils/activity';
 import type { ActivityItem } from '../../types/dashboard';
@@ -48,12 +49,7 @@ export default function BuyerActivityLogsTab({
   return (
     <div className="py-2 pr-1">
       {isLogsLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center text-text-info space-y-3">
-          <Loader2 className="w-7 h-7 animate-spin text-accent-1 opacity-80" />
-          <AppLabel as="p" className="text-[11px] font-semibold tracking-wide text-text-info/70">
-            Fetching activity logs...
-          </AppLabel>
-        </div>
+        <BuyerActivityLogsSkeleton count={3} />
       ) : groupedLogs.length > 0 ? (
         <div className="space-y-5">
           {groupedLogs.map(([dateLabel, items]) => (

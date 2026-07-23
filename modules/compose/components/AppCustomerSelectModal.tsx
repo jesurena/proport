@@ -14,6 +14,7 @@ import {
 import { Search, Building2, Filter, ArrowRight } from 'lucide-react';
 import { type Customer } from '@/lib/customers';
 import { useCustomer } from '../hooks/useCustomer';
+import { AppCustomerSelectSkeleton } from '@/components/skeleton';
 
 const CHIP_VARIANTS: AppChipVariant[] = [
   'info',
@@ -237,10 +238,7 @@ export function AppCustomerSelectModal({
               <p className="text-xs mt-1">Type at least 2 characters to fetch matching database entries.</p>
             </div>
           ) : isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
-              <div className="w-7 h-7 border-2 border-accent-1 border-t-transparent rounded-full animate-spin mb-2.5" />
-              <p className="text-sm font-semibold">Searching live customers...</p>
-            </div>
+            <AppCustomerSelectSkeleton rows={5} />
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-text-info text-center">
               <Building2 size={32} className="opacity-30 mb-2.5" />

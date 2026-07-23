@@ -6,6 +6,7 @@ import { AppModal, AppInput, AppCard } from '@integrated-computer-system/ui-kit'
 import { Ticket as TicketIcon, ArrowRight, Loader2 } from 'lucide-react';
 import { useSearchTickets } from '@/modules/tickets/hooks/useTickets';
 import type { Ticket } from '@/lib/types';
+import { SearchTicketsSkeleton } from '@/components/skeleton';
 
 interface SearchModalProps {
   open: boolean;
@@ -74,10 +75,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
 
         <div className="max-h-[380px] overflow-y-auto custom-scrollbar space-y-4 pr-1">
           {loading ? (
-            <div className="py-12 flex flex-col items-center justify-center text-text-info/50">
-              <Loader2 className="w-8 h-8 animate-spin mb-2" />
-              <span className="text-xs">Searching...</span>
-            </div>
+            <SearchTicketsSkeleton count={3} />
           ) : (
             <>
               {/* Tickets List */}

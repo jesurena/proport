@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { AppEmptyState, AppLabel } from '@/components/ui';
 import { TicketTable } from '@/modules/tickets/components/TicketTable';
 import { useBuyerPeriodTickets } from '@/modules/dashboard/hooks/useDashboard';
+import { TicketTableSkeleton } from '@/components/skeleton';
 
 interface BuyerTicketsTabProps {
   buyerId: string | number;
@@ -29,12 +30,7 @@ export default function BuyerTicketsTab({
   return (
     <div>
       {isTicketsLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center text-text-info space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-accent-1 opacity-80" />
-          <AppLabel as="p" className="text-xs font-semibold tracking-wide">
-            Fetching assigned tickets...
-          </AppLabel>
-        </div>
+        <TicketTableSkeleton rows={10} />
       ) : ticketsArray.length > 0 ? (
         <TicketTable tickets={ticketsArray} hideHeader={true} hideFilters={true} refetch={false} />
       ) : (
