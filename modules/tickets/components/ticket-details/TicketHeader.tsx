@@ -13,6 +13,7 @@ import type { TicketStatus, Attachment } from '@/lib/types';
 import { useAuthStore } from '@/modules/auth';
 import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
 import { UserProfilePopover } from '@/modules/profile';
+import { useBookmarks, useAddBookmark, useRemoveBookmark } from '@/modules/tickets';
 
 interface TicketHeaderProps {
   ticketId: string;
@@ -30,7 +31,7 @@ interface TicketHeaderProps {
   requesterId?: string | number;
 }
 
-export function TicketHeader({
+export const TicketHeader: React.FC<TicketHeaderProps> = ({
   ticketId,
   subject,
   status,
@@ -44,29 +45,17 @@ export function TicketHeader({
   brandName,
   brandType,
   requesterId,
-}: TicketHeaderProps) {
+}) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isPinned, setIsPinned] = useState(false);
-  const token = useAuthStore.getState().token;
+  const { user } = useAuthStore();
   const getAttachmentUrl = useAttachmentUrl();
 
-  useEffect(() => {
-    const checkPinned = () => {
-      const pins = localStorage.getItem('proport_pinned_tickets');
-      if (pins) {
-        const parsed = JSON.parse(pins) as string[];
-        setIsPinned(parsed.includes(ticketId));
-      }
-    };
-    checkPinned();
+  const { data: userBookmarks = [] } = useBookmarks(!!user);
+  const { mutate: addBookmark } = useAddBookmark();
+  const { mutate: removeBookmark } = useRemoveBookmark();
 
-    window.addEventListener('proport-pins-updated', checkPinned);
-    window.addEventListener('storage', checkPinned);
-    return () => {
-      window.removeEventListener('proport-pins-updated', checkPinned);
-      window.removeEventListener('storage', checkPinned);
-    };
-  }, [ticketId]);
+  const numericTicketId = Number(ticketId);
+  const isPinned = userBookmarks.some((b: any) => Number(b.ticket_id ?? b) === numericTicketId);
 
   const statusMeta = STATUS_META[status] || {
     label: typeof status === 'string' ? status : 'Unknown',
@@ -75,6 +64,7 @@ export function TicketHeader({
   };
 
   const handleTogglePin = () => {
+    if (!ticketId || ticketId === 'undefined') return;
     modal.confirm({
       title: isPinned ? 'Unpin request?' : 'Pin request?',
       content: isPinned ? 'This will remove the request from your pinned list.' : 'This will add the request to your pinned list.',
@@ -82,22 +72,11 @@ export function TicketHeader({
       cancelText: 'Cancel',
       centered: true,
       onOk() {
-        const pins = localStorage.getItem('proport_pinned_tickets');
-        let updated: string[] = [];
-        if (pins) {
-          const parsed = JSON.parse(pins) as string[];
-          if (parsed.includes(ticketId)) {
-            updated = parsed.filter((id) => id !== ticketId);
-          } else {
-            updated = [...parsed, ticketId];
-          }
+        if (isPinned) {
+          removeBookmark(numericTicketId);
         } else {
-          updated = [ticketId];
+          addBookmark(numericTicketId);
         }
-        localStorage.setItem('proport_pinned_tickets', JSON.stringify(updated));
-        setIsPinned(!isPinned);
-        window.dispatchEvent(new Event('storage'));
-        window.dispatchEvent(new CustomEvent('proport-pins-updated'));
       },
     });
   };

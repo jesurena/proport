@@ -5,6 +5,7 @@ import { SlidersHorizontal, Filter } from 'lucide-react';
 import { AppButton, AppInput } from '@integrated-computer-system/ui-kit';
 import { AppPopover, AppFilterPopover } from '@/components/ui';
 import { STATUS_META } from '@/lib/types';
+import { useAuthStore } from '@/modules/auth';
 
 interface TicketFiltersProps {
   searchQuery: string;
@@ -41,6 +42,11 @@ export function TicketFilters({
   setFilterOpen,
   activeFiltersCount,
 }: TicketFiltersProps) {
+  const { user, is_head, is_adel } = useAuthStore();
+  const role = user?.role_name;
+  const isRequestor = role === 'requestor';
+  const showScopeFilter = !isRequestor || is_head || is_adel;
+
   const [tempStatuses, setTempStatuses] = React.useState<string[]>(selectedStatuses);
   const [tempBrandTypes, setTempBrandTypes] = React.useState<string[]>(selectedBrandTypes);
   const [tempMyTicketsOnly, setTempMyTicketsOnly] = React.useState<boolean>(myTicketsOnly);
@@ -130,19 +136,21 @@ export function TicketFilters({
           }}
           onClose={() => setFilterOpen(false)}
         >
-          <AppFilterPopover.Group title="Scope">
-            <div className="flex flex-col gap-1 p-1">
-              <label className="flex items-center gap-2 px-2 py-1.5 hover:bg-hover rounded-lg cursor-pointer text-xs text-text font-semibold">
-                <input
-                  type="checkbox"
-                  checked={tempMyTicketsOnly}
-                  onChange={(e) => setTempMyTicketsOnly(e.target.checked)}
-                  className="rounded border-border text-accent-1 focus:ring-accent-1"
-                />
-                My Tickets Only
-              </label>
-            </div>
-          </AppFilterPopover.Group>
+          {showScopeFilter && (
+            <AppFilterPopover.Group title="Scope">
+              <div className="flex flex-col gap-1 p-1">
+                <label className="flex items-center gap-2 px-2 py-1.5 hover:bg-hover rounded-lg cursor-pointer text-xs text-text font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={tempMyTicketsOnly}
+                    onChange={(e) => setTempMyTicketsOnly(e.target.checked)}
+                    className="rounded border-border text-accent-1 focus:ring-accent-1"
+                  />
+                  My Tickets Only
+                </label>
+              </div>
+            </AppFilterPopover.Group>
+          )}
 
           <AppFilterPopover.Group title="Brand Type">
             <div className="flex flex-col gap-1 p-1">

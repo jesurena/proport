@@ -96,7 +96,7 @@ export default function ProportSidebar() {
           {collapsed ? (
             <div className="flex flex-col items-center gap-3 w-full">
               <AppSidebar.Toggle />
-              {(role === 'sales' || role === 'super_user') && (
+              {(role === 'requestor' || role === 'super_user') && (
                 <button
                   onClick={() => openCompose('Focus')}
                   title="Compose Ticket"
@@ -116,7 +116,7 @@ export default function ProportSidebar() {
                   className="lg:hidden h-8 w-8 shrink-0"
                 />
               </div>
-              {(role === 'sales' || role === 'super_user') && (
+              {(role === 'requestor' || role === 'super_user') && (
                 <div className="px-1">
                   {/* Compose button */}
                   <button
@@ -124,7 +124,7 @@ export default function ProportSidebar() {
                     className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg transition-all text-sm text-left cursor-pointer group border border-border hover:text-text hover:bg-hover/60 font-medium"
                   >
                     <PenSquare size={14} className="shrink-0 group-hover:scale-110 transition-transform" />
-                    <span>{role === 'sales' ? 'Compose Ticket' : 'Compose'}</span>
+                    <span>{role === 'requestor' ? 'Compose Ticket' : 'Compose'}</span>
                   </button>
                 </div>
               )}

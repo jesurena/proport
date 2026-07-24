@@ -82,7 +82,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <AppButton
                     variant={period === 'today' ? 'primary' : 'neutral'}
                     size="sm"
-                    className="!py-0.5 !px-2 !h-6 !text-[10px]"
+                    className={`!py-0.5 !px-2 !h-6 !text-[10px] ${period === 'today' ? '!bg-accent-1 !text-white border-none font-bold' : ''}`}
                     onClick={() => setPeriod('today')}
                   >
                     Today
@@ -90,7 +90,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <AppButton
                     variant={period === 'week' ? 'primary' : 'neutral'}
                     size="sm"
-                    className="!py-0.5 !px-2 !h-6 !text-[10px]"
+                    className={`!py-0.5 !px-2 !h-6 !text-[10px] ${period === 'week' ? '!bg-accent-1 !text-white border-none font-bold' : ''}`}
                     onClick={() => setPeriod('week')}
                   >
                     This Week
@@ -98,7 +98,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <AppButton
                     variant={period === 'all' ? 'primary' : 'neutral'}
                     size="sm"
-                    className="!py-0.5 !px-2 !h-6 !text-[10px]"
+                    className={`!py-0.5 !px-2 !h-6 !text-[10px] ${period === 'all' ? '!bg-accent-1 !text-white border-none font-bold' : ''}`}
                     onClick={() => setPeriod('all')}
                   >
                     All Time
@@ -168,6 +168,8 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
               activeTab={activeTab}
               onChange={setActiveTab}
               variant="pills"
+              className="bg-transparent border-none"
+              navClassName="!p-0"
             />
 
             <div className="flex-1 overflow-y-auto mt-3 max-h-[55vh]">

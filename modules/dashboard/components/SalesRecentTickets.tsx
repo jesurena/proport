@@ -12,45 +12,33 @@ import AppEmptyState from '@/components/ui/empty-state/AppEmptyState';
 import { useAuthStore } from '@/modules/auth';
 import { SalesRecentTicketsSkeleton } from '@/components/skeleton/dashboard';
 
+import { useBookmarks, useAddBookmark, useRemoveBookmark } from '@/modules/tickets';
+
 export default function SalesRecentTickets() {
   const router = useRouter();
   const [role, setRole] = useState<string>('super_user');
   const [page, setPage] = useState(0);
-  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
 
   const { user } = useAuthStore();
   const isDeveloper = user?.is_developer ?? false;
   const actualRole = user?.role_name ?? 'buyer';
 
-  // Sync role and pins on mount
+  const { data: userBookmarks = [] } = useBookmarks(!!user);
+  const { mutate: addBookmark } = useAddBookmark();
+  const { mutate: removeBookmark } = useRemoveBookmark();
+
+  const pinnedIds = userBookmarks.map((b: any) => String(b.ticket_id ?? b));
+
   useEffect(() => {
-    const storedRole = localStorage.getItem('proport_my_role');
-    if (isDeveloper && storedRole) {
-      setRole(storedRole);
-    } else {
-      setRole(actualRole);
-    }
-
-    const storedPins = localStorage.getItem('proport_pinned_tickets');
-    if (storedPins) setPinnedIds(JSON.parse(storedPins));
-
-    const handlePinSync = () => {
-      const pins = localStorage.getItem('proport_pinned_tickets');
-      if (pins) setPinnedIds(JSON.parse(pins));
-    };
-    window.addEventListener('proport-pins-updated', handlePinSync);
-    window.addEventListener('storage', handlePinSync);
-    return () => {
-      window.removeEventListener('proport-pins-updated', handlePinSync);
-      window.removeEventListener('storage', handlePinSync);
-    };
-  }, []);
+    setRole(actualRole);
+  }, [actualRole]);
 
   const { data: recentTickets = [], isLoading } = useRecentTickets();
 
   const handleToggleBookmark = (ticketId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const isPinned = pinnedIds.includes(ticketId);
+    const isPinned = pinnedIds.includes(String(ticketId));
+    const numericId = Number(ticketId);
 
     modal.confirm({
       title: isPinned ? 'Remove Bookmark?' : 'Bookmark Ticket?',
@@ -61,16 +49,11 @@ export default function SalesRecentTickets() {
       cancelText: 'No',
       centered: true,
       onOk() {
-        let updated;
         if (isPinned) {
-          updated = pinnedIds.filter((id) => id !== ticketId);
+          removeBookmark(numericId);
         } else {
-          updated = [...pinnedIds, ticketId];
+          addBookmark(numericId);
         }
-        setPinnedIds(updated);
-        localStorage.setItem('proport_pinned_tickets', JSON.stringify(updated));
-        window.dispatchEvent(new CustomEvent('proport-pins-updated'));
-        window.dispatchEvent(new Event('storage'));
       },
     });
   };

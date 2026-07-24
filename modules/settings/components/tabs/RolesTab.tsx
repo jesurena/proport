@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { AppButton } from '@integrated-computer-system/ui-kit';
 import { Shield, ShieldCheck, Wrench, User, Crown, Check, UserCheck } from 'lucide-react';
 
-type Role = 'super_user' | 'admin' | 'buyer' | 'sales' | 'bu_head' | 'adel' | 'user';
+type Role = 'super_user' | 'admin' | 'buyer' | 'requestor' | 'bu_head' | 'adel' | 'user';
 
 const ROLES: { value: Role; label: string; icon: React.ReactNode; color: string }[] = [
     { value: 'super_user', label: 'Super User', icon: <Crown size={11} />, color: 'bg-amber-500/10 text-amber-600 border-amber-400/30' },
     { value: 'admin', label: 'Admin', icon: <ShieldCheck size={11} />, color: 'bg-red-500/10 text-red-600 border-red-400/30' },
     { value: 'buyer', label: 'Buyer', icon: <Wrench size={11} />, color: 'bg-blue-500/10 text-blue-600 border-blue-400/30' },
-    { value: 'sales', label: 'Sales', icon: <Shield size={11} />, color: 'bg-emerald-500/10 text-emerald-600 border-emerald-400/30' },
+    { value: 'requestor', label: 'Requestor', icon: <Shield size={11} />, color: 'bg-emerald-500/10 text-emerald-600 border-emerald-400/30' },
     { value: 'bu_head', label: 'BU Head', icon: <UserCheck size={11} />, color: 'bg-emerald-500/10 text-emerald-600 border-emerald-400/30' },
     { value: 'adel', label: 'Ms. Adel (Executive)', icon: <Crown size={11} />, color: 'bg-purple-500/10 text-purple-600 border-purple-400/30' },
 ];

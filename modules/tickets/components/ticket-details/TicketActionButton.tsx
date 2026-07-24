@@ -46,7 +46,6 @@ export function TicketActionButton({
   const isBuyerOrAdmin = role === 'buyer' || role === 'admin' || role === 'super_user';
   const isRequestor =
     role === 'requestor' ||
-    role === 'sales' ||
     (accountId !== null && String(ticket.requesterId) === accountId);
   const isBUHead = is_head || role === 'super_user';
   const isFinalApprover = is_adel || role === 'super_user';

@@ -25,7 +25,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
-  role?: 'admin' | 'buyer' | 'sales' | 'super_user';
+  role?: 'admin' | 'buyer' | 'requestor' | 'super_user';
   account_group?: string;
 }
 

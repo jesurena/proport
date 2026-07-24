@@ -21,7 +21,7 @@ export default function Dashboard({ role }: DashboardProps) {
   if (is_head) {
     return <BUHeadDashboard />;
   }
-  if (role === 'sales' || role === 'requestor') {
+  if (role === 'requestor') {
     return <SalesDashboard />;
   }
 

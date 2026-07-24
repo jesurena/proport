@@ -103,8 +103,8 @@ export function UserProfileCard({
                 <div className="flex items-center gap-2">
                   <User size={14} className="text-text-info/50 shrink-0" />
                   <AppLabel as="span" className="truncate text-xs text-foreground font-medium capitalize">
-                    {profile?.role === 'sales'
-                      ? 'Sales / Requestor'
+                    {profile?.role === 'requestor'
+                      ? 'Requestor'
                       : (profile?.role === 'buyer'
                         ? 'Buyer Assignee'
                         : (profile?.role?.replace(/_/g, ' ') || 'Buyer Assignee'))}
@@ -136,8 +136,8 @@ export function UserProfileCard({
                     {(() => {
                       const assignedCount = profile?.assignedTickets ?? 0;
                       const createdCount = profile?.createdTickets ?? 0;
-                      const isSalesRole = profile?.role === 'sales';
-                      if (isSalesRole || (createdCount > 0 && assignedCount === 0)) {
+                      const isRequestorRole = profile?.role === 'requestor';
+                      if (isRequestorRole || (createdCount > 0 && assignedCount === 0)) {
                         return `${createdCount} Ticket${createdCount !== 1 ? 's' : ''} Created`;
                       } else if (createdCount > 0 && assignedCount > 0) {
                         return `${assignedCount} Assigned · ${createdCount} Created`;

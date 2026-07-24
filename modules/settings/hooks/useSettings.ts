@@ -75,6 +75,8 @@ export const usePreferences = (enabled = true) => {
     queryKey: ['user-preferences'],
     queryFn: () => settingsService.getPreferences(),
     enabled,
+    staleTime: Infinity,
+    gcTime: 60 * 60 * 1000,
   });
 };
 
@@ -103,34 +105,6 @@ export const useUpdatePreferences = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
-    },
-  });
-};
-
-export const useBookmarks = (enabled = true) => {
-  return useQuery({
-    queryKey: ['user-bookmarks'],
-    queryFn: () => settingsService.getBookmarks(),
-    enabled,
-  });
-};
-
-export const useAddBookmark = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (ticketId: number) => settingsService.addBookmark(ticketId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-bookmarks'] });
-    },
-  });
-};
-
-export const useRemoveBookmark = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (ticketId: number) => settingsService.removeBookmark(ticketId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-bookmarks'] });
     },
   });
 };

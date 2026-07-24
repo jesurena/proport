@@ -1,18 +1,19 @@
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboard.service';
 import type { Ticket as TicketType } from '@/lib/types';
 import { getTickets } from '@/lib/tickets';
 
 // Helper ticket mapper
 const mapTicket = (t: any): TicketType => {
+  const statusId = Number(t.status_id);
   let status: any = 'pending';
-  if (t.status_id === 1) status = 'pending';
-  else if (t.status_id === 2) status = 'answered';
-  else if (t.status_id === 3) status = 'closed';
-  else if (t.status_id === 5) status = 'bu-approval';
-  else if (t.status_id === 6) status = 'bu-declined';
-  else if (t.status_id === 7) status = 'final-approval';
-  else if (t.status_id === 8) status = 'adel-declined';
+  if (statusId === 1) status = 'pending';
+  else if (statusId === 2) status = 'answered';
+  else if (statusId === 3) status = 'closed';
+  else if (statusId === 5) status = 'bu-approval';
+  else if (statusId === 6) status = 'bu-declined';
+  else if (statusId === 7) status = 'final-approval';
+  else if (statusId === 8) status = 'adel-declined';
 
   return {
     id: String(t.ticket_id),
@@ -21,8 +22,8 @@ const mapTicket = (t: any): TicketType => {
     description: t.ticket_content || t.subject || '',
     status,
     priority: 'medium',
-    requesterId: String(t.ao_id),
-    requesterName: t.requestor_name || 'Unknown User',
+    requesterId: String(t.ao_id || t.requestor_id || ''),
+    requesterName: t.requestor_name || t.requestorName || 'Unknown User',
     assignees: t.assignees ? t.assignees.map((a: any) => ({
       id: String(a.id),
       name: a.name,
@@ -35,7 +36,7 @@ const mapTicket = (t: any): TicketType => {
         avatar: t.GAvatarAO || undefined,
       }
     ] : []),
-    brandType: t.transaction_description || undefined,
+    brandType: t.brandType || t.transaction_description || undefined,
     requestType: t.request_type || undefined,
     businessUnitId: t.AccountGroup || 'Unknown',
     businessUnitName: t.AccountGroup || 'Unknown',
@@ -44,7 +45,7 @@ const mapTicket = (t: any): TicketType => {
     ccUsers: [],
     createdAt: t.date_created ? new Date(t.date_created).toISOString() : new Date().toISOString(),
     updatedAt: t.last_updated ? new Date(t.last_updated).toISOString() : new Date().toISOString(),
-    closedAt: t.status_id === 3 && t.last_updated ? new Date(t.last_updated).toISOString() : undefined,
+    closedAt: statusId === 3 && t.last_updated ? new Date(t.last_updated).toISOString() : undefined,
     replies: [],
     tags: [],
     customerName: t.customer_name || undefined,
@@ -62,7 +63,6 @@ export const useDashboardCounts = () => {
       return dashboardService.getCounts();
     },
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
   });
 };
 
@@ -73,21 +73,18 @@ export const useFocusBreakdown = () => {
       return dashboardService.getFocusBreakdown();
     },
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
   });
 };
 
-export const useBookmarkedTickets = (ids?: string) => {
+export const useBookmarkedTickets = (enabled: boolean = true) => {
   return useQuery<TicketType[]>({
-    queryKey: ['bookmarked-tickets', ids],
+    queryKey: ['bookmarked-tickets'],
     queryFn: async () => {
-      if (!ids) return [];
-      const backendBookmarks = await dashboardService.getBookmarkedTickets(ids);
+      const backendBookmarks = await dashboardService.getBookmarkedTickets();
       return backendBookmarks.map(mapTicket);
     },
-    enabled: !!ids,
+    enabled,
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
   });
 };
 
@@ -104,7 +101,6 @@ export const useTicketCountAo = (params?: {
     },
     enabled,
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -118,7 +114,6 @@ export const useChartPerBu = (enabled: boolean = true) => {
     },
     enabled,
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -137,7 +132,6 @@ export const useBuyerCategoryCounts = (params?: {
     },
     enabled,
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -158,7 +152,6 @@ export const useBuyerDateCounts = (params?: {
     },
     enabled,
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -180,7 +173,6 @@ export const useSalesDateCounts = (
     },
     enabled,
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -193,7 +185,6 @@ export const useBuyerPeriodCounts = () => {
       return dashboardService.getBuyerPeriodCounts();
     },
     staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
   });
 };
 

@@ -11,28 +11,30 @@ interface DashboardWelcomeBannerProps {
 
 export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcomeBannerProps) {
   const router = useRouter();
-  const { is_head, is_adel } = useAuthStore();
+  const { is_head, is_adel, user } = useAuthStore();
 
   const handleAction = () => {
     if (is_adel) {
       router.push('/tickets?tab=final-approval');
     } else if (is_head) {
       router.push('/tickets?tab=bu-approval');
-    } else if (role === 'sales') {
+    } else if (role === 'requestor') {
       window.dispatchEvent(new CustomEvent('tcd-open-compose'));
     } else {
       router.push('/tickets');
     }
   };
 
-
+  const rawFirstName = user?.first_name || (user?.AccountName ? user.AccountName.split(' ')[0] : '');
+  const userName = rawFirstName ? rawFirstName.charAt(0).toUpperCase() + rawFirstName.slice(1).toLowerCase() : '';
+  const displayName = userName ? `, ${userName}` : '';
 
   let bannerColor = 'bg-[#6366f1]';
   if (is_adel) {
     bannerColor = 'bg-gradient-to-br from-violet-600 to-indigo-800';
   } else if (is_head) {
     bannerColor = 'bg-gradient-to-br from-emerald-600 to-cyan-800';
-  } else if (role === 'sales') {
+  } else if (role === 'requestor') {
     bannerColor = 'bg-gradient-to-br from-indigo-500 to-purple-600';
   } else if (role === 'buyer') {
     bannerColor = 'bg-gradient-to-br from-emerald-500 to-teal-600';
@@ -47,7 +49,7 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     tag = 'PROPORT · EXECUTIVE DASHBOARD';
   } else if (is_head) {
     tag = 'PROPORT · BU HEAD DASHBOARD';
-  } else if (role === 'sales') {
+  } else if (role === 'requestor') {
     tag = 'PROPORT · PRICING TICKET HUB';
   } else if (role === 'super_user') {
     tag = 'PROPORT · SUPER USER WORKSPACE';
@@ -55,17 +57,17 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     tag = 'PROPORT · ADMIN WORKSPACE';
   }
 
-  let welcomeMessage = "Welcome back! Help sales obtain the best price quotes from suppliers, resolve incoming tickets, and manage quotes.";
+  let welcomeMessage = `Welcome back${displayName}! Help sales obtain the best price quotes from suppliers, resolve incoming tickets, and manage quotes.`;
   if (is_adel) {
-    welcomeMessage = "Welcome back, Ms. Adel. Access reports, monitor overall ticket status, and review final approval requests.";
+    welcomeMessage = `Welcome back${displayName || ', Ms. Adel'}. Access reports, monitor overall ticket status, and review final approval requests.`;
   } else if (is_head) {
-    welcomeMessage = "Welcome back! Monitor your business unit's ticket activities, endorse pending requests, and manage ticket queues.";
-  } else if (role === 'sales') {
-    welcomeMessage = "Need help with product pricing or quotes? Submit a ticket and our buyers will get the best pricing options from suppliers.";
+    welcomeMessage = `Welcome back${displayName}! Monitor your business unit's ticket activities, endorse pending requests, and manage ticket queues.`;
+  } else if (role === 'requestor') {
+    welcomeMessage = `Welcome back${displayName}! Need help with product pricing or quotes? Submit a ticket and our buyers will get the best pricing options from suppliers.`;
   } else if (role === 'super_user') {
-    welcomeMessage = "Welcome back, Super User. Monitor system activity, view reports, manage brand focus catalogs, and reply to all requests.";
+    welcomeMessage = `Welcome back${displayName || ', Super User'}. Monitor system activity, view reports, manage brand focus catalogs, and reply to all requests.`;
   } else if (role === 'admin') {
-    welcomeMessage = "Welcome back, Admin. Proport administrator dashboard. View reports, configure brand classification, and update ticket assignments.";
+    welcomeMessage = `Welcome back${displayName || ', Admin'}. Proport administrator dashboard. View reports, configure brand classification, and update ticket assignments.`;
   }
 
   return (
@@ -105,7 +107,7 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
                   {counts?.for_bu_head_approval ?? 0}
                 </span>
               </>
-            ) : role === 'sales' ? (
+            ) : role === 'requestor' ? (
               'Compose Ticket'
             ) : (
               'View Tickets'

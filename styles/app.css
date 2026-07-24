@@ -1,0 +1,280 @@
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ─── Focus ring ─────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+/* ─── Antd Overrides ─────────────────────────────────────────────────────── */
+.ant-modal-mask {
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ─── AppToggle (Ant Design Segmented) ───────────────────────────────────── */
+.app-toggle.ant-segmented {
+  background-color: var(--primary) !important;
+  border-radius: 10px !important;
+  padding: 1px !important;
+  border: none !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-item {
+  border-radius: 7px !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s ease !important;
+  padding: 3px 10px !important;
+  line-height: 1.5 !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-item:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-item-selected {
+  background-color: #ffffff !important;
+  color: var(--primary) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .app-toggle.ant-segmented .ant-segmented-item-selected {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+.app-toggle.ant-segmented .ant-segmented-thumb {
+  background-color: #ffffff !important;
+  border-radius: 7px !important;
+}
+
+.dark .app-toggle.ant-segmented .ant-segmented-thumb {
+  background-color: #1e293b !important;
+}
+
+/* ─── Borderless AppSelect (Ant Design Select) ──────────────────────────── */
+.ant-select-borderless,
+.ant-select-borderless .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  outline: none !important;
+  padding-left: 0 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+.ant-select-borderless .ant-select-selector:hover,
+.ant-select-borderless .ant-select-selector:focus,
+.ant-select-borderless .ant-select-selector:active,
+.ant-select-borderless.ant-select-focused .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.ant-select-borderless .ant-select-selection-item,
+.ant-select-borderless .ant-select-selection-placeholder {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  padding: 0 !important;
+}
+
+/* ─── AppTable (Ant Design Table) ────────────────────────────────────────── */
+.app-table-wrapper .ant-table {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.app-table-wrapper .ant-table-container {
+  background: transparent !important;
+}
+
+.app-table-wrapper .ant-table-thead>tr>th {
+  background: var(--neutral) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text-info) !important;
+}
+
+.app-table-wrapper .ant-table-tbody>tr>td {
+  background: transparent !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--text) !important;
+  border-bottom: 1px solid rgba(217, 218, 219, 0.2) !important;
+}
+
+.dark .app-table-wrapper .ant-table-tbody>tr>td {
+  border-bottom: 1px solid rgba(39, 39, 42, 0.4) !important;
+}
+
+.app-table-wrapper .ant-table-tbody>tr:last-child>td {
+  border-bottom: none !important;
+}
+
+.app-table-wrapper .ant-table-tbody>tr {
+  transition: all 0.2s ease !important;
+}
+
+/* Fix sticky / fixed left and right column backgrounds so they match the card theme */
+.app-table-wrapper .ant-table-cell-fix-left,
+.app-table-wrapper .ant-table-cell-fix-right {
+  background-color: var(--card-bg) !important;
+}
+
+.app-table-wrapper .ant-table-thead>tr>th.ant-table-cell-fix-left,
+.app-table-wrapper .ant-table-thead>tr>th.ant-table-cell-fix-right {
+  background-color: var(--neutral) !important;
+}
+
+/* Row hover highlight across all cells including fixed left/right cells */
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td,
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td.ant-table-cell-fix-left,
+.app-table-wrapper .ant-table-tbody>tr.ant-table-row:hover>td.ant-table-cell-fix-right {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Sorter icon styling */
+.app-table-wrapper .ant-table-thead th.ant-table-column-has-sorters:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+.app-table-wrapper .ant-table-column-sorter {
+  color: var(--text-info) !important;
+}
+
+.app-table-wrapper .ant-table-column-sorter-up.active,
+.app-table-wrapper .ant-table-column-sorter-down.active {
+  color: var(--accent-1) !important;
+}
+
+/* ─── AppTable Pagination Overrides ──────────────────────────────────────── */
+.app-table-wrapper .ant-pagination {
+  margin: 16px 24px !important;
+  font-size: 13px !important;
+  color: var(--text-info) !important;
+  font-family: inherit !important;
+}
+
+.app-table-wrapper .ant-pagination-total-text {
+  font-weight: 500 !important;
+  color: var(--text-info) !important;
+}
+
+.app-table-wrapper .ant-pagination-item,
+.app-table-wrapper .ant-pagination-prev,
+.app-table-wrapper .ant-pagination-next {
+  border-radius: 8px !important;
+  border: 1px solid var(--border) !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.app-table-wrapper .ant-pagination-item a,
+.app-table-wrapper .ant-pagination-prev .ant-pagination-item-link,
+.app-table-wrapper .ant-pagination-next .ant-pagination-item-link {
+  color: var(--text) !important;
+}
+
+.app-table-wrapper .ant-pagination-item-active {
+  background-color: var(--accent-1) !important;
+  border-color: var(--accent-1) !important;
+}
+
+.app-table-wrapper .ant-pagination-item-active a {
+  color: #ffffff !important;
+}
+
+.app-table-wrapper .ant-pagination-item:hover,
+.app-table-wrapper .ant-pagination-prev:hover,
+.app-table-wrapper .ant-pagination-next:hover {
+  border-color: var(--accent-1) !important;
+}
+
+.app-table-wrapper .ant-pagination-item:hover a {
+  color: var(--accent-1) !important;
+}
+
+.app-table-wrapper .ant-pagination-disabled .ant-pagination-item-link,
+.app-table-wrapper .ant-pagination-disabled:hover .ant-pagination-item-link {
+  color: var(--muted) !important;
+  opacity: 0.5 !important;
+}
+
+/* Page size select dropdown */
+.app-table-wrapper .ant-pagination-options .ant-select-selector {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 8px !important;
+}
+
+.app-table-wrapper .ant-pagination-options .ant-select-arrow {
+  color: var(--text-info) !important;
+}
+
+/* Global Select Dropdown Portal styling */
+.ant-select-dropdown {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.ant-select-dropdown .ant-select-item {
+  color: var(--text) !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+  color: var(--accent-1) !important;
+  font-weight: 600 !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+}
+
+/* ─── AppSkeleton Manual CSS Animation ───────────────────────────────────── */
+@keyframes app-skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.app-skeleton {
+  background-color: var(--skeleton-bg, rgba(200, 200, 200, 0.5));
+  animation: app-skeleton-pulse 1.5s ease-in-out infinite;
+}

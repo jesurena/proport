@@ -13,7 +13,7 @@ export type TicketStatus =
 
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 
-export type UserRole = 'admin' | 'buyer' | 'sales' | 'super_user';
+export type UserRole = 'admin' | 'buyer' | 'requestor' | 'super_user';
 
 export interface User {
   id: string;

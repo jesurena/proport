@@ -17,7 +17,7 @@ export default function SalesDashboard() {
     <div className="flex flex-col xl:flex-row gap-6">
       {/* ── LEFT COLUMN ── */}
       <div className="flex-1 min-w-0 space-y-6">
-        <DashboardWelcomeBanner role="sales" />
+        <DashboardWelcomeBanner role="requestor" />
         <DashboardMetricCard counts={counts} isLoading={isLoading} />
         <SalesRecentTickets />
       </div>

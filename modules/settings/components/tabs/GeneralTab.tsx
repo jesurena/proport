@@ -6,14 +6,14 @@ import { ShoppingBag } from 'lucide-react';
 import { AppLabel, cn } from '@integrated-computer-system/ui-kit';
 import { ThemeCard } from '../ThemeCard';
 import { COLOR_THEMES } from '../../constants/themes';
-import { useTheme } from '@/components/Providers/theme-provider';
+import { useTheme, message } from '@/components/Providers/theme-provider';
 import type { Theme } from '@/components/Providers/theme-provider';
 
 export default function GeneralTab() {
     const { theme, setTheme, fontSizeOffset, setFontSizeOffset } = useTheme();
 
     const handleMarketplaceOpen = () => {
-        window.dispatchEvent(new CustomEvent('tcd-open-marketplace'));
+        message.info('Marketplace feature not yet implemented. Stay tuned!');
     };
 
     return (
