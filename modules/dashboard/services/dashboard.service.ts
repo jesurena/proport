@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { UserTicketsStats } from '@/modules/profile/types';
 
 export const dashboardService = {
   async getCounts(): Promise<{
@@ -98,6 +99,27 @@ export const dashboardService = {
 
   async getRecentTickets(): Promise<any[]> {
     const { data } = await api.get('/dashboard/recent-tickets');
+    return data.data || [];
+  },
+
+  async getUserPeriodTickets(userId: string, period: 'today' | 'week'): Promise<any[]> {
+    const { data } = await api.get('/tickets', {
+      params: { user_id: userId, period, per_page: 10 },
+    });
+    return data.data || [];
+  },
+
+  async getUserTicketsStats(userId: string, period: 'today' | 'week'): Promise<UserTicketsStats> {
+    const { data } = await api.get(`/users/${userId}/tickets-stats`, {
+      params: { period },
+    });
+    return data.data || { total: 0, answered: 0, pending: 0, user: null };
+  },
+
+  async getUserLogs(userId: string, period: 'today' | 'week'): Promise<any[]> {
+    const { data } = await api.get(`/users/${userId}/logs`, {
+      params: { period },
+    });
     return data.data || [];
   },
 };

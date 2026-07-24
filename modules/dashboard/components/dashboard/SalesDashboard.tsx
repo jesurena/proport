@@ -20,7 +20,6 @@ export default function SalesDashboard() {
         <DashboardWelcomeBanner role="sales" />
         <DashboardMetricCard counts={counts} isLoading={isLoading} />
         <SalesRecentTickets />
-        <DashboardTabTable />
       </div>
 
       {/* ── RIGHT COLUMN ── */}

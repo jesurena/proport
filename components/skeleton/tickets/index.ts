@@ -1,4 +1,3 @@
-export * from './UserProfileCardSkeleton';
 export * from './TicketThreadSkeleton';
 export * from './TicketTableSkeleton';
 export * from './TicketInfoPanelSkeleton';

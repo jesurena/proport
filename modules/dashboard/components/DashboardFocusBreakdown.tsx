@@ -24,12 +24,8 @@ export default function DashboardFocusBreakdown() {
   const [showMore, setShowMore] = useState(false);
   const { data: breakdown, isLoading } = useFocusBreakdown();
 
-  const focusCount = breakdown?.focus ?? 0;
-  const nonFocusCount = breakdown?.non_focus ?? 0;
-
-  const totalTickets = focusCount + nonFocusCount || 1;
-  const focusPct = Math.round((focusCount / totalTickets) * 100);
-  const nonFocusPct = 100 - focusPct;
+  const totalTickets = (breakdown?.focus ?? 0) + (breakdown?.non_focus ?? 0) || 1;
+  const focusPct = Math.round(((breakdown?.focus ?? 0) / totalTickets) * 100);
   const circumference = 2 * Math.PI * 40; // r=40
   const dashOffset = circumference - (focusPct / 100) * circumference;
 
@@ -79,11 +75,11 @@ export default function DashboardFocusBreakdown() {
           <div className="grid grid-cols-2 gap-2 mt-2">
             <div className="rounded-2xl border border-border/50 bg-hover/30 px-3 py-2 text-center">
               <AppLabel as="p" className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Focus</AppLabel>
-              <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{focusCount} ({focusPct}%)</AppLabel>
+              <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{breakdown?.focus ?? 0} ({focusPct}%)</AppLabel>
             </div>
             <div className="rounded-2xl border border-border/50 bg-hover/30 px-3 py-2 text-center">
               <AppLabel as="p" className="text-[10px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400">Non-Focus</AppLabel>
-              <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{nonFocusCount} ({nonFocusPct}%)</AppLabel>
+              <AppLabel as="p" className="text-sm font-bold text-text mt-0.5">{breakdown?.non_focus ?? 0} ({100 - focusPct}%)</AppLabel>
             </div>
           </div>
 

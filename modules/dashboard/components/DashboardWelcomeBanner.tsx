@@ -25,7 +25,7 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     }
   };
 
-  const isSales = role === 'sales';
+
 
   let bannerColor = 'bg-[#6366f1]';
   if (is_adel) {
@@ -47,7 +47,7 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     tag = 'PROPORT · EXECUTIVE DASHBOARD';
   } else if (is_head) {
     tag = 'PROPORT · BU HEAD DASHBOARD';
-  } else if (isSales) {
+  } else if (role === 'sales') {
     tag = 'PROPORT · PRICING TICKET HUB';
   } else if (role === 'super_user') {
     tag = 'PROPORT · SUPER USER WORKSPACE';
@@ -60,7 +60,7 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
     welcomeMessage = "Welcome back, Ms. Adel. Access reports, monitor overall ticket status, and review final approval requests.";
   } else if (is_head) {
     welcomeMessage = "Welcome back! Monitor your business unit's ticket activities, endorse pending requests, and manage ticket queues.";
-  } else if (isSales) {
+  } else if (role === 'sales') {
     welcomeMessage = "Need help with product pricing or quotes? Submit a ticket and our buyers will get the best pricing options from suppliers.";
   } else if (role === 'super_user') {
     welcomeMessage = "Welcome back, Super User. Monitor system activity, view reports, manage brand focus catalogs, and reply to all requests.";
@@ -105,7 +105,7 @@ export default function DashboardWelcomeBanner({ role, counts }: DashboardWelcom
                   {counts?.for_bu_head_approval ?? 0}
                 </span>
               </>
-            ) : isSales ? (
+            ) : role === 'sales' ? (
               'Compose Ticket'
             ) : (
               'View Tickets'

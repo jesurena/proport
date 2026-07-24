@@ -4,4 +4,5 @@ export interface Brand {
   id: string;
   name: string;
   type: BrandType;
+  defaultAssignee?: string;
 }

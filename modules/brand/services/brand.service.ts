@@ -12,14 +12,22 @@ export interface BackendBrand {
 export const brandService = {
     async getBrands(): Promise<Brand[]> {
         const { data } = await api.get<BackendBrand[]>('/brand-settings');
+        const assigneeGroups = [
+            'Jesureña',
+            'ESD-Buyer1, ESD-Buyer2',
+            'ESD-Buyer2',
+            'Sales / Requestor, Admin',
+            'Admin, Jesureña'
+        ];
         return data.map((b) => ({
             id: String(b.brand_id),
             name: b.brand,
             type: b.transaction_description === 'Focus' ? 'Focus' : 'Non Focus',
+            defaultAssignee: assigneeGroups[b.brand_id % assigneeGroups.length],
         }));
     },
 
-    async addBrands(items: { name: string; type: 'Focus' | 'Non Focus' }[]): Promise<any> {
+    async addBrands(items: { name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string }[]): Promise<any> {
         const brandNames = items.map(item => item.name);
         const brandTypeIDs = items.map(item => item.type === 'Focus' ? 1 : 2);
         
@@ -30,7 +38,7 @@ export const brandService = {
         return data;
     },
 
-    async updateBrand(id: string | number, name: string, type: 'Focus' | 'Non Focus'): Promise<any> {
+    async updateBrand(id: string | number, name: string, type: 'Focus' | 'Non Focus', defaultAssignee?: string): Promise<any> {
         const typeID = type === 'Focus' ? 1 : 2;
         const { data } = await api.post('/edit-brand', {
             editBrandID: id,

@@ -17,54 +17,23 @@ export default function DashboardMetricCard({ counts, isLoading }: DashboardMetr
   const [showAllCards, setShowAllCards] = useState(false);
   const { is_adel, is_head } = useAuthStore();
 
-  const isLoadingOrNoCounts = isLoading || !counts;
-
-  // 1. New Tickets Today (created in the last 24 hours)
-  const newTicketsTodayCount = counts?.ticket_today ?? 0;
-
-  // 2. My Pending Tickets (unassigned or assigned)
-  const pendingCount = counts?.ticket_pending ?? 0;
-
-  // 3. My Focus Tickets
-  const focusCount = counts?.focus_ticket ?? 0;
-
-  // 4. My Non Focus Tickets
-  const nonFocusCount = counts?.nf_ticket ?? 0;
-
-  // 5. My Open Tickets (status !== 'closed')
-  const openCount = counts?.ticket_open ?? 0;
-
-  // 6. My Closed Tickets (status === 'closed')
-  const closedCount = counts?.ticket_closed ?? 0;
-
-  const initialCards = (is_adel || is_head)
+  const cardsToRender = showAllCards
     ? [
-        { label: 'My Groups Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
-        { label: 'My Groups Pending Tickets', count: pendingCount, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
-        { label: 'My Groups Focus Tickets', count: focusCount, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
+        { label: (is_adel || is_head) ? 'My Groups Tickets Today' : 'New Tickets Today', count: counts?.ticket_today ?? 0, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
+        { label: (is_adel || is_head) ? 'My Groups Pending Tickets' : 'My Pending Tickets', count: counts?.ticket_pending ?? 0, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
+        { label: (is_adel || is_head) ? 'My Groups Focus Tickets' : 'My Focus Tickets', count: counts?.focus_ticket ?? 0, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
+        { label: (is_adel || is_head) ? 'My Groups Non Focus Tickets' : 'My Non Focus Tickets', count: counts?.nf_ticket ?? 0, status: 'non-focus', icon: <ShieldAlert size={18} />, iconBg: 'bg-pink-500/10', iconColor: 'text-pink-600' },
+        { label: (is_adel || is_head) ? 'My Groups Open Tickets' : 'My Open Tickets', count: counts?.ticket_open ?? 0, status: 'open', icon: <BookOpen size={18} />, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600' },
+        { label: (is_adel || is_head) ? 'My Groups Closed Tickets' : 'My Closed Tickets', count: counts?.ticket_closed ?? 0, status: 'closed', icon: <CheckCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
       ]
     : [
-        { label: 'New Tickets Today', count: newTicketsTodayCount, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
-        { label: 'My Pending Tickets', count: pendingCount, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
-        { label: 'My Focus Tickets', count: focusCount, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
+        { label: (is_adel || is_head) ? 'My Groups Tickets Today' : 'New Tickets Today', count: counts?.ticket_today ?? 0, status: 'new', icon: <Inbox size={18} />, iconBg: 'bg-indigo-500/10', iconColor: 'text-indigo-600' },
+        { label: (is_adel || is_head) ? 'My Groups Pending Tickets' : 'My Pending Tickets', count: counts?.ticket_pending ?? 0, status: 'pending', icon: <Clock size={18} />, iconBg: 'bg-amber-500/10', iconColor: 'text-amber-600' },
+        { label: (is_adel || is_head) ? 'My Groups Focus Tickets' : 'My Focus Tickets', count: counts?.focus_ticket ?? 0, status: 'focus', icon: <Zap size={18} />, iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-600' },
       ];
-
-  const extraCards = (is_adel || is_head)
-    ? [
-        { label: 'My Groups Non Focus Tickets', count: nonFocusCount, status: 'non-focus', icon: <ShieldAlert size={18} />, iconBg: 'bg-pink-500/10', iconColor: 'text-pink-600' },
-        { label: 'My Groups Open Tickets', count: openCount, status: 'open', icon: <BookOpen size={18} />, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600' },
-        { label: 'My Groups Closed Tickets', count: closedCount, status: 'closed', icon: <CheckCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
-      ]
-    : [
-        { label: 'My Non Focus Tickets', count: nonFocusCount, status: 'non-focus', icon: <ShieldAlert size={18} />, iconBg: 'bg-pink-500/10', iconColor: 'text-pink-600' },
-        { label: 'My Open Tickets', count: openCount, status: 'open', icon: <BookOpen size={18} />, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600' },
-        { label: 'My Closed Tickets', count: closedCount, status: 'closed', icon: <CheckCircle size={18} />, iconBg: 'bg-slate-500/10', iconColor: 'text-slate-600' },
-      ];
-
-  const cardsToRender = showAllCards ? [...initialCards, ...extraCards] : initialCards;
 
   return (
-    isLoadingOrNoCounts ? (
+    isLoading || !counts ? (
       <DashboardMetricCardSkeleton cardsCount={showAllCards ? 6 : 3} />
     ) : (
       <div className="space-y-3">

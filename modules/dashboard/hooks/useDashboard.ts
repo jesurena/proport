@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboard.service';
 import type { Ticket as TicketType } from '@/lib/types';
+import type { UserTicketsStats } from '@/modules/profile/types';
 import { getTickets } from '@/lib/tickets';
 
 // Helper ticket mapper
@@ -23,13 +24,18 @@ const mapTicket = (t: any): TicketType => {
     priority: 'medium',
     requesterId: String(t.ao_id),
     requesterName: t.requestor_name || 'Unknown User',
-    assignees: t.ao_name ? [
+    assignees: t.assignees ? t.assignees.map((a: any) => ({
+      id: String(a.id),
+      name: a.name,
+      avatar: a.avatar || undefined,
+      email: a.email || undefined,
+    })) : (t.ao_name ? [
       {
         id: String(t.req_id || ''),
         name: t.ao_name,
         avatar: t.GAvatarAO || undefined,
       }
-    ] : [],
+    ] : []),
     brandType: t.transaction_description || undefined,
     requestType: t.request_type || undefined,
     businessUnitId: t.AccountGroup || 'Unknown',
@@ -239,3 +245,46 @@ export function useDashboard() {
     isLoading: isCountsLoading,
   };
 }
+
+export const useUserPeriodTickets = (userId: string | null, period: 'today' | 'week', enabled = true) => {
+  return useQuery<TicketType[]>({
+    queryKey: ['user-period-tickets', userId, period],
+    queryFn: async () => {
+      if (!userId) return [];
+      const data = await dashboardService.getUserPeriodTickets(userId, period);
+      return data.map(mapTicket);
+    },
+    enabled: !!userId && enabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};
+
+export const useUserTicketsStats = (userId: string | null, period: 'today' | 'week', enabled = true) => {
+  return useQuery<UserTicketsStats>({
+    queryKey: ['user-tickets-stats', userId, period],
+    queryFn: async () => {
+      if (!userId) return { total: 0, answered: 0, pending: 0, user: null };
+      return dashboardService.getUserTicketsStats(userId, period);
+    },
+    enabled: !!userId && enabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};
+
+export const useUserLogs = (userId: string | null, period: 'today' | 'week', enabled = true) => {
+  return useQuery<any[]>({
+    queryKey: ['user-logs', userId, period],
+    queryFn: async () => {
+      if (!userId) return [];
+      return dashboardService.getUserLogs(userId, period);
+    },
+    enabled: !!userId && enabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};

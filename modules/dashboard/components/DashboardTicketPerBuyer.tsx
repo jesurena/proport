@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useBuyerPeriodCounts } from '../hooks/useDashboard';
-import BuyerTicketsModal from './modals/BuyerTicketsModal';
+import { UserProfileModal } from '@/modules/profile';
 import { Segmented } from 'antd';
 import { AppLabel, AppAvatar, AppCard } from '@/components/ui';
 import { useRouter } from 'next/router';
@@ -22,8 +22,6 @@ export default function DashboardTicketPerBuyer() {
     const list = buyerPeriod === 'today' ? periodCounts.today : periodCounts.week;
     return [...list].sort((a, b) => b.count - a.count);
   }, [periodCounts, buyerPeriod]);
-
-  const displayedBuyers = showAllBuyers ? buyerCounts : buyerCounts.slice(0, 8);
 
   return (
     <>
@@ -55,7 +53,7 @@ export default function DashboardTicketPerBuyer() {
             </div>
 
             <div className="space-y-1">
-              {displayedBuyers.map((buyer) => (
+              {(showAllBuyers ? buyerCounts : buyerCounts.slice(0, 8)).map((buyer) => (
                 <div
                   key={buyer.name}
                   onClick={() => setSelectedBuyer({ id: buyer.id, name: buyer.name })}
@@ -92,12 +90,12 @@ export default function DashboardTicketPerBuyer() {
 
       {/* Embedded TicketTable Modal */}
       {selectedBuyer && (
-        <BuyerTicketsModal
+        <UserProfileModal
           open={!!selectedBuyer}
           onClose={() => setSelectedBuyer(null)}
-          buyerId={selectedBuyer.id}
-          buyerName={selectedBuyer.name}
-          buyerPeriod={buyerPeriod}
+          userId={selectedBuyer.id}
+          userName={selectedBuyer.name}
+          period={buyerPeriod}
         />
       )}
     </>

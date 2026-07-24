@@ -23,8 +23,8 @@ export const useAddBrands = () => {
 export const useUpdateBrand = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, name, type }: { id: string; name: string; type: 'Focus' | 'Non Focus' }) =>
-      brandService.updateBrand(id, name, type),
+    mutationFn: ({ id, name, type, defaultAssignee }: { id: string; name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string }) =>
+      brandService.updateBrand(id, name, type, defaultAssignee),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['brands'] });
     },

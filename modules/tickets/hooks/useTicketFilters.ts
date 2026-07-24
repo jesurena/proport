@@ -17,12 +17,20 @@ export function useTicketFilters() {
 
   const [activeTab, setActiveTab] = useState(getTabFromParams());
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'recent' | 'oldest' | 'price-desc' | 'price-asc' | 'qty-desc'>('recent');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedBrandTypes, setSelectedBrandTypes] = useState<string[]>([]);
   const [myTicketsOnly, setMyTicketsOnly] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -96,6 +104,7 @@ export function useTicketFilters() {
 
   return {
     searchQuery,
+    debouncedSearchQuery,
     setSearchQuery,
     activeTab,
     setActiveTab,

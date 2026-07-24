@@ -1,20 +1,20 @@
 import React from 'react';
 import { Edit, Trash2, MoreVertical, Award, Box } from 'lucide-react';
 import { AppChip } from '@integrated-computer-system/ui-kit';
-import { AppDropdown, AppTable } from '@/components/ui';
+import { AppAvatar, AppDropdown, AppTable } from '@/components/ui';
 import type { Brand } from '../types/brand';
 
-interface BrandMaintenanceTableProps {
+interface BrandTableProps {
   filteredBrands: Brand[];
   onEdit: (brand: Brand) => void;
   onDelete: (brand: Brand) => void;
 }
 
-export default function BrandMaintenanceTable({
+export default function BrandTable({
   filteredBrands,
   onEdit,
   onDelete,
-}: BrandMaintenanceTableProps) {
+}: BrandTableProps) {
   const columns = [
     {
       title: 'Brand Name',
@@ -38,6 +38,25 @@ export default function BrandMaintenanceTable({
           size="sm"
         />
       ),
+    },
+    {
+      title: 'Default Assignee',
+      dataIndex: 'defaultAssignee',
+      key: 'defaultAssignee',
+      align: 'center' as const,
+      render: (defaultAssignee: string) => {
+        if (!defaultAssignee) return null;
+        const assignees = defaultAssignee.split(',').map((name) => name.trim());
+        return (
+          <div className="flex items-center justify-center -space-x-1.5 overflow-hidden">
+            {assignees.map((name, idx) => (
+              <div key={idx} className="inline-block ring-2 ring-card-bg rounded-full">
+                <AppAvatar name={name} size={28} />
+              </div>
+            ))}
+          </div>
+        );
+      },
     },
     {
       title: 'Action',

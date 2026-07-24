@@ -1,5 +1,6 @@
 import api from '@/lib/api';
 import { useAuthStore } from '@/modules/auth';
+import { UserProfile } from '@/modules/profile/types';
 
 export const ticketsService = {
   async getTickets(params?: {
@@ -82,7 +83,7 @@ export const ticketsService = {
     return data;
   },
 
-  async getUserProfile(id: string): Promise<any> {
+  async getUserProfile(id: string): Promise<UserProfile> {
     const { data } = await api.get(`/users/${id}/profile`);
     return data?.data ?? data;
   },

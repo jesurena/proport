@@ -48,15 +48,6 @@ export default function SalesRecentTickets() {
 
   const { data: recentTickets = [], isLoading } = useRecentTickets();
 
-  // Filter to show last 6 tickets (already sorted descending by date_created from backend)
-  const displayTickets = recentTickets.slice(0, 6);
-
-  const itemsPerPage = 3;
-  const startIndex = page * itemsPerPage;
-  const visibleTickets = displayTickets.slice(startIndex, startIndex + itemsPerPage);
-
-
-
   const handleToggleBookmark = (ticketId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const isPinned = pinnedIds.includes(ticketId);
@@ -84,6 +75,8 @@ export default function SalesRecentTickets() {
     });
   };
 
+  const visibleTickets = recentTickets.slice(0, 6).slice(page * 3, (page * 3) + 3);
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -102,7 +95,7 @@ export default function SalesRecentTickets() {
             variant={page === 1 ? 'neutral' : 'accent'}
             size="icon"
             onClick={() => setPage(1)}
-            disabled={page === 1 || displayTickets.length <= itemsPerPage || isLoading}
+            disabled={page === 1 || recentTickets.slice(0, 6).length <= 3 || isLoading}
             className="!w-7 !h-7 rounded-full"
           >
             <ChevronRight size={14} />
@@ -124,7 +117,6 @@ export default function SalesRecentTickets() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {visibleTickets.map((ticket) => {
-            const isPinned = pinnedIds.includes(ticket.id);
             const statusMeta = STATUS_META[ticket.status] || { label: ticket.status, chipVariant: 'muted' };
 
             return (
@@ -147,10 +139,10 @@ export default function SalesRecentTickets() {
                 <div className="p-4 flex-1 flex flex-col gap-2">
                   <div className="flex items-start gap-2 text-left">
                     <AppBookmark
-                      active={isPinned}
+                      active={pinnedIds.includes(ticket.id)}
                       onClick={(e) => handleToggleBookmark(ticket.id, e)}
                       size={15}
-                      title={isPinned ? 'Remove Bookmark' : 'Bookmark Ticket'}
+                      title={pinnedIds.includes(ticket.id) ? 'Remove Bookmark' : 'Bookmark Ticket'}
                       className="mt-0.5"
                     />
                     <AppLabel

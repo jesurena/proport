@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsService } from '../services/tickets.service';
+import { UserProfile } from '@/modules/profile/types';
 
 export const useTickets = (
   params?: {
@@ -109,7 +110,7 @@ export const useAttachmentUrl = () => {
 
 export const useUserProfile = (id?: string | number, enabled = false) => {
   const userIdStr = id ? String(id) : '';
-  return useQuery({
+  return useQuery<UserProfile>({
     queryKey: ['user-profile', userIdStr],
     queryFn: () => ticketsService.getUserProfile(userIdStr),
     enabled: Boolean(userIdStr) && enabled,

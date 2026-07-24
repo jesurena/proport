@@ -6,7 +6,7 @@ import { AppButton, AppLabel } from '@integrated-computer-system/ui-kit';
 import { ProportNavbar } from '@/modules/sidebar';
 import { BrandTableSkeleton } from '@/components/skeleton';
 import {
-  BrandMaintenanceTable,
+  BrandTable,
   BrandModal,
   BrandToolbar,
   useBrands,
@@ -53,7 +53,7 @@ export default function BrandsPage() {
         {isLoading ? (
           <BrandTableSkeleton />
         ) : (
-          <BrandMaintenanceTable
+          <BrandTable
             filteredBrands={filters.filteredBrands}
             onEdit={modal.openEdit}
             onDelete={actions.deleteBrand}

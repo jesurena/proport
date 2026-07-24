@@ -36,14 +36,6 @@ export default function DashboardGroupTicketCreations() {
       ) : (
         <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
           {creations.map((t: BuHeadGroupCreation) => {
-            const avatarUrl =
-              t.requestor_avatar ||
-              `https://api.dicebear.com/7.x/initials/svg?seed=${t.requestor_name}`;
-
-            const formattedDate = t.date_created
-              ? String(t.date_created).substring(0, 10)
-              : '';
-
             return (
               <div
                 key={t.ticket_id}
@@ -53,7 +45,7 @@ export default function DashboardGroupTicketCreations() {
                 {/* Requestor Avatar */}
                 <AppAvatar
                   name={t.requestor_name}
-                  src={avatarUrl}
+                  src={t.requestor_avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${t.requestor_name}`}
                   size={32}
                   className="shrink-0"
                 />
@@ -79,7 +71,7 @@ export default function DashboardGroupTicketCreations() {
 
                 {/* Date Display */}
                 <span className="text-[10px] font-mono font-semibold text-text-info/60 shrink-0">
-                  {formattedDate}
+                  {t.date_created ? String(t.date_created).substring(0, 10) : ''}
                 </span>
               </div>
             );

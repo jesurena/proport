@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Info } from 'lucide-react';
-import { AppButton, AppInput, AppModal, AppSelect } from '@integrated-computer-system/ui-kit';
+import { Info, Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { AppButton, AppInput, AppSelect, AppModal, AppLabel, AppAvatar } from '@/components/ui';
+import { BrandAssigneeModal } from './BrandAssigneeModal';
+import { getUsers } from '@/lib/tickets';
+import type { User } from '@/lib/types';
 import type { BrandModalController } from '../hooks/use-brand-modal';
-
-interface BrandRow {
-  id: string;
-  name: string;
-  type: 'Focus' | 'Non Focus';
-  checked: boolean;
-}
 
 interface BrandModalProps {
   controller: BrandModalController;
-  onSave: (items: { name: string; type: 'Focus' | 'Non Focus' }[]) => void;
+  onSave: (items: { name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string }[]) => void;
   loading?: boolean;
 }
 
@@ -26,186 +22,175 @@ export default function BrandModal({
   onSave,
   loading,
 }: BrandModalProps) {
-  const { open, close, mode, brandName, brandType } = controller;
-  const [rows, setRows] = useState<BrandRow[]>([]);
+  const { open, close, mode, brandName, setBrandName, brandType, setBrandType } = controller;
+
+  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+  const [brandAssigneeOpen, setBrandAssigneeOpen] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 
   useEffect(() => {
     if (open) {
-      if (mode === 'add') {
-        setRows([{ id: 'row_' + Date.now(), name: '', type: 'Focus', checked: false }]);
+      if (mode === 'edit' && controller.selectedBrand) {
+        const assignees = (controller.selectedBrand.defaultAssignee || '')
+          .split(',')
+          .map((n) => n.trim())
+          .filter(Boolean);
+        const allUsers = getUsers();
+
+        const matched = assignees.map((name) => {
+          const found = allUsers.find((u) => u.name.toLowerCase() === name.toLowerCase());
+          if (found) return found;
+          return {
+            id: 'temp_' + name,
+            name,
+            email: `${name.toLowerCase().replace(/\s+/g, '')}@proport.com`,
+          } as User;
+        });
+        setSelectedUsers(matched);
+        setIsSettingsExpanded(assignees.length > 0);
       } else {
-        setRows([{ id: 'row_' + Date.now(), name: brandName, type: brandType, checked: false }]);
+        setSelectedUsers([]);
+        setIsSettingsExpanded(false);
       }
     }
-  }, [open, mode, brandName, brandType]);
+  }, [open, mode, controller.selectedBrand]);
 
-  const handleAddRow = () => {
-    setRows((prev) => [
-      ...prev,
-      { id: 'row_' + (Date.now() + Math.random()), name: '', type: 'Focus', checked: false },
+  const handleSaveClick = () => {
+    onSave([
+      {
+        name: brandName.trim(),
+        type: brandType,
+        defaultAssignee: selectedUsers.map((u) => u.name).join(', '),
+      },
     ]);
   };
 
-  const handleRemoveRows = () => {
-    if (rows.length === 1) {
-      return;
-    }
-    const remaining = rows.filter((r) => !r.checked);
-    if (remaining.length === 0) {
-      setRows([{ ...rows[0], name: '', checked: false }]);
-    } else {
-      setRows(remaining);
-    }
-  };
-
-  const handleRowChange = (id: string, field: 'name' | 'type' | 'checked', value: any) => {
-    setRows((prev) =>
-      prev.map((r) => {
-        if (r.id === id) {
-          if (field === 'name') {
-            return { ...r, name: (value as string).toUpperCase() };
-          }
-          return { ...r, [field]: value };
-        }
-        return r;
-      })
-    );
-  };
-
-  const handleSaveClick = () => {
-    onSave(
-      rows.map((r) => ({
-        name: r.name.trim(),
-        type: r.type,
-      }))
-    );
-  };
-
   return (
-    <AppModal open={open} onClose={close} width={mode === 'add' ? '680px' : '450px'} centered>
-      <AppModal.Body className="space-y-4">
-        <div>
-          <AppModal.Title>
-            {mode === 'add' ? 'Add New Brand' : 'Edit Brand'}
-          </AppModal.Title>
-          <AppModal.Description>
-            {mode === 'add'
-              ? 'Enter the details of the brands you want to add to the catalog.'
-              : 'Modify the brand name or focus classification status.'}
-          </AppModal.Description>
-        </div>
+    <>
+      <AppModal open={open} onClose={close} width="540px" centered>
+        <AppModal.Body className="space-y-4">
+          <div>
+            <AppModal.Title>
+              {mode === 'add' ? 'Add New Brand' : 'Edit Brand'}
+            </AppModal.Title>
+            <AppModal.Description>
+              {mode === 'add'
+                ? 'Enter the details of the brand you want to add to the catalog.'
+                : 'Modify the brand name or focus classification status.'}
+            </AppModal.Description>
+          </div>
 
-        {/* Buttons (Add Row / Remove Row) */}
-        {mode === 'add' && (
-          <div className="flex justify-end items-center gap-2 pt-1">
-            <AppButton
-              variant="neutral"
-              size="sm"
-              leftIcon={<Plus size={14} />}
-              onClick={handleAddRow}
-              className="text-xs !bg-emerald-500/10 !text-emerald-700 !border-emerald-500/20 hover:!bg-emerald-500/15"
+          {/* Inputs */}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <AppLabel className="text-xs font-semibold text-text-info">Brand Name</AppLabel>
+              <AppInput
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value.toUpperCase())}
+                placeholder="e.g. ASUS"
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <AppLabel className="text-xs font-semibold text-text-info">Brand Type</AppLabel>
+              <AppSelect
+                options={TYPE_OPTIONS}
+                value={brandType}
+                onChange={(val) => setBrandType(val as any)}
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          <div className="">
+            <button
+              type="button"
+              onClick={() => setIsSettingsExpanded(!isSettingsExpanded)}
+              className="flex items-center justify-between w-full text-left py-1 text-xs font-bold text-text-info/80 hover:text-text cursor-pointer select-none transition-colors"
             >
-              Add Row
+              <span>Additional Settings</span>
+              {isSettingsExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+
+            {isSettingsExpanded && (
+              <div className="mt-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <AppLabel className="text-xs font-semibold text-text-info">Default Assignees</AppLabel>
+                  <AppButton
+                    variant="neutral"
+                    size="sm"
+                    className="text-xs font-semibold !h-7 !py-0.5 cursor-pointer"
+                    leftIcon={<Plus size={12} />}
+                    onClick={() => setBrandAssigneeOpen(true)}
+                  >
+                    Assign Buyer
+                  </AppButton>
+                </div>
+
+                {selectedUsers.length === 0 ? (
+                  <div className="text-xs text-text-info/50 border border-dashed border-border/40 rounded-xl p-3.5 text-center">
+                    No default assignees selected.
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5 border border-border/40 rounded-xl p-2.5 bg-neutral/5">
+                    {selectedUsers.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-1.5 bg-card-bg border border-border/60 px-2 py-1 rounded-lg select-none"
+                      >
+                        <AppAvatar name={user.name} src={user.avatar} size={20} />
+                        <span className="text-[11px] font-bold text-foreground max-w-[100px] truncate">
+                          {user.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedUsers((prev) => prev.filter((u) => u.id !== user.id))}
+                          className="text-text-info/40 hover:text-rose-600 transition-colors p-0.5 cursor-pointer"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Remarks */}
+          <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-800 flex items-start gap-2.5 shadow-sm">
+            <Info size={16} className="text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-semibold text-amber-900">
+                Remarks: Brand Name will be automatically capitalized.
+              </p>
+              <p className="italic text-amber-800/80">
+                E.g: sap bussiness one = SAP BUSINESS ONE
+              </p>
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex justify-end gap-2 pt-2">
+            <AppButton variant="neutral" onClick={close} disabled={loading}>
+              Cancel
             </AppButton>
-            <AppButton
-              variant="neutral"
-              size="sm"
-              leftIcon={<Trash2 size={14} />}
-              onClick={handleRemoveRows}
-              className="text-xs !bg-rose-500/10 !text-rose-700 !border-rose-500/20 hover:!bg-rose-500/15"
-              disabled={rows.length <= 1}
-            >
-              Remove Row
+            <AppButton variant="primary" onClick={handleSaveClick} loading={loading} disabled={loading}>
+              {mode === 'add' ? 'Save' : 'Save Changes'}
             </AppButton>
           </div>
-        )}
+        </AppModal.Body>
+      </AppModal>
 
-        {/* Grid / Table */}
-        <div className="border border-border/60 rounded-xl overflow-hidden bg-background">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-neutral/40 border-b border-border/60 text-xs font-bold text-text-info select-none">
-                {mode === 'add' && <th className="p-3 w-10 text-center"></th>}
-                <th className="p-3">Brand Name</th>
-                <th className="p-3 w-48">Brand Type</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/40">
-              {rows.map((row) => (
-                <tr 
-                  key={row.id} 
-                  className={`hover:bg-hover/20 transition-colors ${mode === 'add' ? 'cursor-pointer' : ''}`}
-                  onClick={(e) => {
-                    if (mode === 'add') {
-                      const target = e.target as HTMLElement;
-                      if (
-                        target.tagName === 'INPUT' ||
-                        target.closest('.ant-select') ||
-                        target.closest('select') ||
-                        target.closest('[role="combobox"]') ||
-                        target.closest('button')
-                      ) {
-                        return;
-                      }
-                      handleRowChange(row.id, 'checked', !row.checked);
-                    }
-                  }}
-                >
-                  {mode === 'add' && (
-                    <td className="p-3 w-10 text-center align-middle">
-                      <input
-                        type="checkbox"
-                        checked={row.checked}
-                        onChange={(e) => handleRowChange(row.id, 'checked', e.target.checked)}
-                        className="rounded border-border text-accent-1 focus:ring-accent-1 cursor-pointer"
-                      />
-                    </td>
-                  )}
-                  <td className="p-3 align-middle">
-                    <AppInput
-                      value={row.name}
-                      onChange={(e) => handleRowChange(row.id, 'name', e.target.value)}
-                      placeholder="e.g. ASUS"
-                      className="w-full"
-                    />
-                  </td>
-                  <td className="p-3 w-48 align-middle">
-                    <AppSelect
-                      options={TYPE_OPTIONS}
-                      value={row.type}
-                      onChange={(val) => handleRowChange(row.id, 'type', val)}
-                      className="w-full"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Remarks */}
-        <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-800 flex items-start gap-2.5 shadow-sm">
-          <Info size={16} className="text-amber-600 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <p className="font-semibold text-amber-900">
-              Remarks: Brand Name will be automatically capitalized.
-            </p>
-            <p className="italic text-amber-800/80">
-              E.g: sap bussiness one = SAP BUSINESS ONE
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="flex justify-end gap-2 pt-2">
-          <AppButton variant="neutral" onClick={close} disabled={loading}>
-            Cancel
-          </AppButton>
-          <AppButton variant="primary" onClick={handleSaveClick} loading={loading} disabled={loading}>
-            {mode === 'add' ? 'Save' : 'Save Changes'}
-          </AppButton>
-        </div>
-      </AppModal.Body>
-    </AppModal>
+      <BrandAssigneeModal
+        open={brandAssigneeOpen}
+        onClose={() => setBrandAssigneeOpen(false)}
+        selectedUsers={selectedUsers}
+        onSelect={(users) => {
+          setSelectedUsers(users);
+        }}
+      />
+    </>
   );
 }

@@ -32,6 +32,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
   const router = useRouter();
   const {
     searchQuery,
+    debouncedSearchQuery,
     setSearchQuery,
     activeTab,
     sortBy,
@@ -63,13 +64,13 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
       page,
       per_page: pageSize,
       tab: activeTab,
-      search: searchQuery.trim() || undefined,
+      search: debouncedSearchQuery.trim() || undefined,
       sort_by: sortBy,
       status: statusVal,
       brand_type: brandTypeVal,
       my_tickets: myTicketsOnly ? 'true' : undefined,
     };
-  }, [page, pageSize, activeTab, searchQuery, sortBy, selectedStatuses, selectedBrandTypes, myTicketsOnly]);
+  }, [page, pageSize, activeTab, debouncedSearchQuery, sortBy, selectedStatuses, selectedBrandTypes, myTicketsOnly]);
 
   const { data, isLoading } = useTickets(queryParams, refetch);
 
@@ -173,26 +174,18 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
         let participants: string[] = [];
         let participantAvatars: string[] = [];
 
-        if (record.OwnerName) {
-          const parts = record.OwnerName.split(';');
-          parts.forEach((p: string) => {
-            const fields = p.split(',');
-            if (fields[0]) {
-              participants.push(fields[0]);
-              participantAvatars.push(fields[1] || `https://api.dicebear.com/7.x/initials/svg?seed=${fields[0]}`);
-            }
-          });
-        } else {
-          const rawParticipants = Array.from(
-            new Set(
-              [...((record.assignees || []).map((a: any) => a.name)), ...(record.replies || []).map((r: any) => r.authorName)].filter(
-                (name): name is string => Boolean(name) && name !== record.requesterName
-              )
-            )
-          );
-          participants = rawParticipants as string[];
-          participantAvatars = participants.map(name => `https://api.dicebear.com/7.x/initials/svg?seed=${name}`);
-        }
+        const rawParticipants = Array.from(
+          new Set(
+            (record.assignees || [])
+              .map((a: any) => a.name)
+              .filter((name: any): name is string => Boolean(name))
+          )
+        ) as string[];
+        participants = rawParticipants;
+        participantAvatars = participants.map((name) => {
+          const match = (record.assignees || []).find((a: any) => a.name === name);
+          return match?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${name}`;
+        });
 
         if (participants.length === 0) {
           return (
@@ -248,7 +241,7 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
                   trigger="hover"
                   placement="top"
                   arrow={false}
-                  overlayInnerStyle={{ padding: '10px 12px', borderRadius: '10px' }}
+                  styles={{ container: { padding: '10px 12px', borderRadius: '10px' } }}
                 >
                   <div
                     className="w-[24px] h-[24px] rounded-full bg-neutral hover:bg-neutral/80 text-[9px] font-bold text-text-info flex items-center justify-center ring-2 ring-background shrink-0 select-none relative cursor-pointer transition-colors"

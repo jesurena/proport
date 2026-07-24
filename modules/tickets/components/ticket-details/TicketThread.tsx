@@ -8,7 +8,7 @@ import { timeAgo, fullDate } from '@/components/utils/time';
 import { getPreviewText, displayFileName, localizeHtmlImages } from '@/components/utils/ticket';
 import type { Reply, Attachment } from '@/lib/types';
 import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
-import { UserProfilePopover } from '@/components/tickets/UserProfilePopover';
+import { UserProfilePopover } from '@/modules/profile';
 
 interface TicketThreadProps {
   replies: Reply[];

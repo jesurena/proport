@@ -12,7 +12,7 @@ import { BrandTicketChip } from '@/components/tickets/BrandTicketChip';
 import type { TicketStatus, Attachment } from '@/lib/types';
 import { useAuthStore } from '@/modules/auth';
 import { useAttachmentUrl } from '@/modules/tickets/hooks/useTickets';
-import { UserProfilePopover } from '@/components/tickets/UserProfilePopover';
+import { UserProfilePopover } from '@/modules/profile';
 
 interface TicketHeaderProps {
   ticketId: string;

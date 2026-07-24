@@ -32,8 +32,9 @@ export default function DashboardBookmarkedTickets() {
     };
   }, []);
 
-  const idsParam = bookmarkedIds.length > 0 ? bookmarkedIds.join(',') : '';
-  const { data: bookmarkedTickets = [], isLoading } = useBookmarkedTickets(idsParam);
+  const { data: bookmarkedTickets = [], isLoading } = useBookmarkedTickets(
+    bookmarkedIds.length > 0 ? bookmarkedIds.join(',') : ''
+  );
 
   return (
     <AppCard variant="default" padding="md" className="space-y-3">
@@ -55,13 +56,6 @@ export default function DashboardBookmarkedTickets() {
       ) : (
         <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
           {bookmarkedTickets.map((ticket) => {
-            let chipVariant: any = 'muted';
-            if (ticket.status === 'answered') chipVariant = 'success';
-            else if (ticket.status === 'closed') chipVariant = 'archive';
-            else if (ticket.status === 'pending') chipVariant = 'info';
-            else if (ticket.status === 'assigned') chipVariant = 'assigned';
-            else if (ticket.status === 'unassigned') chipVariant = 'unassigned';
-
             return (
               <div
                 key={ticket.id}
@@ -73,7 +67,18 @@ export default function DashboardBookmarkedTickets() {
                     <span className="font-mono text-[9px] font-bold text-text-info">
                       #{String(ticket.ticketNumber).padStart(4, '0')}
                     </span>
-                    <AppChip label={ticket.status} variant={chipVariant} size="sm" className="!font-bold font-mono !pl-2 !pr-2 !py-0.5" />
+                    <AppChip
+                      label={ticket.status}
+                      variant={
+                        ticket.status === 'answered' ? 'success' :
+                        ticket.status === 'closed' ? 'archive' :
+                        ticket.status === 'pending' ? 'info' :
+                        ticket.status === 'assigned' ? 'assigned' :
+                        ticket.status === 'unassigned' ? 'unassigned' : 'muted'
+                      }
+                      size="sm"
+                      className="!font-bold font-mono !pl-2 !pr-2 !py-0.5"
+                    />
                   </div>
                   <AppLabel as="span" className="block text-xs font-bold text-text truncate">
                     {ticket.subject}
