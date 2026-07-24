@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Search, Tag, Award, Box } from 'lucide-react';
 import { AppChip } from '@integrated-computer-system/ui-kit';
-import { AppInput, AppLabel } from '@/components/ui';
+import { AppInput, AppLabel, AppEmptyState } from '@/components/ui';
 import { UserProfileBrandsSkeleton } from '@/components/skeleton';
 import { useUserBrands } from '../../hooks/useProfile';
 
@@ -38,12 +38,17 @@ export function ProfileBrandsTab({ userId }: ProfileBrandsTabProps) {
 
       {/* Brands List / Grid */}
       {filteredBrands.length === 0 ? (
-        <div className="py-12 flex flex-col items-center justify-center text-center text-text-info/60 border border-dashed border-border/60 rounded-xl">
-          <Tag size={28} className="mb-2 opacity-40" />
-          <AppLabel as="p" className="text-xs font-medium">
-            {search ? 'No brands matching search criteria' : 'No assigned brands found for this buyer'}
-          </AppLabel>
-        </div>
+        <AppEmptyState
+          title={search ? 'No Brands Found' : 'No Assigned Brands'}
+          description={
+            search
+              ? 'No brands matching search criteria.'
+              : 'No assigned brands found for this buyer.'
+          }
+          imageSrc="/aria-mascott-sad.svg"
+          imageSize={120}
+          bordered
+        />
       ) : (
         <div className="grid grid-cols-2 gap-2.5 max-h-[48vh] overflow-y-auto pr-1">
           {filteredBrands.map((brand) => (

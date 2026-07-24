@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface UserProfile {
-  id: string | number;
+  id?: string | number;
   name: string;
   avatar?: string | null;
   group?: string | null;
@@ -16,13 +16,7 @@ export interface UserTicketsStats {
   answered: number;
   pending: number;
   declined: number;
-  user?: {
-    name: string;
-    avatar?: string | null;
-    group?: string | null;
-    role?: string | null;
-    email?: string | null;
-  } | null;
+  user?: UserProfile | null;
 }
 
 export interface UserProfileModalProps {
@@ -32,6 +26,8 @@ export interface UserProfileModalProps {
   userName: string;
   period?: 'today' | 'week' | 'all';
   initialTab?: 'activity' | 'tickets' | 'brands';
+  onlyBrands?: boolean;
+  isMe?: boolean;
 }
 
 export interface UserProfilePopoverProps {

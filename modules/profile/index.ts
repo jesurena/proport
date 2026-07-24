@@ -3,3 +3,5 @@ export { default as UserProfileModal } from './components/UserProfileModal';
 export * from './types';
 export * from './hooks/useProfile';
 export * from './services/profile.service';
+export * from './config/profile-tabs.config';
+

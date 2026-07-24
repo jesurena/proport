@@ -5,8 +5,10 @@ import { UserCheck, User, Mail, Copy, Check } from 'lucide-react';
 import { useCopyToClipboard } from '@/components/utils/clipboard';
 import { AppAvatar, AppLabel, AppModal } from '@integrated-computer-system/ui-kit';
 import { AppTabs, AppButton } from '@/components/ui';
+import { useAuthStore } from '@/modules/auth/store/auth.store';
 import { useUserProfile, useUserTicketsStats, useUserLogs } from '@/modules/profile';
 import { UserProfileModalProps } from '../types';
+import { getProfileModalTabs } from '../config/profile-tabs.config';
 import { ProfileActivityLogsTab, ProfileTicketsTab, ProfileBrandsTab } from './tabs';
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({
@@ -16,48 +18,42 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   userName,
   period: initialPeriod = 'week',
   initialTab = 'activity',
+  onlyBrands,
+  isMe,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [period, setPeriod] = useState<'today' | 'week' | 'all'>(initialPeriod);
   const { copied, copy } = useCopyToClipboard();
+  const { user: currentUser, is_head, is_adel } = useAuthStore();
 
   const { data: userProfile } = useUserProfile(String(userId), open);
   const { data: stats } = useUserTicketsStats(String(userId), period, open);
   const { data: logs, isLoading: isLogsLoading } = useUserLogs(String(userId), period === 'all' ? 'week' : period, open);
 
   const user = userProfile || stats?.user;
-  const isBuyer = !user?.role || user.role !== 'requestor' || initialTab === 'brands';
 
-  const modalTabs = [
-    {
-      id: 'activity',
-      label: (
-        <span className="flex items-center gap-1.5 font-bold text-xs">
-          Activity Feed
-        </span>
-      ),
-    },
-    {
-      id: 'tickets',
-      label: (
-        <span className="flex items-center gap-1.5 font-bold text-xs">
-          Tickets
-        </span>
-      ),
-    },
-    ...(isBuyer
-      ? [
-          {
-            id: 'brands',
-            label: (
-              <span className="flex items-center gap-1.5 font-bold text-xs">
-                Assigned Brands
-              </span>
-            ),
-          },
-        ]
-      : []),
-  ];
+  const visibleTabs = getProfileModalTabs({
+    currentUser,
+    profileUser: user,
+    targetUserId: userId,
+    isHead: is_head,
+    isAdel: is_adel,
+    onlyBrands,
+    isMe,
+  });
+
+  const modalTabs = visibleTabs.map((tab) => ({
+    id: tab.id,
+    label: (
+      <span className="flex items-center gap-1.5 font-bold text-xs">
+        {tab.label}
+      </span>
+    ),
+  }));
+
+  const effectiveActiveTab = modalTabs.some((t) => t.id === activeTab)
+    ? activeTab
+    : modalTabs[0]?.id || 'activity';
 
   return (
     <AppModal open={open} onClose={onClose} width="920px" centered>
@@ -181,7 +177,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <div className="flex-1 flex flex-col p-4 overflow-hidden">
             <AppTabs
               tabs={modalTabs}
-              activeTab={activeTab}
+              activeTab={effectiveActiveTab}
               onChange={setActiveTab}
               variant="pills"
               className="bg-transparent border-none"
@@ -189,13 +185,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
             />
 
             <div className="flex-1 overflow-y-auto mt-3 max-h-[55vh]">
-              {activeTab === 'activity' ? (
+              {effectiveActiveTab === 'activity' ? (
                 <ProfileActivityLogsTab
                   logs={logs}
                   isLoading={isLogsLoading}
                   onClose={onClose}
                 />
-              ) : activeTab === 'brands' ? (
+              ) : effectiveActiveTab === 'brands' ? (
                 <ProfileBrandsTab userId={userId} />
               ) : (
                 <ProfileTicketsTab
