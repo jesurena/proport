@@ -26,9 +26,22 @@ export interface TicketTableProps {
   hideHeader?: boolean;
   hideFilters?: boolean;
   refetch?: boolean;
+  page?: number;
+  pageSize?: number;
+  total?: number;
+  onPageChange?: (page: number, pageSize?: number) => void;
 }
 
-export function TicketTable({ tickets, hideHeader = false, hideFilters = false, refetch = true }: TicketTableProps = {}) {
+export function TicketTable({
+  tickets,
+  hideHeader = false,
+  hideFilters = false,
+  refetch = true,
+  page: customPage,
+  pageSize: customPageSize,
+  total: customTotal,
+  onPageChange,
+}: TicketTableProps = {}) {
   const router = useRouter();
   const {
     searchQuery,
@@ -369,24 +382,35 @@ export function TicketTable({ tickets, hideHeader = false, hideFilters = false, 
           scroll={{ x: 'max-content' }}
           loading={isLoading}
           pagination={
-            !tickets
+            onPageChange
               ? {
-                current: page,
-                pageSize: pageSize,
-                total: total,
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20', '50', '100'],
-                onChange: (p, ps) => {
-                  setPage(p);
-                  if (ps) setPageSize(ps);
-                },
-              }
+                  current: customPage ?? 1,
+                  pageSize: customPageSize ?? 10,
+                  total: customTotal ?? tickets?.length ?? 0,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
+                  onChange: (p, ps) => {
+                    onPageChange(p, ps);
+                  },
+                }
+              : !tickets
+              ? {
+                  current: page,
+                  pageSize: pageSize,
+                  total: total,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
+                  onChange: (p, ps) => {
+                    setPage(p);
+                    if (ps) setPageSize(ps);
+                  },
+                }
               : {
-                pageSize: localPageSize,
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20', '50', '100'],
-                onShowSizeChange: (_, size) => setLocalPageSize(size),
-              }
+                  pageSize: localPageSize,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
+                  onShowSizeChange: (_, size) => setLocalPageSize(size),
+                }
           }
           onRow={(record) => ({
             onClick: () => router.push(`/tickets/${record.id}`),

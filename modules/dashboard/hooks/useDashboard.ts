@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboard.service';
 import type { Ticket as TicketType } from '@/lib/types';
 import { getTickets } from '@/lib/tickets';
@@ -61,6 +61,8 @@ export const useDashboardCounts = () => {
     queryFn: async () => {
       return dashboardService.getCounts();
     },
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -70,6 +72,8 @@ export const useFocusBreakdown = () => {
     queryFn: async () => {
       return dashboardService.getFocusBreakdown();
     },
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -82,6 +86,8 @@ export const useBookmarkedTickets = (ids?: string) => {
       return backendBookmarks.map(mapTicket);
     },
     enabled: !!ids,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -97,6 +103,10 @@ export const useTicketCountAo = (params?: {
       return dashboardService.getTicketCountAo(params);
     },
     enabled,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -107,6 +117,10 @@ export const useChartPerBu = (enabled: boolean = true) => {
       return dashboardService.getChartPerBu();
     },
     enabled,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -122,6 +136,10 @@ export const useBuyerCategoryCounts = (params?: {
       return dashboardService.getBuyerCategoryCounts(params);
     },
     enabled,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -139,6 +157,10 @@ export const useBuyerDateCounts = (params?: {
       return dashboardService.getBuyerDateCounts(params);
     },
     enabled,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -157,6 +179,10 @@ export const useSalesDateCounts = (
       return dashboardService.getSalesDateCounts(params);
     },
     enabled,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -166,6 +192,8 @@ export const useBuyerPeriodCounts = () => {
     queryFn: async () => {
       return dashboardService.getBuyerPeriodCounts();
     },
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 };
 

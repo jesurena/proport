@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { profileService } from '../services/profile.service';
 import { UserProfile, UserTicketsStats } from '../types';
 import type { Ticket as TicketType } from '@/lib/types';
@@ -69,36 +69,56 @@ export const useUserProfile = (id?: string | number, enabled = false) => {
   });
 };
 
-export const useUserTicketsStats = (userId: string | null, period: 'today' | 'week', enabled = true) => {
+export const useUserTicketsStats = (userId: string | null, period: 'today' | 'week' | 'all', enabled = true) => {
   return useQuery<UserTicketsStats>({
     queryKey: ['user-tickets-stats', userId, period],
     queryFn: async () => {
-      if (!userId) return { total: 0, answered: 0, pending: 0, user: null };
+      if (!userId) return { total: 0, answered: 0, pending: 0, declined: 0, user: null };
       return profileService.getUserTicketsStats(userId, period);
     },
     enabled: !!userId && enabled,
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 };
 
-export const useUserPeriodTickets = (userId: string | null, period: 'today' | 'week', enabled = true) => {
-  return useQuery<TicketType[]>({
-    queryKey: ['user-period-tickets', userId, period],
+export interface PaginatedTicketsResponse {
+  data: TicketType[];
+  total: number;
+  currentPage: number;
+  lastPage: number;
+}
+
+export const useUserPeriodTickets = (
+  userId: string | null,
+  period: 'today' | 'week' | 'all',
+  page = 1,
+  perPage = 10,
+  enabled = true
+) => {
+  return useQuery<PaginatedTicketsResponse>({
+    queryKey: ['user-period-tickets', userId, period, page, perPage],
     queryFn: async () => {
-      if (!userId) return [];
-      const data = await profileService.getUserPeriodTickets(userId, period);
-      return data.map(mapTicket);
+      if (!userId) return { data: [], total: 0, currentPage: 1, lastPage: 1 };
+      const res = await profileService.getUserPeriodTickets(userId, period, page, perPage);
+      return {
+        data: (res.data || []).map(mapTicket),
+        total: res.total || 0,
+        currentPage: res.current_page || 1,
+        lastPage: res.last_page || 1,
+      };
     },
     enabled: !!userId && enabled,
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 };
 
-export const useUserLogs = (userId: string | null, period: 'today' | 'week', enabled = true) => {
+export const useUserLogs = (userId: string | null, period: 'today' | 'week' | 'all', enabled = true) => {
   return useQuery<any[]>({
     queryKey: ['user-logs', userId, period],
     queryFn: async () => {
@@ -106,6 +126,7 @@ export const useUserLogs = (userId: string | null, period: 'today' | 'week', ena
       return profileService.getUserLogs(userId, period);
     },
     enabled: !!userId && enabled,
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

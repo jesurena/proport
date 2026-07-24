@@ -15,6 +15,7 @@ export interface UserTicketsStats {
   total: number;
   answered: number;
   pending: number;
+  declined: number;
   user?: {
     name: string;
     avatar?: string | null;
@@ -29,7 +30,7 @@ export interface UserProfileModalProps {
   onClose: () => void;
   userId: string | number;
   userName: string;
-  period?: 'today' | 'week';
+  period?: 'today' | 'week' | 'all';
 }
 
 export interface UserProfilePopoverProps {
