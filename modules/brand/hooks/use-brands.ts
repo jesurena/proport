@@ -10,6 +10,14 @@ export const useBrands = () => {
   });
 };
 
+export const useBuyers = () => {
+  return useQuery({
+    queryKey: ['buyers'],
+    queryFn: brandService.getBuyers,
+    staleTime: 10 * 60 * 1000,
+  });
+};
+
 export const useAddBrands = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -23,8 +31,8 @@ export const useAddBrands = () => {
 export const useUpdateBrand = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, name, type, defaultAssignee }: { id: string; name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string }) =>
-      brandService.updateBrand(id, name, type, defaultAssignee),
+    mutationFn: ({ id, name, type, defaultAssignee, assignees }: { id: string; name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string; assignees?: string[] }) =>
+      brandService.updateBrand(id, name, type, defaultAssignee, assignees),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['brands'] });
     },

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Edit, Trash2, MoreVertical, Award, Box } from 'lucide-react';
+import { Tooltip } from 'antd';
 import { AppChip } from '@integrated-computer-system/ui-kit';
 import { AppAvatar, AppDropdown, AppTable } from '@/components/ui';
 import type { Brand } from '../types/brand';
@@ -44,17 +45,43 @@ export default function BrandTable({
       dataIndex: 'defaultAssignee',
       key: 'defaultAssignee',
       align: 'center' as const,
-      render: (defaultAssignee: string) => {
-        if (!defaultAssignee) return null;
-        const assignees = defaultAssignee.split(',').map((name) => name.trim());
-        return (
-          <div className="flex items-center justify-center -space-x-1.5 overflow-hidden">
-            {assignees.map((name, idx) => (
-              <div key={idx} className="inline-block ring-2 ring-card-bg rounded-full">
-                <AppAvatar name={name} size={28} />
+      render: (_: any, record: Brand) => {
+        const assignees = record.assignees || [];
+        if (assignees.length > 0) {
+          return (
+            <div className="flex items-center justify-center -space-x-1.5 overflow-hidden">
+              {assignees.map((assignee) => (
+                <Tooltip key={assignee.id} title={assignee.name} placement="top" mouseEnterDelay={0.1}>
+                  <div className="inline-block rounded-full cursor-pointer hover:z-10 transition-transform">
+                    <AppAvatar src={assignee.avatar || undefined} name={assignee.name} size={28} />
+                  </div>
+                </Tooltip>
+              ))}
+            </div>
+          );
+        }
+
+        if (record.defaultAssignee) {
+          const names = record.defaultAssignee.split(',').map((n) => n.trim()).filter(Boolean);
+          if (names.length > 0) {
+            return (
+              <div className="flex items-center justify-center -space-x-1.5 overflow-hidden">
+                {names.map((name, idx) => (
+                  <Tooltip key={idx} title={name} placement="top" mouseEnterDelay={0.1}>
+                    <div className="inline-block ring-2 ring-card-bg rounded-full cursor-pointer hover:z-10 transition-transform hover:scale-110">
+                      <AppAvatar name={name} size={28} />
+                    </div>
+                  </Tooltip>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          }
+        }
+
+        return (
+          <span className="text-xs text-text-info/60 font-medium italic">
+            No assignee yet
+          </span>
         );
       },
     },

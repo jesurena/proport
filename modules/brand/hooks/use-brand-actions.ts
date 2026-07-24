@@ -8,7 +8,7 @@ export const useBrandActions = (modalController: BrandModalController) => {
   const updateMutation = useUpdateBrand();
   const deleteMutation = useDeleteBrand();
 
-  const saveBrand = async (items: { name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string }[]) => {
+  const saveBrand = async (items: { name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string; assignees?: string[] }[]) => {
     if (items.length === 0) {
       message.warning('At least one brand is required!');
       return;
@@ -33,6 +33,7 @@ export const useBrandActions = (modalController: BrandModalController) => {
         name: items[0].name.trim(),
         type: items[0].type,
         defaultAssignee: items[0].defaultAssignee,
+        assignees: items[0].assignees,
       });
       notification.success({
         message: 'Brand Updated',

@@ -13,6 +13,7 @@ interface BrandAssigneeModalProps {
   onClose: () => void;
   selectedUsers: User[];
   onSelect: (users: User[]) => void;
+  availableBuyers?: User[];
 }
 
 export function BrandAssigneeModal({
@@ -20,6 +21,7 @@ export function BrandAssigneeModal({
   onClose,
   selectedUsers,
   onSelect,
+  availableBuyers,
 }: BrandAssigneeModalProps) {
   const [assignedList, setAssignedList] = useState<User[]>([]);
   const [availableList, setAvailableList] = useState<User[]>([]);
@@ -30,11 +32,13 @@ export function BrandAssigneeModal({
 
   useEffect(() => {
     if (open) {
-      const allUsers = getUsers().filter((u) => u.role === 'buyer' || !u.role);
-      
+      const buyerPool = availableBuyers && availableBuyers.length > 0
+        ? availableBuyers
+        : getUsers().filter((u) => u.role === 'buyer' || !u.role);
+
       // Filter out users that are already assigned
       const assignedIds = selectedUsers.map((u) => String(u.id));
-      const available = allUsers.filter((u) => !assignedIds.includes(String(u.id)));
+      const available = buyerPool.filter((u) => !assignedIds.includes(String(u.id)));
 
       setAssignedList(selectedUsers);
       setAvailableList(available);
@@ -43,7 +47,7 @@ export function BrandAssigneeModal({
       setIsDragging(false);
       setDragSource(null);
     }
-  }, [open, selectedUsers]);
+  }, [open, selectedUsers, availableBuyers]);
 
   const handleDragStart = (e: React.DragEvent, userId: string, source: 'available' | 'assigned') => {
     e.dataTransfer.setData('text/plain', userId);
@@ -244,7 +248,7 @@ export function BrandAssigneeModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-border/40">
+        <div className="flex justify-end gap-2">
           <AppButton variant="neutral" onClick={onClose}>
             Cancel
           </AppButton>

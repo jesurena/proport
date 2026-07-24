@@ -8,7 +8,8 @@ import type { BrandModalController } from '../hooks/use-brand-modal';
 
 interface BrandModalProps {
   controller: BrandModalController;
-  onSave: (items: { name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string }[]) => void;
+  onSave: (items: { name: string; type: 'Focus' | 'Non Focus'; defaultAssignee?: string; assignees?: string[] }[]) => void;
+  availableBuyers?: User[];
   loading?: boolean;
 }
 
@@ -20,6 +21,7 @@ const TYPE_OPTIONS = [
 export default function BrandModal({
   controller,
   onSave,
+  availableBuyers,
   loading,
 }: BrandModalProps) {
   const { open, close, mode, brandName, setBrandName, brandType, setBrandType } = controller;
@@ -31,29 +33,42 @@ export default function BrandModal({
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && controller.selectedBrand) {
-        const assignees = (controller.selectedBrand.defaultAssignee || '')
-          .split(',')
-          .map((n) => n.trim())
-          .filter(Boolean);
-        const allUsers = getUsers();
+        const brand = controller.selectedBrand;
+        if (brand.assignees && brand.assignees.length > 0) {
+          setSelectedUsers(
+            brand.assignees.map((a) => ({
+              id: a.id,
+              name: a.name,
+              email: a.email,
+              avatar: a.avatar || undefined,
+            }))
+          );
+          setIsSettingsExpanded(true);
+        } else {
+          const assignees = (brand.defaultAssignee || '')
+            .split(',')
+            .map((n) => n.trim())
+            .filter(Boolean);
+          const allUsers = availableBuyers && availableBuyers.length > 0 ? availableBuyers : getUsers();
 
-        const matched = assignees.map((name) => {
-          const found = allUsers.find((u) => u.name.toLowerCase() === name.toLowerCase());
-          if (found) return found;
-          return {
-            id: 'temp_' + name,
-            name,
-            email: `${name.toLowerCase().replace(/\s+/g, '')}@proport.com`,
-          } as User;
-        });
-        setSelectedUsers(matched);
-        setIsSettingsExpanded(assignees.length > 0);
+          const matched = assignees.map((name) => {
+            const found = allUsers.find((u) => u.name.toLowerCase() === name.toLowerCase());
+            if (found) return found;
+            return {
+              id: 'temp_' + name,
+              name,
+              email: `${name.toLowerCase().replace(/\s+/g, '')}@proport.com`,
+            } as User;
+          });
+          setSelectedUsers(matched);
+          setIsSettingsExpanded(assignees.length > 0);
+        }
       } else {
         setSelectedUsers([]);
         setIsSettingsExpanded(false);
       }
     }
-  }, [open, mode, controller.selectedBrand]);
+  }, [open, mode, controller.selectedBrand, availableBuyers]);
 
   const handleSaveClick = () => {
     onSave([
@@ -61,6 +76,7 @@ export default function BrandModal({
         name: brandName.trim(),
         type: brandType,
         defaultAssignee: selectedUsers.map((u) => u.name).join(', '),
+        assignees: selectedUsers.map((u) => String(u.id)).filter((id) => !id.startsWith('temp_')),
       },
     ]);
   };
@@ -187,6 +203,7 @@ export default function BrandModal({
         open={brandAssigneeOpen}
         onClose={() => setBrandAssigneeOpen(false)}
         selectedUsers={selectedUsers}
+        availableBuyers={availableBuyers}
         onSelect={(users) => {
           setSelectedUsers(users);
         }}

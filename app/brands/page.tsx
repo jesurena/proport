@@ -10,6 +10,7 @@ import {
   BrandModal,
   BrandToolbar,
   useBrands,
+  useBuyers,
   useBrandFilters,
   useBrandModal,
   useBrandActions,
@@ -17,6 +18,7 @@ import {
 
 export default function BrandsPage() {
   const { data: brands = [], isLoading } = useBrands();
+  const { data: buyers = [] } = useBuyers();
 
   const filters = useBrandFilters(brands);
   const modal = useBrandModal();
@@ -62,7 +64,12 @@ export default function BrandsPage() {
       </div>
 
       {/* Modal */}
-      <BrandModal controller={modal} onSave={actions.saveBrand} loading={actions.loading} />
+      <BrandModal
+        controller={modal}
+        onSave={actions.saveBrand}
+        loading={actions.loading}
+        availableBuyers={buyers}
+      />
     </>
   );
 }
