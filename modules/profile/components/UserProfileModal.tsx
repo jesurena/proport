@@ -7,7 +7,7 @@ import { AppAvatar, AppLabel, AppModal } from '@integrated-computer-system/ui-ki
 import { AppTabs, AppButton } from '@/components/ui';
 import { useUserProfile, useUserTicketsStats, useUserLogs } from '@/modules/profile';
 import { UserProfileModalProps } from '../types';
-import { ProfileActivityLogsTab, ProfileTicketsTab } from './tabs';
+import { ProfileActivityLogsTab, ProfileTicketsTab, ProfileBrandsTab } from './tabs';
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({
   open,
@@ -15,8 +15,9 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   userId,
   userName,
   period: initialPeriod = 'week',
+  initialTab = 'activity',
 }) => {
-  const [activeTab, setActiveTab] = useState<string>('activity');
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [period, setPeriod] = useState<'today' | 'week' | 'all'>(initialPeriod);
   const { copied, copy } = useCopyToClipboard();
 
@@ -25,6 +26,38 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const { data: logs, isLoading: isLogsLoading } = useUserLogs(String(userId), period === 'all' ? 'week' : period, open);
 
   const user = userProfile || stats?.user;
+  const isBuyer = !user?.role || user.role !== 'requestor' || initialTab === 'brands';
+
+  const modalTabs = [
+    {
+      id: 'activity',
+      label: (
+        <span className="flex items-center gap-1.5 font-bold text-xs">
+          Activity Feed
+        </span>
+      ),
+    },
+    {
+      id: 'tickets',
+      label: (
+        <span className="flex items-center gap-1.5 font-bold text-xs">
+          Tickets
+        </span>
+      ),
+    },
+    ...(isBuyer
+      ? [
+          {
+            id: 'brands',
+            label: (
+              <span className="flex items-center gap-1.5 font-bold text-xs">
+                Assigned Brands
+              </span>
+            ),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <AppModal open={open} onClose={onClose} width="920px" centered>
@@ -147,24 +180,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           {/* Right Panel */}
           <div className="flex-1 flex flex-col p-4 overflow-hidden">
             <AppTabs
-              tabs={[
-                {
-                  id: 'activity',
-                  label: (
-                    <span className="flex items-center gap-1.5 font-bold text-xs">
-                      Activity Feed
-                    </span>
-                  ),
-                },
-                {
-                  id: 'tickets',
-                  label: (
-                    <span className="flex items-center gap-1.5 font-bold text-xs">
-                      Tickets
-                    </span>
-                  ),
-                },
-              ]}
+              tabs={modalTabs}
               activeTab={activeTab}
               onChange={setActiveTab}
               variant="pills"
@@ -179,6 +195,8 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   isLoading={isLogsLoading}
                   onClose={onClose}
                 />
+              ) : activeTab === 'brands' ? (
+                <ProfileBrandsTab userId={userId} />
               ) : (
                 <ProfileTicketsTab
                   userId={userId}

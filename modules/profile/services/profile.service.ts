@@ -32,4 +32,9 @@ export const profileService = {
     });
     return data.data || [];
   },
+
+  async getUserBrands(userId: string): Promise<any[]> {
+    const { data } = await api.get(`/users/${userId}/brands`);
+    return data.data || [];
+  },
 };

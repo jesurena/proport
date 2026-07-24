@@ -132,3 +132,18 @@ export const useUserLogs = (userId: string | null, period: 'today' | 'week' | 'a
     refetchOnMount: false,
   });
 };
+
+export const useUserBrands = (userId: string | null, enabled = true) => {
+  return useQuery<any[]>({
+    queryKey: ['user-brands', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      return profileService.getUserBrands(userId);
+    },
+    enabled: !!userId && enabled,
+    placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+};

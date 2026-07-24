@@ -31,6 +31,7 @@ export interface UserProfileModalProps {
   userId: string | number;
   userName: string;
   period?: 'today' | 'week' | 'all';
+  initialTab?: 'activity' | 'tickets' | 'brands';
 }
 
 export interface UserProfilePopoverProps {

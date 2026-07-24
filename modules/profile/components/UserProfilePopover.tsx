@@ -7,6 +7,7 @@ import {
   User,
   Mail,
   Ticket,
+  Tag,
   MoreHorizontal,
   X,
   Copy,
@@ -29,6 +30,7 @@ export function UserProfileCard({
   isOpen,
   onClose,
   onViewTickets,
+  onViewBrands,
 }: {
   authorId?: string | number;
   name: string;
@@ -36,6 +38,7 @@ export function UserProfileCard({
   isOpen: boolean;
   onClose?: () => void;
   onViewTickets?: () => void;
+  onViewBrands?: () => void;
 }) {
   const { data: profile, isLoading } = useUserProfile(authorId, isOpen);
   const { user, is_head, is_adel } = useAuthStore();
@@ -43,13 +46,16 @@ export function UserProfileCard({
 
   const isMe = !!(user?.account_id && authorId && String(user.account_id) === String(authorId));
   const currentRole = user?.role_name;
-  const isBuyer = currentRole === 'buyer';
+  const isViewerRequestor = currentRole === 'requestor' || currentRole === 'sales';
+  const targetRole = profile?.role;
+  const targetIsBuyer = targetRole === 'buyer';
   const isBUHeadForUser = is_head && profile?.group && user?.AccountGroup && profile.group === user.AccountGroup;
   const adelGroups = ['BU1', 'BU2', 'BU5', 'BU8', 'BU10', 'BU12', 'CE01'];
   const isUnderAdel = is_adel && profile?.group && adelGroups.includes(profile.group);
   const isAdmin = ['admin', 'super_user'].includes(currentRole || '');
 
-  const showViewTickets = isMe || isBuyer || isBUHeadForUser || isUnderAdel || isAdmin;
+  const showViewTickets = (isMe || currentRole === 'buyer' || isBUHeadForUser || isUnderAdel || isAdmin || !isViewerRequestor) && !(isViewerRequestor && targetIsBuyer);
+  const showViewBrands = isViewerRequestor && targetIsBuyer;
 
   return (
     <div
@@ -71,7 +77,8 @@ export function UserProfileCard({
 
       {isLoading ? (
         <UserProfileCardSkeleton />
-      ) : (         <div className="space-y-4">
+      ) : (
+        <div className="space-y-4">
           <div className="flex items-start gap-3.5 pt-1">
             <div className="relative shrink-0">
               <AppAvatar
@@ -112,7 +119,7 @@ export function UserProfileCard({
                 </div>
 
                 {(profile?.email || `${name.toLowerCase().replace(/\s+/g, '.')}@proport.com`) && (
-                  <div 
+                  <div
                     className="flex items-center gap-2 cursor-pointer group/email relative"
                     onClick={() => copy(profile?.email || `${name.toLowerCase().replace(/\s+/g, '.')}@proport.com`)}
                   >
@@ -151,7 +158,7 @@ export function UserProfileCard({
           </div>
 
           {/* Action buttons bar */}
-          <div className="flex items-center gap-1 pt-1">
+          <div className="flex items-center gap-1.5 pt-1">
             {showViewTickets && (
               <AppButton
                 variant="neutral"
@@ -168,6 +175,25 @@ export function UserProfileCard({
                 }}
               >
                 {isMe ? 'View My Ticket' : 'View Tickets'}
+              </AppButton>
+            )}
+
+            {showViewBrands && (
+              <AppButton
+                variant="neutral"
+                className="flex-1"
+                leftIcon={<Tag size={14} />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onViewBrands?.();
+                  onClose?.();
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                View Tagged Brands
               </AppButton>
             )}
           </div>
@@ -187,6 +213,7 @@ export function UserProfilePopover({
 }: UserProfilePopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState<'activity' | 'tickets' | 'brands'>('tickets');
 
   return (
     <>
@@ -201,7 +228,14 @@ export function UserProfilePopover({
               avatar={avatarSrc}
               isOpen={isOpen}
               onClose={() => setIsOpen(false)}
-              onViewTickets={() => setIsModalOpen(true)}
+              onViewTickets={() => {
+                setModalTab('tickets');
+                setIsModalOpen(true);
+              }}
+              onViewBrands={() => {
+                setModalTab('brands');
+                setIsModalOpen(true);
+              }}
             />
           </div>
         }
@@ -222,6 +256,7 @@ export function UserProfilePopover({
           onClose={() => setIsModalOpen(false)}
           userId={authorId}
           userName={authorName}
+          initialTab={modalTab}
         />
       )}
     </>
