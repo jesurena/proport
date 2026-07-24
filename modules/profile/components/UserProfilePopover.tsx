@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { AppAvatar } from '@integrated-computer-system/ui-kit';
 import { AppButton, AppLabel } from '@/components/ui';
-import { useUserProfile } from '@/modules/tickets/hooks/useTickets';
+import { useUserProfile } from '@/modules/profile';
 import { useAuthStore } from '@/modules/auth';
 import UserProfileModal from './UserProfileModal';
 import { UserProfileCardSkeleton } from '@/components/skeleton';

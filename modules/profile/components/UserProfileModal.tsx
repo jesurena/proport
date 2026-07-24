@@ -5,7 +5,7 @@ import { UserCheck, User, Mail, Copy, Check } from 'lucide-react';
 import { useCopyToClipboard } from '@/components/utils/clipboard';
 import { AppAvatar, AppLabel, AppModal } from '@integrated-computer-system/ui-kit';
 import { AppTabs, AppButton } from '@/components/ui';
-import { useUserTicketsStats, useUserPeriodTickets, useUserLogs } from '@/modules/dashboard/hooks/useDashboard';
+import { useUserTicketsStats, useUserPeriodTickets, useUserLogs } from '@/modules/profile';
 import { UserProfileModalProps } from '../types';
 import { ProfileActivityLogsTab, ProfileTicketsTab } from './tabs';
 

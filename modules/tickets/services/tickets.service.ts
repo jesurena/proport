@@ -1,6 +1,5 @@
 import api from '@/lib/api';
 import { useAuthStore } from '@/modules/auth';
-import { UserProfile } from '@/modules/profile/types';
 
 export const ticketsService = {
   async getTickets(params?: {
@@ -83,10 +82,7 @@ export const ticketsService = {
     return data;
   },
 
-  async getUserProfile(id: string): Promise<UserProfile> {
-    const { data } = await api.get(`/users/${id}/profile`);
-    return data?.data ?? data;
-  },
+
 
   getAttachmentUrl(fileName: string): string {
     const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
